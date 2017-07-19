@@ -667,7 +667,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         
         if (isset($this->context->cart) && $this->context->cart->id_address_delivery > 0) {
             $tmp_address = new Address((int) ($this->context->cart->id_address_delivery));
-            $country = new Country($tmp_address->id_country);
+            //$country = new Country($tmp_address->id_country);
             $id_country_austria = (int) Country::getByIso('AT');
             $id_country_germany = (int) Country::getByIso('DE');
             
