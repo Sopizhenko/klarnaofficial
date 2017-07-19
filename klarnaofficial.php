@@ -2470,7 +2470,7 @@ class KlarnaOfficial extends PaymentModule
         $this->context->smarty->assign('klarnacheckout_risk_status', $klarna_orderinfo['risk_status']);
         $this->context->smarty->assign('klarnacheckout_eid', $klarna_orderinfo['eid']);
         $this->context->smarty->assign('klarna_errors', $klarna_errors);
-        if (strlen($klarna_orderinfo['invoicenumber']) > 0) {
+        if (Tools::strlen($klarna_orderinfo['invoicenumber']) > 0) {
             $invoice_number = $klarna_orderinfo['invoicenumber'];
             $eid = $klarna_orderinfo['eid'];
             $eid_ss_comb = $this->getAllEIDSScombinations($order->id_shop);

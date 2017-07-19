@@ -312,9 +312,6 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
                             );
                         }
                         
-                        if ($ssid=='us') {
-                            $create['merchant_urls']['address_update'] = $address_updatePage;
-                        }
                         $create['merchant_reference2'] = ''.(int) ($this->context->cart->id);
                         if ((int)Configuration::get('KCO_ADD_NEWSLETTERBOX') == 0) {
                             $create['options']['additional_checkbox']['text'] = ''.
