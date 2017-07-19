@@ -33,7 +33,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
             //This is a KCO V3 ORDER
             //Convert Data
             $klarnaorder["merchant_reference"]["orderid2"] = $klarnadata["merchant_reference2"];
-            $klarnaorder["cart"]["items"] = $klarnadata["order_lines"]
+            $klarnaorder["cart"]["items"] = $klarnadata["order_lines"];
         }
         
         //DO THE CHECKS ON THE CART

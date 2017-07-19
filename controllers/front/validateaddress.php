@@ -49,6 +49,7 @@ class KlarnaOfficialValidateAddressModuleFrontController extends ModuleFrontCont
         //We need to set a temporary address here on the cart to calculate tax and shipping cost based on
         $cart = new Cart($id_cart);
         $language = new Language($cart->id_lang);
+        $checkoutcart = array();
         
         $round_diff = 0;
         $totalCartValue = 0;
