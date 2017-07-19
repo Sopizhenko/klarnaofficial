@@ -52,6 +52,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
 
     public function initContent()
     {
+        $ssid = '';
         $eid = '';
         $sharedSecret = '';
         parent::initContent();
@@ -200,7 +201,6 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     if ($cart_wrapping > 0) {
                         $wrapping_cost_excl = $this->context->cart->getOrderTotal(false, Cart::ONLY_WRAPPING);
                         $wrapping_cost_incl = $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
-                        /*$wrapping_vat = (($wrapping_cost_incl / $wrapping_cost_excl) - 1) * 100;*/
                         
                         if (!is_object($carrieraddress)) {
                             $carrieraddress = new Address($this->context->cart->id_address_delivery);
@@ -215,6 +215,10 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             $wrapping_vat = $tax_calculator->getTotalRate();
                         } else {
                             $wrapping_vat = 0;
+                        }
+                        
+                        if ($wrapping_cost_excl != $wrapping_cost_incl && $wrapping_vat == 0) {
+                            $wrapping_vat = (($wrapping_cost_incl / $wrapping_cost_excl) - 1) * 100;
                         }
                         
                         $cart_wrapping = Tools::ps_round($cart_wrapping, 2);
