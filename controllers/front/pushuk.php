@@ -371,8 +371,8 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
                         Configuration::get('PS_OS_PAYMENT'),
                         number_format($amount, 2, '.', ''),
                         $this->module->displayName,
-                        $reference,
                         '',
+                        $extra,
                         $cart->id_currency,
                         false,
                         $customer->secure_key
