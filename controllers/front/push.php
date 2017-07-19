@@ -422,10 +422,9 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 $cart = new Cart($cart->id);
 
                 $id_shop = (int) $cart->id_shop;
+                $ssn = "";
                 if (isset($klarnaorder['customer']['organization_registration_id'])) {
-                    $snn = $klarnaorder['customer']['organization_registration_id'];
-                } else {
-                    $snn = "";
+                    $ssn = $klarnaorder['customer']['organization_registration_id'];
                 }
                 
                 $sql = 'INSERT INTO `'._DB_PREFIX_."klarna_orders`".

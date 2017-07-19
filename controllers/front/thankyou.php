@@ -12,11 +12,10 @@
  * obtain it through the world-wide-web, please send an email
  * to info@prestaworks.se so we can send you a copy immediately.
  *
- * @author Prestaworks AB <info@prestaworks.se>
- * @copyright 2015 Prestaworks AB
- * @category PrestaShop Module
- * @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- * International Registered Trademark & Property of Prestaworks AB
+ *  @author    Prestaworks AB <info@prestaworks.se>
+ *  @copyright 2015 Prestaworks AB
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of Prestaworks AB
  */
  
 class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController

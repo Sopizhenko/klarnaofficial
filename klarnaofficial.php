@@ -3290,6 +3290,8 @@ class KlarnaOfficial extends PaymentModule
         $sweden_done === true &&
         $germany_done === true &&
         $austria_done === true &&
+        $us_done === true &&
+        $nl_done === true &&
         $uk_done === true) {
             return true;
         } else {

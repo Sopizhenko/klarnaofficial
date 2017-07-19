@@ -48,6 +48,9 @@ class KlarnaOfficialCheckoutKlarnaUsModuleFrontController extends ModuleFrontCon
 
     public function initContent()
     {
+        $ssid = 'us';
+        $eid = '';
+        $sharedSecret = '';
         parent::initContent();
 
         if (!$this->context->cart->getDeliveryOption(null, true)) {
