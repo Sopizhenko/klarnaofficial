@@ -1,0 +1,14 @@
+{literal}
+<script type="text/javascript" id="klarna-credit-lib-x">
+/* <![CDATA[ */
+(function(w, d) {
+var url = 'https://credit.klarnacdn.net/lib/v1/api.js';
+n = d.createElement('script');
+c = d.getElementById('klarna-credit-lib-x');
+n.async = !0;
+n.src = url + '?' + ( new Date ()).getTime();
+c.parentNode.replaceChild(n, c);
+})(this, document);
+/* ]]> */
+</script>
+{/literal}

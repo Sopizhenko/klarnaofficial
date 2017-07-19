@@ -17,13 +17,16 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of Prestaworks AB
  */
- 
+
 class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
     public $display_column_right = false;
     public $ssl = true;
-
+    public $current_kco = 'NORDICS';
+    
+    
+    
     public function setMedia()
     {
         parent::setMedia();
@@ -44,147 +47,17 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 session_start();
             }
         }
-        if (Tools::isSubmit('kco_change_country')) {
-            $id_lang = 0;
-            $id_currency = 0;
-            if (Tools::getValue('kco_change_country') == 'gb') {
-                $id_lang = Language::getIdByIso('en');
-                $id_currency = Currency::getIdByIsoCode('gbp');
-                $id_tmp_address = Configuration::get('KCO_UK_ADDR');
-                if (isset($_SESSION['klarna_checkout'])) {
-                    unset($_SESSION['klarna_checkout']);
-                }
-
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnauk');
-            }
-            if (Tools::getValue('kco_change_country') == 'sv') {
-                $id_lang = Language::getIdByIso('sv');
-                $id_currency = Currency::getIdByIsoCode('SEK');
-                $id_tmp_address = Configuration::get('KCO_SWEDEN_ADDR');
-            }
-            if (Tools::getValue('kco_change_country') == 'fi') {
-                $id_lang = Language::getIdByIso('fi');
-                if ((int) ($id_lang) == 0) {
-                    $id_lang = Language::getIdByIso('sv');
-                }
-                $id_currency = Currency::getIdByIsoCode('EUR');
-                $id_tmp_address = Configuration::get('KCO_FINLAND_ADDR');
-            }
-            if (Tools::getValue('kco_change_country') == 'de') {
-                $id_lang = Language::getIdByIso('de');
-                $id_currency = Currency::getIdByIsoCode('EUR');
-                $id_tmp_address = Configuration::get('KCO_GERMANY_ADDR');
-            }
-            if (Tools::getValue('kco_change_country') == 'at') {
-                $id_lang = Language::getIdByIso('de');
-                $id_currency = Currency::getIdByIsoCode('EUR');
-                $id_tmp_address = Configuration::get('KCO_AUSTRIA_ADDR');
-            }
-            if (Tools::getValue('kco_change_country') == 'no') {
-                $id_lang = Language::getIdByIso('no');
-                if ((int) $id_lang == 0) {
-                    $id_lang = Language::getIdByIso('nb');
-                }
-                if ((int) $id_lang == 0) {
-                    $id_lang = Language::getIdByIso('nn');
-                }
-                $id_currency = Currency::getIdByIsoCode('NOK');
-                $id_tmp_address = Configuration::get('KCO_NORWAY_ADDR');
-            }
-            
-            if ($id_lang > 0 and $id_currency > 0) {
-                $_GET['id_lang'] = $id_lang;
-                $_POST['id_lang'] = $id_lang;
-                $_POST['id_currency'] = $id_currency;
-                $_POST['SubmitCurrency'] = $id_currency;
-                Tools::switchLanguage();
-                Tools::setCurrency($this->context->cookie);
-                $this->context->cart->id_lang = $id_lang;
-                $this->context->cart->id_currency = $id_currency;
-                $this->context->cart->id_address_delivery = $id_tmp_address;
-                $this->context->cart->update();
-                //KILL THE SESSION TO START A NEW
-                if (isset($_SESSION['klarna_checkout'])) {
-                    unset($_SESSION['klarna_checkout']);
-                }
-
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        }
-        if (Tools::isSubmit('savemessagebutton')) {
-            $messageContent = Tools::getValue('message');
-            $message_result = $this->updateMessage($messageContent, $this->context->cart);
-            if (!$message_result) {
-                $this->context->smarty->assign('gift_error', Tools::displayError('Invalid message'));
-            }
-        }
-        if (Tools::isSubmit('savegift')) {
-            $this->context->cart->gift = (int) (Tools::getValue('gift'));
-            $gift_error = '';
-            if (!Validate::isMessage($_POST['gift_message'])) {
-                $gift_error = Tools::displayError('Invalid gift message');
-            } else {
-                $this->context->cart->gift_message = strip_tags(Tools::getValue('gift_message'));
-            }
-            $this->context->cart->update();
-            $this->context->smarty->assign('gift_error', $gift_error);
-        }
-        if (CartRule::isFeatureActive()) {
-            $vouchererrors = '';
-            if (Tools::isSubmit('submitAddDiscount')) {
-                $code = trim(Tools::getValue('discount_name'));
-                $code = Tools::purifyHTML($code);
-                if (!($code)) {
-                    $vouchererrors = Tools::displayError('You must enter a voucher code');
-                } elseif (!Validate::isCleanHtml($code)) {
-                    $vouchererrors = Tools::displayError('Voucher code invalid');
-                } else {
-                    if (($cartRule = new CartRule(CartRule::getIdByCode($code))) &&
-                        Validate::isLoadedObject($cartRule)) {
-                        if ($error = $cartRule->checkValidity($this->context, false, true)) {
-                            $vouchererrors = $error;
-                        } else {
-                            $this->context->cart->addCartRule($cartRule->id);
-                            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-                        }
-                    } else {
-                        $vouchererrors = Tools::displayError('This voucher does not exists');
-                    }
-                }
-                //FORCE html_entity_decode SINCE PRESTASHOP Demand escape:html
-                //in tpl files but already does this on displayError..
-                $this->context->smarty->assign(array(
-                    'vouchererrors' => html_entity_decode($vouchererrors),
-                    'discount_name' => Tools::safeOutput($code),
-                ));
-            } elseif (($id_cart_rule = (int) Tools::getValue('deleteDiscount')) &&
-            Validate::isUnsignedId($id_cart_rule)) {
-                $this->context->cart->removeCartRule($id_cart_rule);
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        }
-
-        if (Tools::getIsset('delivery_option')) {
-            if ($this->validateDeliveryOption(Tools::getValue('delivery_option'))) {
-                $this->context->cart->setDeliveryOption(Tools::getValue('delivery_option'));
-            }
-
-            if (!$this->context->cart->update()) {
-                $this->context->smarty->assign(array(
-                    'vouchererrors' => Tools::displayError('Could not save carrier selection'),
-                ));
-            }
-
-            // Carrier has changed, so we check if the cart rules still apply
-            CartRule::autoRemoveFromCart($this->context);
-            CartRule::autoAddToCart($this->context);
-        }
+        require_once dirname(__FILE__).'/../../libraries/kcocommonpostprocess.php';
     }
 
     public function initContent()
     {
         parent::initContent();
 
+        if (!$this->context->cart->getDeliveryOption(null, true)) {
+            $this->context->cart->setDeliveryOption($this->context->cart->getDeliveryOption());
+        }
+        
         //Make a check on reload
         CartRule::autoRemoveFromCart($this->context);
         CartRule::autoAddToCart($this->context);
@@ -208,129 +81,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
 
         $country_information = $this->getKlarnaCountryInformation($currency->iso_code, $language->iso_code);
 
-        if ($country_information === false) {
-            Tools::redirect('index.php?controller=order&step=1');
-        }
-
-        $tmp_address = new Address((int) ($this->context->cart->id_address_delivery));
-        $country = new Country($tmp_address->id_country);
-        if ($country_information['purchase_country'] == 'SE') {
-            $eid = (int) (Configuration::get('KCO_SWEDEN_EID'));
-            $sharedSecret = Configuration::get('KCO_SWEDEN_SECRET');
-            $ssid = 'se';
-            if ($country->iso_code != 'SE') {
-                if ($this->context->cart->id_address_delivery==Configuration::get('KCO_SWEDEN_ADDR')) {
-                    $this->module->createAddress(
-                        'SE',
-                        'KCO_SWEDEN_ADDR',
-                        'Stockholm',
-                        'Sverige',
-                        'KCO_SVERIGE_DEFAULT'
-                    );
-                }
-                $this->context->cart->id_address_delivery = Configuration::get('KCO_SWEDEN_ADDR');
-                $this->context->cart->update();
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        } elseif ($country_information['purchase_country'] == 'FI') {
-            $eid = (int) (Configuration::get('KCO_FINLAND_EID'));
-            $sharedSecret = Configuration::get('KCO_FINLAND_SECRET');
-            $ssid = 'fi';
-            if ($country->iso_code != 'FI') {
-                if ($this->context->cart->id_address_delivery==Configuration::get('KCO_FINLAND_ADDR')) {
-                    $this->module->createAddress(
-                        'FI',
-                        'KCO_FINLAND_ADDR',
-                        'Helsinkki',
-                        'Finland',
-                        'KCO_FINLAND_DEFAULT'
-                    );
-                }
-                $this->context->cart->id_address_delivery = Configuration::get('KCO_FINLAND_ADDR');
-                $this->context->cart->update();
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        } elseif ($country_information['purchase_country'] == 'NO') {
-            $eid = (int) (Configuration::get('KCO_NORWAY_EID'));
-            $sharedSecret = Configuration::get('KCO_NORWAY_SECRET');
-            $ssid = 'no';
-            if ($country->iso_code != 'NO') {
-                
-                if ($this->context->cart->id_address_delivery==Configuration::get('KCO_NORWAY_ADDR')) {
-                    $this->module->createAddress(
-                        'NO',
-                        'KCO_NORWAY_ADDR',
-                        'Oslo',
-                        'Norge',
-                        'KCO_NORGE_DEFAULT'
-                    );
-                }
-                
-                $this->context->cart->id_address_delivery = Configuration::get('KCO_NORWAY_ADDR');
-                $this->context->cart->update();
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        } elseif ($country_information['purchase_country'] == 'DE') {
-            $eid = (int) (Configuration::get('KCO_GERMANY_EID'));
-            $sharedSecret = Configuration::get('KCO_GERMANY_SECRET');
-            $ssid = 'de';
-            if ($country->iso_code != 'DE') {
-                
-                if ($this->context->cart->id_address_delivery==Configuration::get('KCO_GERMANY_ADDR')) {
-                    $this->module->createAddress(
-                        'DE',
-                        'KCO_GERMANY_ADDR',
-                        'Berlin',
-                        'Germany',
-                        'KCO_GERMANY_DEFAULT'
-                    );
-                }
-                
-                $this->context->cart->id_address_delivery = Configuration::get('KCO_GERMANY_ADDR');
-                $this->context->cart->update();
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        } elseif ($country_information['purchase_country'] == 'AT') {
-            $eid = (int) (Configuration::get('KCO_AUSTRIA_EID'));
-            $sharedSecret = Configuration::get('KCO_AUSTRIA_SECRET');
-            $ssid = 'at';
-            if ($country->iso_code != 'AT') {
-                
-                if ($this->context->cart->id_address_delivery==Configuration::get('KCO_AUSTRIA_ADDR')) {
-                    $this->module->createAddress(
-                        'AT',
-                        'KCO_AUSTRIA_ADDR',
-                        'Vienna',
-                        'Austria',
-                        'KCO_AUSTRIA_DEFAULT'
-                    );
-                }
-                
-                $this->context->cart->id_address_delivery = Configuration::get('KCO_AUSTRIA_ADDR');
-                $this->context->cart->update();
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-            }
-        } elseif ($country_information['purchase_country'] == 'GB') {
-            $eid = Configuration::get('KCO_UK_EID');
-            $sharedSecret = Configuration::get('KCO_UK_SECRET');
-            $ssid = 'gb';
-            if ($country->iso_code != 'GB') {
-                
-                if ($this->context->cart->id_address_delivery==Configuration::get('KCO_UK_ADDR')) {
-                    $this->module->createAddress(
-                        'GB',
-                        'KCO_UK_ADDR',
-                        'London',
-                        'United Kingdom',
-                        'KCO_UK_DEFAULT'
-                    );
-                }
-                
-                $this->context->cart->id_address_delivery = Configuration::get('KCO_UK_ADDR');
-                $this->context->cart->update();
-            }
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnauk');
-        }
+        require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
 
         $layout = 'desktop';
         //if($this->context->getMobileDevice())
@@ -416,13 +167,21 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 $shipping_cost_without_tax = $this->context->cart->getOrderTotal(false, Cart::ONLY_SHIPPING);
 
                 if ($shipping_cost_without_tax > 0) {
-                    /*$shipping_tax_rate = ($shipping_cost_with_tax / $shipping_cost_without_tax) - 1;*/
                     $totalCartValue += $shipping_cost_with_tax;
                     
                     $carrier = new Carrier($this->context->cart->id_carrier);
                     $carrieraddress = new Address($this->context->cart->id_address_delivery);
-                    $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
-
+                    if (!Configuration::get('PS_ATCP_SHIPWRAP')) {
+                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1 ,2) * 100;
+                    } else {
+                        $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
+                    }
+                    
+                    if (($shipping_cost_with_tax != $shipping_cost_without_tax) && $carriertaxrate == 0) {
+                        //Prestashop error due to EU module?
+                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1 ,2) * 100;
+                    }
+                    
                     $shippingReference = $this->module->shippingreferences[$language->iso_code];
 
                     $checkoutcart[] = array(
@@ -437,8 +196,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 if ($this->context->cart->gift == 1) {
                     $cart_wrapping = $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
                     if ($cart_wrapping > 0) {
-                        //$wrapping_cost_excl = $this->context->cart->getOrderTotal(false, Cart::ONLY_WRAPPING);
-                        //$wrapping_cost_incl = $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
+                        $wrapping_cost_excl = $this->context->cart->getOrderTotal(false, Cart::ONLY_WRAPPING);
+                        $wrapping_cost_incl = $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
                         /*$wrapping_vat = (($wrapping_cost_incl / $wrapping_cost_excl) - 1) * 100;*/
                         
                         if (!is_object($carrieraddress)) {
@@ -593,20 +352,30 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         $create['merchant_reference']['orderid2'] = ''.(int) ($this->context->cart->id);
                         
                         if ($country_information['purchase_country'] == "SE") {
-                            $allowB2B = (bool)Configuration::get('KCO_SWEDEN_B2B');
+                            $allowB2B = (int)Configuration::get('KCO_SWEDEN_B2B');
                         } elseif ($country_information['purchase_country'] == "NO") {
-                            $allowB2B = (bool)Configuration::get('KCO_NORWAY_B2B');
+                            $allowB2B = (int)Configuration::get('KCO_NORWAY_B2B');
                         } elseif ($country_information['purchase_country'] == "FI") {
-                            $allowB2B = (bool)Configuration::get('KCO_FINLAND_B2B');
+                            $allowB2B = (int)Configuration::get('KCO_FINLAND_B2B');
                         } else {
-                            $allowB2B = false;
+                            $allowB2B = 0;
                         }
-                        if ($allowB2B == true) {
+                        if ($allowB2B == 1) {
                             $create['options']['allowed_customer_types'] = array("person", "organization");
+                        } elseif ($allowB2B == 2) {
+                            $create['options']['allowed_customer_types'] = array("organization","person");
+                        } elseif ($allowB2B == 3) {
+                            $create['options']['allowed_customer_types'] = array("organization");
                         }
-                        $forcePhone = false;
-                        if ($forcePhone == true) {
+                        
+                        if (Configuration::get('KCO_FORCEPHONE')) {
                             $create['options']['phone_mandatory'] = true;
+                        }
+                        if (Configuration::get('KCO_FORCESSN')) {
+                            $create['options']['national_identification_number_mandatory'] = true;
+                        }
+                        if (Configuration::get('KCO_ALLOWSEPADDR')) {
+                            $create['options']['allow_separate_shipping_address'] = true;
                         }
                         
                         if ((int)Configuration::get('KCO_ADD_NEWSLETTERBOX') == 0) {
@@ -766,9 +535,15 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     $show_germany = false;
                     $show_austria = false;
                     $show_uk = false;
+                    $show_us = false;
+                    $show_nl = false;
                     if ((int) (Configuration::get('KCO_SWEDEN')) == 1) {
                         ++$no_active_countries;
                         $show_sweden = true;
+                    }
+                    if ((int) (Configuration::get('KCO_NL')) == 1) {
+                        ++$no_active_countries;
+                        $show_nl = true;
                     }
                     if ((int) (Configuration::get('KCO_FINLAND')) == 1) {
                         ++$no_active_countries;
@@ -790,6 +565,10 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         ++$no_active_countries;
                         $show_uk = true;
                     }
+                    if ((int) (Configuration::get('KCO_US')) == 1) {
+                        ++$no_active_countries;
+                        $show_us = true;
+                    }
                     $this->assignSummaryInformations();
                     $this->context->smarty->assign(array(
                         'no_active_countries' => $no_active_countries,
@@ -797,8 +576,10 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         'show_germany' => $show_germany,
                         'show_norway' => $show_norway,
                         'show_uk' => $show_uk,
+                        'show_us' => $show_us,
                         'show_finland' => $show_finland,
                         'show_sweden' => $show_sweden,
+                        'show_nl' => $show_nl,
                         'kco_selected_country' => $country_information['purchase_country'],
                         'klarna_checkout' => $snippet,
                         'controllername' => 'checkoutklarna',
@@ -880,7 +661,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         
         if (isset($this->context->cart) && $this->context->cart->id_address_delivery > 0) {
             $tmp_address = new Address((int) ($this->context->cart->id_address_delivery));
-            //$country = new Country($tmp_address->id_country);
+            $country = new Country($tmp_address->id_country);
             $id_country_austria = (int) Country::getByIso('AT');
             $id_country_germany = (int) Country::getByIso('DE');
             
@@ -936,6 +717,14 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $language_iso_code == 'gb' &&
         Configuration::get('KCO_UK') == 1) {
             return array('locale' => 'en-gb', 'purchase_currency' => 'GBP', 'purchase_country' => 'GB');
+        } elseif ($currency_iso_code == 'USD' &&
+        $language_iso_code == 'en' &&
+        Configuration::get('KCO_US') == 1) {
+            return array('locale' => 'en-us', 'purchase_currency' => 'USD', 'purchase_country' => 'US');
+        } elseif ($currency_iso_code == 'EUR' &&
+        $language_iso_code == 'nl' &&
+        Configuration::get('KCO_NL') == 1) {
+            return array('locale' => 'nl-nl', 'purchase_currency' => 'EUR', 'purchase_country' => 'NL');
         } else {
             return false;
         }

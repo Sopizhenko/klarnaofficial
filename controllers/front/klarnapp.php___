@@ -1,0 +1,102 @@
+<?php
+/**
+ * 2015 Prestaworks AB.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to info@prestaworks.se so we can send you a copy immediately.
+ *
+ *  @author    Prestaworks AB <info@prestaworks.se>
+ *  @copyright 2015 Prestaworks AB
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of Prestaworks AB
+ */
+ 
+class klarnaofficialklarnappModuleFrontController extends ModuleFrontController
+{
+    public function postProcess()
+    {
+        
+        if (Tools::getIsset("getkppsession")) {
+            $eid = "K500079";
+            $secret = "()V@gy6v6K*TRsK6";
+            
+            $token = "$eid:$secret";
+            /*
+            LIVE
+            EU https://api.klarna.com/
+            U.S. https://api-na.klarna.com/
+            
+            Testing environment
+            EU https://api.playground.klarna.com/
+            US https://api-na.playground.klarna.com/
+            */
+            $url = "https://api.playground.klarna.com/credit/v1/sessions";
+            //$headers = array('Authorization: '.$token, 'Content-Type: application/json');
+            //$headers = array('Authorization: Basic Auth', 'Content-Type: application/json');
+            //$headers = array('authorization: $token', 'Content-Type: application/json');
+            $headers = array('Content-Type: application/json');
+            
+            $data = array();
+            $data["purchase_country"] = "GB";
+            $data["purchase_currency"] = "GBP";
+            $data["locale"] = "en-GB";
+            $data["order_amount"] = 10;
+            $data["order_tax_amount"] = 0;
+            $data["merchant_reference2"] = 1;
+            
+            $order_line = array();
+            $order_line["type"] = "physical";
+            $order_line["reference"] = "19-402-USA";
+            $order_line["name"] = "Battery Power Pack";
+            $order_line["quantity"] = 1;
+            $order_line["unit_price"] = 10;
+            $order_line["tax_rate"] = 0;
+            $order_line["total_amount"] = 10;
+            $order_line["total_discount_amount"] = 0;
+            $order_line["total_tax_amount"] = 0;
+            
+            $order_lines = array();
+            $order_lines[] = $order_line;
+            
+            $data["order_lines"] = $order_lines;
+            
+            $jsondata = json_encode($data);
+            $handle = curl_init();
+            curl_setopt($handle, CURLOPT_URL, $url);
+            curl_setopt($handle, CURLOPT_USERPWD, $token);
+            curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+    //        curl_setopt($handle, CURLOPT_VERBOSE, true);
+            curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($handle, CURLOPT_POSTFIELDS, $jsondata);
+            
+            $response = curl_exec($handle);
+            echo $response;
+            
+            /*DEBUGG*/
+  /*          
+$verbose = fopen('php://temp', 'w+');
+curl_setopt($handle, CURLOPT_STDERR, $verbose);
+rewind($verbose);
+$verboseLog = stream_get_contents($verbose);
+echo "Verbose information:\n<pre>", htmlspecialchars($verboseLog), "</pre>\n";
+
+*/
+            exit;
+        }
+    }
+    public function initContent()
+    {
+        parent::initContent();
+        $this->setTemplate('klarnapp.tpl');
+    }
+}

@@ -48,6 +48,12 @@ class KlarnaOfficialThankYouUkModuleFrontController extends ModuleFrontControlle
             if ($sid == 'gb') {
                 $sharedSecret = Configuration::get('KCO_UK_SECRET');
                 $merchantId = Configuration::get('KCO_UK_EID');
+            } elseif ($sid == 'us') {
+                $sharedSecret = Configuration::get('KCO_US_SECRET');
+                $merchantId = Configuration::get('KCO_US_EID');
+            } elseif ($sid == 'nl') {
+                $sharedSecret = Configuration::get('KCO_NL_SECRET');
+                $merchantId = Configuration::get('KCO_NL_EID');
             }
 
             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
@@ -101,11 +107,37 @@ class KlarnaOfficialThankYouUkModuleFrontController extends ModuleFrontControlle
                     $result = Db::getInstance()->getRow($sql);
                 }
             }
-            $this->context->smarty->assign(array(
+            
+            
+            
+            if (isset($result['id_order'])) {
+                //If order is created, we can redirect to normal thankyou page.
+                $order = new Order((int) $result['id_order']);
+                $id_customer = $order->id_customer;
+                $customer = new Customer((int)$id_customer);
+                Tools::redirect(
+                    'order-confirmation.php?key='.
+                    $customer->secure_key.
+                    '&kcotpv3=1'.
+                    '&sid='.
+                    $sid.
+                    '&id_cart='.
+                    $this->context->cart->id.
+                    '&id_module='.
+                    $this->module->id
+                );
+            } else {
+                //order was not created, show fake confirmation and unload cart
+                unset($this->context->cookie->id_cart, $cart, $this->context->cart);
+                $this->context->cart = new Cart();
+                
+                $this->context->smarty->assign(array(
                     'klarna_html' => $snippet,
-                    'HOOK_ORDER_CONFIRMATION' => $this->displayOrderConfirmation((int) ($result['id_order'])),
+                    'cart_qties' => 0,
+                    'cart' => $this->context->cart
                 ));
-            unset($_SESSION['klarna_checkout_uk']);
+                unset($_SESSION['klarna_checkout_uk']);
+            }
         } catch (Exception $e) {
             //var_dump($e);
             echo $orderId;

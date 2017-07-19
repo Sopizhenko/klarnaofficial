@@ -93,6 +93,8 @@
                         {if $show_germany}<option value="de" {if $kco_selected_country=='DE'}selected="selected"{/if}>{l s='Germany' mod='klarnaofficial'}</option>{/if}
                         {if $show_austria}<option value="at" {if $kco_selected_country=='AT'}selected="selected"{/if}>{l s='Austria' mod='klarnaofficial'}</option>{/if}
                         {if $show_uk}<option value="gb" {if $kco_selected_country=='GB'}selected="selected"{/if}>{l s='United Kingdom' mod='klarnaofficial'}</option>{/if}
+                        {if $show_us}<option value="us" {if $kco_selected_country=='US'}selected="selected"{/if}>{l s='United States' mod='klarnaofficial'}</option>{/if}
+                        {if $show_nl}<option value="nl" {if $kco_selected_country=='NL'}selected="selected"{/if}>{l s='Netherlands' mod='klarnaofficial'}</option>{/if}
                     </select>
                 </form><!-- /form#kco_change_country -->
                 {/if}

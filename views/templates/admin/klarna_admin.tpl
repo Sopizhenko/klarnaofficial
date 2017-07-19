@@ -103,12 +103,14 @@
 						<ul class="nav nav-tabs">
 							<li class="nav-item"><a href="javascript:;" title="{l s='General settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="0"><i class="icon-AdminAdmin"></i>{l s='General settings' mod='klarnaofficial'}</a></li>
 							<li class="nav-item"><a href="javascript:;" title="{l s='Color settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="1"><i class="icon-AdminParentPreferences"></i>{l s='Color settings' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='UK' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="1" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="1" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="1" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="1" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="1" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='UK' mod='klarnaofficial'}" data-panel="1" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='UK' mod='klarnaofficial'}</a></li>
+{* DISABLED FOR NOW							<li class="nav-item"><a href="javascript:;" title="{l s='US' mod='klarnaofficial'}" data-panel="1" data-fieldset="8"><i class="icon-AdminParentLocalization"></i>{l s='US' mod='klarnaofficial'}</a></li>*}
+							<li class="nav-item"><a href="javascript:;" title="{l s='Netherlands' mod='klarnaofficial'}" data-panel="1" data-fieldset="9"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">
@@ -123,13 +125,13 @@
 					<div class="sidebar col-lg-2">
 						<ul class="nav nav-tabs">
 							<li class="nav-item"><a href="javascript:;" title="{l s='General settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="0"><i class="icon-AdminAdmin"></i>{l s='General settings' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Denmark' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Country settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="2" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="2" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="2" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Denmark' mod='klarnaofficial'}" data-panel="2" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Denmark' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="2" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Netherlands' mod='klarnaofficial'}" data-panel="2" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="2" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">

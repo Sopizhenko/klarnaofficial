@@ -17,7 +17,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of Prestaworks AB
  */
- 
+
 class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
@@ -95,13 +95,12 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 if ($cart->OrderExists()) {
                     $klarna_reservation = $klarnaorder['reservation'];
                     
-                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.'order_payment` m '.
-                    'LEFT JOIN `'._DB_PREFIX_.
+                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.'order_payment` m LEFT JOIN `'._DB_PREFIX_.
                     'orders` o ON m.order_reference=o.reference WHERE o.id_cart='.(int) ($id_cart);
                     
                     $messages = Db::getInstance()->ExecuteS($sql);
                     foreach ($messages as $message) {
-                        //Check if reference matches
+                        //Check if reference matches                        
                         if ($message['transaction_id']==$klarna_reservation) {
                             //Already created, send create
                             $update['status'] = 'created';
@@ -156,6 +155,7 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 }//Check and handle errors
                 $shipping = $klarnaorder['shipping_address'];
                 $billing = $klarnaorder['billing_address'];
+                $klarnacustomer = $klarnaorder['customer'];
                 //$reference = $klarnaorder['reference'];
                 $reference = $klarnaorder['reservation'];
                 if (!Validate::isEmail($shipping['email'])) {
@@ -196,7 +196,35 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                     $customer->newsletter = $newsletter;
                     $customer->optin = 0;
                     $customer->active = 1;
-                    $customer->id_gender = 9;
+                    //Check gender
+                    
+                    if (isset($klarnacustomer['gender']) && $klarnacustomer['gender'] == 'male') {
+                        //MALE
+                        $id_gender = Db::getInstance()->getValue("SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=0");
+                    } elseif (isset($klarnacustomer['gender']) && $klarnacustomer['gender'] == "female") {
+                        //FEMALE
+                        $id_gender = Db::getInstance()->getValue("SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=1");
+                    } elseif (isset($klarnacustomer['type']) && $klarnacustomer['type'] == "organization") {
+                        //NEUTRAL
+                        $id_gender = Db::getInstance()->getValue("SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=2");
+                    } else {
+                        $id_gender = 0;
+                    }
+                    $customer->id_gender = $id_gender;
+                    
+                    //Set dateofbirth
+                    if (isset($klarnacustomer['date_of_birth'])) {
+                        $date_of_birth = $klarnacustomer['date_of_birth'];
+                    } else {
+                        $date_of_birth = "";
+                    }
+                    
+                    if (Tools::strlen($date_of_birth) > 0) {
+                        if (Validate::isBirthDate($date_of_birth)) {
+                            $customer->birthday = $date_of_birth;
+                        }
+                    }
+                    
                     $customer->add();
                     if (!$this->sendConfirmationMail($customer, $cart->id_lang, $password)) {
                         Logger::addLog(
@@ -392,9 +420,9 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
 
                 $id_shop = (int) $cart->id_shop;
                 if (isset($klarnaorder['customer']['organization_registration_id'])) {
-                    $ssn = $klarnaorder['customer']['organization_registration_id'];
+                    $snn = $klarnaorder['customer']['organization_registration_id'];
                 } else {
-                    $ssn = "";
+                    $snn = "";
                 }
                 
                 $sql = 'INSERT INTO `'._DB_PREFIX_."klarna_orders`".
@@ -513,8 +541,7 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
         }
     }
     
-    protected function cleanupAddressData($string)
-    {
+    protected function cleanupAddressData($string) {
         $string = preg_replace("/[^\p{L}\p{N} -]/u", '', $string);
         $string = trim($string);
         return $string;

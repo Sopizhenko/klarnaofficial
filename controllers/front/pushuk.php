@@ -49,6 +49,7 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
         'de' => 'DE',
         'nl' => 'NL',
         'gb' => 'GB',
+        'us' => 'US',
         );
 
         try {
@@ -56,6 +57,12 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
             if ($sid == 'gb') {
                 $sharedSecret = Configuration::get('KCO_UK_SECRET');
                 $merchantId = Configuration::get('KCO_UK_EID');
+            } elseif ($sid == 'us') {
+                $sharedSecret = Configuration::get('KCO_US_SECRET');
+                $merchantId = Configuration::get('KCO_US_EID');
+            } elseif ($sid == 'nl') {
+                $sharedSecret = Configuration::get('KCO_NL_SECRET');
+                $merchantId = Configuration::get('KCO_NL_EID');
             }
             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
                 $connector = \Klarna\Rest\Transport\Connector::create(
@@ -91,8 +98,7 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
                 if ($cart->OrderExists()) {
                     $klarna_reservation = Tools::getValue('klarna_order_id');
                     
-                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.'order_payment` m '.
-                    'LEFT JOIN `'._DB_PREFIX_.
+                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.'order_payment` m LEFT JOIN `'._DB_PREFIX_.
                     'orders` o ON m.order_reference=o.reference WHERE o.id_cart='.(int) ($id_cart);
                     
                     $messages = Db::getInstance()->ExecuteS($sql);

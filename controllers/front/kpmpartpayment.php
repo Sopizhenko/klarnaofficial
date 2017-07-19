@@ -35,6 +35,10 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
     {
         parent::initContent();
 
+        if (!$this->context->cart->getDeliveryOption(null, true)) {
+            $this->context->cart->setDeliveryOption($this->context->cart->getDeliveryOption());
+        }
+        
         //create klarna invoice order
 
         $deliveryAddress = new Address($this->context->cart->id_address_delivery);
@@ -152,7 +156,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 }
 
                 $total_shipping_wt = (float) $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
-                //$total_shipping = (float) $this->context->cart->getOrderTotal(false, Cart::ONLY_SHIPPING);
+                $total_shipping = (float) $this->context->cart->getOrderTotal(false, Cart::ONLY_SHIPPING);
 
                 $total_discounts_wt = 0;
                 $total_discounts = 0;
@@ -170,7 +174,17 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                     $flags = KlarnaFlags::INC_VAT | KlarnaFlags::IS_SHIPMENT;
                     $carrier = new Carrier($this->context->cart->id_carrier);
                     $carrieraddress = new Address($this->context->cart->id_address_delivery);
-                    $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
+                    if (Configuration::get('PS_ATCP_SHIPWRAP')) {
+                        $carriertaxrate = round(($total_shipping_wt / $total_shipping) -1 ,2) * 100;
+                    } else {
+                        $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
+                    }
+                    
+                    if (($total_shipping_wt != $total_shipping) && $carriertaxrate == 0) {
+                        //Prestashop error due to EU module?
+                        $carriertaxrate = round(($total_shipping_wt / $total_shipping) -1 ,2) * 100;
+                    }
+                    
                     $shippingReference = $this->module->shippingreferences[$languageIso];
                     
                     $k->addArticle(

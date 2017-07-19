@@ -33,9 +33,9 @@ class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController
         $this->context->controller->addCSS(_MODULE_DIR_.'klarnaofficial/views/css/klarnacheckout.css', 'all');
     }
 
-    public function initContent()
+    public function init()
     {
-        parent::initContent();
+        parent::init();
         require_once dirname(__FILE__).'/../../libraries/Checkout.php';
 
         session_start();
@@ -89,35 +89,39 @@ class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController
                     $result = Db::getInstance()->getRow($sql);
                 }
             }
-            $this->context->smarty->assign(array(
-                    'klarna_html' => $snippet,
-                    'HOOK_ORDER_CONFIRMATION' => $this->displayOrderConfirmation((int) ($result['id_order'])),
-                ));
-
-            unset($_SESSION['klarna_checkout']);
+            
+            if (isset($result['id_order'])) {
+                //If order is created, we can redirect to normal thankyou page.
+                $order = new Order((int) $result['id_order']);
+                $id_customer = $order->id_customer;
+                $customer = new Customer((int)$id_customer);
+                Tools::redirect(
+                    'order-confirmation.php?key='.
+                    $customer->secure_key.
+                    '&kcotp=1'.
+                    '&sid='.
+                    $sid.
+                    '&id_cart='.
+                    $this->context->cart->id.
+                    '&id_module='.
+                    $this->module->id
+                );
+            } else {
+                unset($this->context->cookie->id_cart, $cart, $this->context->cart);
+                $this->context->cart = new Cart();
+                
+                //if no order is created show thank you page.
+                $this->context->smarty->assign(array(
+                        'klarna_html' => $snippet,
+                        'cart_qties' => 0,
+                        'cart' => $this->context->cart
+                    ));
+                unset($_SESSION['klarna_checkout']);
+            }
         } catch (Klarna_Exception $e) {
             $this->context->smarty->assign('klarna_error', $e->getMessage());
         }
+        
         $this->setTemplate('kco_thankyoupage.tpl');
-    }
-
-    public function displayOrderConfirmation($id_order)
-    {
-        if (Validate::isUnsignedId($id_order)) {
-            $params = array();
-            $order = new Order($id_order);
-            $currency = new Currency($order->id_currency);
-
-            if (Validate::isLoadedObject($order)) {
-                $params['total_to_pay'] = $order->getOrdersTotalPaid();
-                $params['currency'] = $currency->sign;
-                $params['objOrder'] = $order;
-                $params['currencyObj'] = $currency;
-
-                return Hook::exec('displayOrderConfirmation', $params);
-            }
-        }
-
-        return false;
     }
 }
