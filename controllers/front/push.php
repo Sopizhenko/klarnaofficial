@@ -95,12 +95,13 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 if ($cart->OrderExists()) {
                     $klarna_reservation = $klarnaorder['reservation'];
                     
-                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.'order_payment` m LEFT JOIN `'._DB_PREFIX_.
+                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.
+                    'order_payment` m LEFT JOIN `'._DB_PREFIX_.
                     'orders` o ON m.order_reference=o.reference WHERE o.id_cart='.(int) ($id_cart);
                     
                     $messages = Db::getInstance()->ExecuteS($sql);
                     foreach ($messages as $message) {
-                        //Check if reference matches                        
+                        //Check if reference matches
                         if ($message['transaction_id']==$klarna_reservation) {
                             //Already created, send create
                             $update['status'] = 'created';
@@ -164,8 +165,7 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 $newsletter = 0;
                 $newsletter_setting = (int)Configuration::get('KCO_ADD_NEWSLETTERBOX', null, $cart->id_shop);
                 if ($newsletter_setting == 0 || $newsletter_setting == 1) {
-                    if (
-                            isset($klarnaorder['merchant_requested']) &&
+                    if (isset($klarnaorder['merchant_requested']) &&
                             isset($klarnaorder['merchant_requested']['additional_checkbox']) &&
                             $klarnaorder['merchant_requested']['additional_checkbox'] == true
                         ) {
@@ -200,13 +200,16 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                     
                     if (isset($klarnacustomer['gender']) && $klarnacustomer['gender'] == 'male') {
                         //MALE
-                        $id_gender = Db::getInstance()->getValue("SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=0");
+                        $sql = "SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=0";
+                        $id_gender = Db::getInstance()->getValue($sql);
                     } elseif (isset($klarnacustomer['gender']) && $klarnacustomer['gender'] == "female") {
                         //FEMALE
-                        $id_gender = Db::getInstance()->getValue("SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=1");
+                        $sql = "SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=1";
+                        $id_gender = Db::getInstance()->getValue($sql);
                     } elseif (isset($klarnacustomer['type']) && $klarnacustomer['type'] == "organization") {
                         //NEUTRAL
-                        $id_gender = Db::getInstance()->getValue("SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=2");
+                        $sql = "SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=2";
+                        $id_gender = Db::getInstance()->getValue($sql);
                     } else {
                         $id_gender = 0;
                     }
@@ -541,7 +544,8 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
         }
     }
     
-    protected function cleanupAddressData($string) {
+    protected function cleanupAddressData($string)
+    {
         $string = preg_replace("/[^\p{L}\p{N} -]/u", '', $string);
         $string = trim($string);
         return $string;

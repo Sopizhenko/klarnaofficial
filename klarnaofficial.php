@@ -152,8 +152,7 @@ class KlarnaOfficial extends PaymentModule
     }
     public function install()
     {
-        if (
-            parent::install() == false
+        if (parent::install() == false
             || $this->registerHook('header') == false
             || $this->registerHook('footer') == false
             || $this->registerHook('updateOrderStatus') == false
@@ -2480,7 +2479,7 @@ class KlarnaOfficial extends PaymentModule
             $eid_ss_comb = $this->getAllEIDSScombinations($order->id_shop);
             $shared_secret = $eid_ss_comb[$eid];
             $digest_secret = "$eid:$invoice_number:$shared_secret";
-            $digest_secret = hash("sha512",$digest_secret);
+            $digest_secret = hash("sha512", $digest_secret);
             $digest_secret = pack('H*', $digest_secret);
             $digest_secret = base64_encode($digest_secret);
             $digest_secret = urlencode($digest_secret);
@@ -2513,7 +2512,8 @@ class KlarnaOfficial extends PaymentModule
                 $shared_secret = $eid_ss_comb[$eid];
                 if ($reservation_number != '') {
                     try {
-                        if ($eid == Configuration::get('KCO_UK_EID', null, null, $order->id_shop) || $eid == Configuration::get('KCO_NL_EID', null, null, $order->id_shop)) {
+                        if ($eid == Configuration::get('KCO_UK_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCO_NL_EID', null, null, $order->id_shop)) {
                             require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
                             
                             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
@@ -2611,7 +2611,8 @@ class KlarnaOfficial extends PaymentModule
                         $invoice_number = '';
                         $risk_status = '';
 
-                        if ($eid == Configuration::get('KCO_UK_EID', null, null, $order->id_shop) || $eid == Configuration::get('KCO_NL_EID', null, null, $order->id_shop)) {
+                        if ($eid == Configuration::get('KCO_UK_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCO_NL_EID', null, null, $order->id_shop)) {
                             require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
                             
                             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
@@ -2875,8 +2876,7 @@ class KlarnaOfficial extends PaymentModule
             } else {
                 Tools::redirect('index.php');
             }
-        } elseif(Tools::getIsset("kcotpv3")) {
-            
+        } elseif (Tools::getIsset("kcotpv3")) {
             $sid = Tools::getValue('sid');
             if ($sid == 'gb') {
                 $sharedSecret = Configuration::get('KCO_UK_SECRET');
@@ -2920,7 +2920,6 @@ class KlarnaOfficial extends PaymentModule
             $this->context->smarty->assign('snippet', $snippet);
             unset($_SESSION['klarna_checkout_uk']);
             return $this->display(__FILE__, 'kco_payment_return.tpl');
-            
         } else {
             $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
             $this->context->smarty->assign('orderid', $params["objOrder"]->id);

@@ -721,7 +721,8 @@ class KlarnaOfficialCheckoutKlarnaUsModuleFrontController extends ModuleFrontCon
         ));
     }
     
-    public function getConnector($ssid, $eid, $sharedSecret) {
+    public function getConnector($ssid, $eid, $sharedSecret)
+    {
         if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
             if ($ssid=='us') {
                 $url = 'https://api-na.playground.klarna.com/';

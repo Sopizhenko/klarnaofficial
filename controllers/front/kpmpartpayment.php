@@ -175,14 +175,14 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                     $carrier = new Carrier($this->context->cart->id_carrier);
                     $carrieraddress = new Address($this->context->cart->id_address_delivery);
                     if (Configuration::get('PS_ATCP_SHIPWRAP')) {
-                        $carriertaxrate = round(($total_shipping_wt / $total_shipping) -1 ,2) * 100;
+                        $carriertaxrate = round(($total_shipping_wt / $total_shipping) -1, 2) * 100;
                     } else {
                         $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
                     }
                     
                     if (($total_shipping_wt != $total_shipping) && $carriertaxrate == 0) {
                         //Prestashop error due to EU module?
-                        $carriertaxrate = round(($total_shipping_wt / $total_shipping) -1 ,2) * 100;
+                        $carriertaxrate = round(($total_shipping_wt / $total_shipping) -1, 2) * 100;
                     }
                     
                     $shippingReference = $this->module->shippingreferences[$languageIso];
@@ -443,7 +443,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                         '&id_order='.
                         $id_order
                     );
-                    
                 } catch (Exception $e) {
                     $kpminvoicefee = Configuration::get('KPM_INVOICEFEE', null, null, $this->context->shop->id);
                     if ($kpminvoicefee != '' && (int) Tools::getValue('kpm_pclass') == -1) {
@@ -620,8 +619,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             
             $this->context->smarty->assign('terms_account', "Lees meer!");
             $this->context->smarty->assign('terms_invoice', "Factuurvoorwaarden");
-            
-            
         } elseif ($klarnaCountry == KlarnaCountry::DK) {
             $kpm_expected_language = array("da");
             $kpm_expected_language_display = "Danska";
@@ -692,7 +689,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             
             $this->context->smarty->assign('terms_account', "Læs mere");
             $this->context->smarty->assign('terms_invoice', "Læs mere");
-            
         } elseif ($klarnaCountry == KlarnaCountry::FI) {
             $kpm_expected_language = array("fi", "sv");
             $kpm_expected_language_display = "Sumoi, Svenska";
@@ -763,8 +759,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             
             $this->context->smarty->assign('terms_account', "Lule lisää");
             $this->context->smarty->assign('terms_invoice', "Lule lisää");
-            
-            
         } elseif ($klarnaCountry == KlarnaCountry::AT) {
             $kpm_expected_language = array("de");
             $kpm_expected_language_display = "Deutch";
@@ -819,7 +813,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             $this->context->smarty->assign('special_usecase', $use_case);
 
             $this->context->smarty->assign('terms_invoice', "Rechnungsbedingungen");
-            
         } elseif (in_array($klarnaCountry, array(KlarnaCountry::SE, KlarnaCountry::NO, KlarnaCountry::DE))) {
             if ($klarnaCountry == KlarnaCountry::DE) {
                 $kpm_expected_currency = "EUR";

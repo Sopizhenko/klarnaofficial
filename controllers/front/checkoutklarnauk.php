@@ -134,14 +134,14 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
 
                 if ($shipping_cost_without_tax > 0) {
                     if (!Configuration::get('PS_ATCP_SHIPWRAP')) {
-                        $shipping_tax_rate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1 ,2) * 100;
+                        $shipping_tax_rate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
                     } else {
                         $shipping_tax_rate = $carrier->getTaxesRate($carrieraddress);
                     }
                     
                     if (($shipping_cost_with_tax != $shipping_cost_without_tax) && $shipping_tax_rate == 0) {
                         //Prestashop error due to EU module?
-                        $shipping_tax_rate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1 ,2) * 100;
+                        $shipping_tax_rate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
                     }
                     
                     $shipping_tax_value = ($shipping_cost_with_tax - $shipping_cost_without_tax);
@@ -744,7 +744,8 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
         ));
     }
     
-    public function getConnector($ssid, $eid, $sharedSecret) {
+    public function getConnector($ssid, $eid, $sharedSecret)
+    {
         if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
             if ($ssid=='us') {
                 $url = 'https://api-na.playground.klarna.com/';

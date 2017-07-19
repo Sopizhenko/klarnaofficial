@@ -29,7 +29,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnaorder = Tools::jsonDecode($klarnadata, true);
         
-        if(isset($klarnaorder["merchant_reference2"])) {
+        if (isset($klarnaorder["merchant_reference2"])) {
             //This is a KCO V3 ORDER
             //Convert Data
             $klarnaorder["merchant_reference"]["orderid2"] = $klarnadata["merchant_reference2"];

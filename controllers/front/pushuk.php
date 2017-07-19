@@ -98,7 +98,8 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
                 if ($cart->OrderExists()) {
                     $klarna_reservation = Tools::getValue('klarna_order_id');
                     
-                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.'order_payment` m LEFT JOIN `'._DB_PREFIX_.
+                    $sql = 'SELECT m.transaction_id, o.id_order FROM `'._DB_PREFIX_.
+                    'order_payment` m LEFT JOIN `'._DB_PREFIX_.
                     'orders` o ON m.order_reference=o.reference WHERE o.id_cart='.(int) ($id_cart);
                     
                     $messages = Db::getInstance()->ExecuteS($sql);
@@ -147,8 +148,7 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
                     $newsletter = 0;
                     $newsletter_setting = (int)Configuration::get('KCO_ADD_NEWSLETTERBOX', null, $cart->id_shop);
                     if ($newsletter_setting == 0 || $newsletter_setting == 1) {
-                        if (
-                            isset($checkout['merchant_requested']) &&
+                        if (isset($checkout['merchant_requested']) &&
                             isset($checkout['merchant_requested']['additional_checkbox']) &&
                             $checkout['merchant_requested']['additional_checkbox'] == true
                         ) {
