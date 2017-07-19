@@ -13,10 +13,8 @@
  * to info@prestaworks.se so we can send you a copy immediately.
  *
  * @author Prestaworks AB <info@prestaworks.se>
- * @category PrestaShop
- * @category  Module
  * @copyright 2015 Prestaworks AB
- * @license     see file: docs/LICENSE.txt
+ * @category PrestaShop Module
  * @license http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registered Trademark & Property of Prestaworks AB
  */

@@ -108,10 +108,10 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
                         if ($message['transaction_id']==$klarna_reservation) {
                             //Already created, send create
                             $update = new Klarna\Rest\OrderManagement\Order($connector, $orderId);
-                            $update->updateMerchantReferences([
+                            $update->updateMerchantReferences(array(
                                 'merchant_reference1' => ''.$message['id_order'],
                                 'merchant_reference2' => ''.$id_cart,
-                            ]);
+                            ));
                             $update->acknowledge();
                             Logger::addLog(
                                 'KCO: created sent: '.$id_cart.' res:'.$klarna_reservation,
@@ -384,10 +384,10 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
                         $order_reference = $order->reference;
                     }
                     $update = new Klarna\Rest\OrderManagement\Order($connector, $reference);
-                    $update->updateMerchantReferences([
+                    $update->updateMerchantReferences(array(
                                 'merchant_reference1' => ''.$order_reference,
                                 'merchant_reference2' => ''.$cart->id,
-                            ]);
+                            ));
                     $update->acknowledge();
 
                     $sql = 'UPDATE `'._DB_PREFIX_.
