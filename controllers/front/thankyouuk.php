@@ -128,6 +128,7 @@ class KlarnaOfficialThankYouUkModuleFrontController extends ModuleFrontControlle
                 );
             } else {
                 //order was not created, show fake confirmation and unload cart
+                $cart = $this->context->cart;
                 unset($this->context->cookie->id_cart, $cart, $this->context->cart);
                 $this->context->cart = new Cart();
                 

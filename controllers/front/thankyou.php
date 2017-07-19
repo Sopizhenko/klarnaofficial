@@ -105,6 +105,7 @@ class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController
                     $this->module->id
                 );
             } else {
+                $cart = $this->context->cart;
                 unset($this->context->cookie->id_cart, $cart, $this->context->cart);
                 $this->context->cart = new Cart();
                 

@@ -48,6 +48,9 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
     }
     public function initContent()
     {
+        $ssid = 'gb';
+        $eid = '';
+        $sharedSecret = '';
         parent::initContent();
 
         if (!$this->context->cart->getDeliveryOption(null, true)) {
@@ -131,7 +134,9 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
 
                 $shipping_cost_with_tax = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
                 $shipping_cost_without_tax = $this->context->cart->getOrderTotal(false, Cart::ONLY_SHIPPING);
-
+                $carrier = new Carrier($this->context->cart->id_carrier);
+                $carrieraddress = new Address($this->context->cart->id_address_delivery);
+                
                 if ($shipping_cost_without_tax > 0) {
                     if (!Configuration::get('PS_ATCP_SHIPWRAP')) {
                         $shipping_tax_rate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
@@ -146,8 +151,7 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
                     
                     $shipping_tax_value = ($shipping_cost_with_tax - $shipping_cost_without_tax);
                     $totalCartValue += $shipping_cost_with_tax;
-
-                    $carrier = new Carrier($this->context->cart->id_carrier);
+                    
                     $shippingReference = $this->module->shippingreferences[$language->iso_code];
                     
                     $checkoutcart[] = array(

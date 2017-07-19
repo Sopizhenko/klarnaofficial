@@ -52,6 +52,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
 
     public function initContent()
     {
+        $eid = '';
+        $sharedSecret = '';
         parent::initContent();
 
         if (!$this->context->cart->getDeliveryOption(null, true)) {
@@ -172,14 +174,14 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     $carrier = new Carrier($this->context->cart->id_carrier);
                     $carrieraddress = new Address($this->context->cart->id_address_delivery);
                     if (!Configuration::get('PS_ATCP_SHIPWRAP')) {
-                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1 ,2) * 100;
+                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
                     } else {
                         $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
                     }
                     
                     if (($shipping_cost_with_tax != $shipping_cost_without_tax) && $carriertaxrate == 0) {
                         //Prestashop error due to EU module?
-                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1 ,2) * 100;
+                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
                     }
                     
                     $shippingReference = $this->module->shippingreferences[$language->iso_code];

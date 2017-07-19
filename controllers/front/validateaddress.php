@@ -26,16 +26,18 @@ class KlarnaOfficialValidateAddressModuleFrontController extends ModuleFrontCont
 
     public function init()
     {
+        /*
         $klarnadata = Tools::file_get_contents('php://input');
         $id_cart = (int) Tools::getValue("cartid");
         PrestaShopLogger::addLog("id_cart: ".$id_cart, 3, null, '', 0, true);
         PrestaShopLogger::addLog(print_r($klarnadata, true), 3, null, '', 0, true);
-        $klarnaorder = Tools::jsonDecode($klarnadata, true);
+        //$klarnaorder = Tools::jsonDecode($klarnadata, true);
         if ($klarnadata["shipping_address"]["country"] == "us") {
             $iso_code = pSQL($klarnadata["shipping_address"]["region"]);
             $id_country = (int)Country::getByIso("us");
             if ($id_country > 0) {
-                $sql = "SELECT id_state FROM `"._DB_PREFIX_."state` WHERE id_country=$id_country AND iso_code='$iso_code'";
+                $sql = "SELECT id_state FROM `"._DB_PREFIX_.
+                "state` WHERE id_country=$id_country AND iso_code='$iso_code'";
                 $id_state = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
             } else {
                 //US NOT FOUND
@@ -268,5 +270,6 @@ class KlarnaOfficialValidateAddressModuleFrontController extends ModuleFrontCont
         $object["shipping_options"] = $shipping_options;
         echo json_encode($object);
         exit;
+        */
     }
 }
