@@ -47,7 +47,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.8';
+        $this->version = '1.9.9';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3165,7 +3165,7 @@ class KlarnaOfficial extends PaymentModule
         $id_address_nl = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_nl) > 0) {
             Configuration::updateValue('KCO_NL_ADDR', $id_address_nl);
-            $us_done = true;
+            $nl_done = true;
         } else {
             $id_country = (int) Country::getByIso('NL');
             $insert_sql = 'INSERT INTO '._DB_PREFIX_.
@@ -3178,7 +3178,7 @@ class KlarnaOfficial extends PaymentModule
             $id_address_nl = Db::getInstance()->getValue($sql);
             if ((int) ($id_address_nl) > 0) {
                 Configuration::updateValue('KCO_NL_ADDR', $id_address_nl);
-                $us_done = true;
+                $nl_done = true;
             }
         }
         
