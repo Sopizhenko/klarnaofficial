@@ -510,7 +510,6 @@ class KlarnaOfficialCheckoutKlarnaUsModuleFrontController extends ModuleFrontCon
         }
 
         $this->setTemplate('module:klarnaofficial/views/templates/front/kco_checkout.tpl');
-
     }
 
     protected function validateDeliveryOption($delivery_option)

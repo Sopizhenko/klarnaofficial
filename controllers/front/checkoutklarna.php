@@ -942,5 +942,4 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
     {
         return floor($num).Tools::substr($num-floor($num), 1, $precision+1);
     }
-    
 }
