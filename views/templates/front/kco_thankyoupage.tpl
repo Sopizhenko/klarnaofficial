@@ -16,12 +16,16 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of Prestaworks AB
 *}
-{capture name=path}{l s='Thank you!' mod='klarnaofficial'}{/capture}
+{extends $layout}
+
+{block name='content'}
+
 {if isset($klarna_error)}
 <div class="alert alert-warning">{$klarna_error|escape:'html':'UTF-8'}</div>
 {else}
-{$klarna_html}
+{$klarna_html nofilter}
 {/if}
 {if isset($HOOK_ORDER_CONFIRMATION)}
-{$HOOK_ORDER_CONFIRMATION}
+{$HOOK_ORDER_CONFIRMATION nofilter}
 {/if}
+{/block}

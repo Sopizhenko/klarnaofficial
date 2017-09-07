@@ -186,8 +186,7 @@
         .kco-input {
             background: #fff;
             border: 0;
-            border-radius: 3px;
-            box-shadow: inset 0 0 0 1px #a6a6a6;
+            box-shadow: inset 0 0 0 1px #cbcbcd;
             color: #595959;
             font-size: .9375em;
             font-weight: 600;
@@ -312,14 +311,14 @@
         }
         .kco-trigger:before {
             color: #0089cf;
-            content: '\f146';
+            content: '\E5CE';
             display: block;
             float: right;
-            font-family: Fontawesome;
+            font-family: Material Icons;
             font-size: 16px;
         }
             .kco-trigger--inactive:before {
-                content: '\f0fe';
+                content: '\E5CF';
             }
             .kco-trigger--big {
                 background: #f0f4f8;
@@ -329,6 +328,17 @@
             }
                 .kco-trigger--big:before {
                     font-size: 18px;
+                }
+                .alternative_methods {
+                    text-transform: none;
+                    font-size: 14px;
+                    float: right;
+                }
+                @media (max-width: 992px) {
+                    .alternative_methods {
+                        display: block;
+                        float: none;
+                    }
                 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -340,13 +350,8 @@
         margin: 0;
         padding: 0;
     }
+    .hidden_kco_radio { display: none; }
         .kco-sel-list__item {
-            box-shadow: inset 0 0 0 1px #a6a6a6;
-            border-radius: 3px;
-            display: block;
-            font-size: .9375em;
-            margin: 0 0 .3333333333333333em;
-            position: relative;
         }
             .kco-sel-list__item:after,
             .kco-sel-list__item__label:after {
@@ -413,8 +418,14 @@
                     color: #0089cf;
                 }
             .kco-sel-list__item.selected {
-                box-shadow: 0 0 0 1px #0089cf,
-                            0 0 3px 1px #0089cf;
+                border: 1px solid #0089cf;
+            }
+            .kco-sel-list__item.selected label:before {
+                content: 'check_circle';
+                font-family: Material Icons;
+                color: #0089cf;
+                float: left;
+                margin: 0px 5px 0px 0px;
             }
             .kco-sel-list__item__info {
                 clear: both;

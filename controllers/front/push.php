@@ -468,6 +468,7 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
             Logger::addLog('Klarna Checkout: '.htmlspecialchars($e->getMessage()), 1, null, null, null, true);
         }
+        exit;
     }
 
     //FOR CANCEL RESERVATION

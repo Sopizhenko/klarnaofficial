@@ -18,6 +18,10 @@
  *  International Registered Trademark & Property of Prestaworks AB
  */
 
+use Symfony\Component\Translation\TranslatorInterface;
+use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
+use PrestaShop\PrestaShop\Adapter\ObjectPresenter;
+ 
 class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
@@ -47,6 +51,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 session_start();
             }
         }
+        
         require_once dirname(__FILE__).'/../../libraries/kcocommonpostprocess.php';
     }
 
@@ -87,11 +92,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
 
         $layout = 'desktop';
-        //if($this->context->getMobileDevice())
-        //	$layout = 'mobile';
-        require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
-        $mobile_detect_class = new Mobile_Detect();
-        if ($mobile_detect_class->isMobile() or $mobile_detect_class->isMobile()) {
+        
+        if (Context::getContext()->getDevice() == Context::DEVICE_MOBILE) {
             $layout = 'mobile';
         }
 
@@ -124,7 +126,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 }
                 $lastrate = "notset";
                 $has_different_rates = false;
-                foreach ($this->context->cart->getProducts() as $product) {
+
+                foreach ($this->context->cart->getProducts(true, false, $this->context->cart->id_address_delivery) as $product) {
                     if ($lastrate == "notset") {
                         $lastrate = $product['rate'];
                     } elseif ($lastrate != $product['rate']) {
@@ -165,37 +168,48 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     'tax_rate' => (int) ($product['rate']) * 100,
                     );
                 }
-
-                $shipping_cost_with_tax = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
-                $shipping_cost_without_tax = $this->context->cart->getOrderTotal(false, Cart::ONLY_SHIPPING);
-
-                if ($shipping_cost_without_tax > 0) {
-                    $totalCartValue += $shipping_cost_with_tax;
-                    
-                    $carrier = new Carrier($this->context->cart->id_carrier);
-                    $carrieraddress = new Address($this->context->cart->id_address_delivery);
-                    if (!Configuration::get('PS_ATCP_SHIPWRAP')) {
-                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
-                    } else {
-                        $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
+                
+                $free_shipping = false;
+                foreach ($this->context->cart->getCartRules() as $rule) {
+                    if ($rule['free_shipping']) {
+                        $free_shipping = true;
+                        break;
                     }
-                    
-                    if (($shipping_cost_with_tax != $shipping_cost_without_tax) && $carriertaxrate == 0) {
-                        //Prestashop error due to EU module?
-                        $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
-                    }
-                    
-                    $shippingReference = $this->module->shippingreferences[$language->iso_code];
-
-                    $checkoutcart[] = array(
-                        'type' => 'shipping_fee',
-                        'reference' => $shippingReference,
-                        'name' => strip_tags($carrier->name),
-                        'quantity' => 1,
-                        'unit_price' => ($shipping_cost_with_tax * 100),
-                        'tax_rate' => (int) ($carriertaxrate * 100),
-                    );
                 }
+
+                if ($free_shipping === false) {
+                    $shipping_cost_with_tax = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
+                    $shipping_cost_without_tax = $this->context->cart->getOrderTotal(false, Cart::ONLY_SHIPPING);
+
+                    if ($shipping_cost_without_tax > 0) {
+                        $totalCartValue += $shipping_cost_with_tax;
+                        
+                        $carrier = new Carrier($this->context->cart->id_carrier);
+                        $carrieraddress = new Address($this->context->cart->id_address_delivery);
+                        if (!Configuration::get('PS_ATCP_SHIPWRAP')) {
+                            $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
+                        } else {
+                            $carriertaxrate = $carrier->getTaxesRate($carrieraddress);
+                        }
+                        
+                        if (($shipping_cost_with_tax != $shipping_cost_without_tax) && $carriertaxrate == 0) {
+                            //Prestashop error due to EU module?
+                            $carriertaxrate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
+                        }
+                        
+                        $shippingReference = $this->module->shippingreferences[$language->iso_code];
+
+                        $checkoutcart[] = array(
+                            'type' => 'shipping_fee',
+                            'reference' => $shippingReference,
+                            'name' => strip_tags($carrier->name),
+                            'quantity' => 1,
+                            'unit_price' => ($shipping_cost_with_tax * 100),
+                            'tax_rate' => (int) ($carriertaxrate * 100),
+                        );
+                    }
+                }
+                
                 if ($this->context->cart->gift == 1) {
                     $cart_wrapping = $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
                     if ($cart_wrapping > 0) {
@@ -237,8 +251,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 }
 
                 //DISCOUNTS
-                
-                foreach ($this->context->cart->getCartRules() as $cart_rule) {
+                $total_discounts = 0;
+                foreach ($this->context->cart->getCartRules(CartRule::FILTER_ACTION_ALL) as $cart_rule) {
                     $value_real = $cart_rule["value_real"];
                     $value_tax_exc = $cart_rule["value_tax_exc"];
                     
@@ -252,6 +266,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         $discount_tax_rate = Tools::ps_round($discount_tax_rate, 2);
                     }
                     
+                    if ($totalCartValue<=$total_discounts) {
+                        $value_real = 0;
+                    }
                     
                     $checkoutcart[] = array(
                             'type' => 'discount',
@@ -261,8 +278,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             'unit_price' => -(Tools::ps_round($value_real, 2) * 100),
                             'tax_rate' => (int) ($discount_tax_rate * 100),
                         );
+                    $total_discounts += $value_real;
                 }
-
+//echo "<pre>"; print_r($checkoutcart);echo "</pre>";exit;
                 if ($round_diff != 0) {
                     $checkoutcart[] = array(
                         'reference' => '',
@@ -322,6 +340,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             $update['purchase_currency'] = $country_information['purchase_currency'];
                             $update['locale'] = $country_information['locale'];
                             $update['merchant_reference']['orderid2'] = ''.(int) ($this->context->cart->id);
+
                             $klarnaorder->update($update);
                         } catch (Exception $e) {
                             // Reset session
@@ -332,6 +351,25 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     if ($klarnaorder == null) {
                         $klarnaorder = new Klarna_Checkout_Order($connector);
 
+                        if (isset($this->context->customer) && $this->context->customer->id > 0) {
+                            //Logged in customer, set customer info
+                            $create['shipping_address']['email'] = $this->context->customer->email;
+                            $create['shipping_address']['given_name'] = $this->context->customer->firstname;
+                            $create['shipping_address']['family_name'] = $this->context->customer->lastname;
+                            
+                            $id_address = Address::getFirstCustomerAddressId($this->context->customer->id);
+                            if ((int) $id_address > 0) {
+                                $addressObj = new Address($id_address);
+                                $create['shipping_address']['street_address'] = $addressObj->address1;
+                                $create['shipping_address']['postal_code'] = $addressObj->postcode;
+                                $create['shipping_address']['city'] = $addressObj->city;
+                                $create['shipping_address']['care_of'] = $addressObj->address2;
+                                $create['shipping_address']['organization_name'] = $addressObj->company;
+                                $create['shipping_address']['phone'] = $addressObj->phone_mobile;
+                            }
+                            
+                        }
+                        
                         $create['purchase_country'] = $country_information['purchase_country'];
                         $create['purchase_currency'] = $country_information['purchase_currency'];
                         $create['locale'] = $country_information['locale'];
@@ -487,13 +525,6 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         $delivery_option_list = $this->context->cart->getDeliveryOptionList();
                     }
 
-                    $free_shipping = false;
-                    foreach ($this->context->cart->getCartRules() as $rule) {
-                        if ($rule['free_shipping']) {
-                            $free_shipping = true;
-                            break;
-                        }
-                    }
                     $free_fees_price = 0;
                     $configuration = Configuration::getMultiple(
                         array(
@@ -576,6 +607,17 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         $show_us = true;
                     }
                     $this->assignSummaryInformations();
+                    $checkoutSession = $this->getCheckoutSession();
+                    $delivery_options = $checkoutSession->getDeliveryOptions();
+                   // print_r($delivery_options);exit;
+                    // $deliveryoptionsfinder = new DeliveryOptionsfinder();
+                    // $deliveryoptionsfinder->getDeliveryOptions();
+                    //AS DONE IN ORDERCONTROLLER.php 73
+                    $delivery_options_finder_core = new DeliveryOptionsFinder($this->context,$this->getTranslator(),
+            $this->objectPresenter,
+            new PriceFormatter());
+                    $delivery_option = $delivery_options_finder_core->getSelectedDeliveryOption();
+                    
                     $this->context->smarty->assign(array(
                         'no_active_countries' => $no_active_countries,
                         'show_austria' => $show_austria,
@@ -590,8 +632,11 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         'klarna_checkout' => $snippet,
                         'controllername' => 'checkoutklarna',
                         'free_shipping' => $free_shipping,
+                        'id_lang' => $this->context->language->id,
                         'token_cart' => $this->context->cart->secure_key,
-                        'delivery_option_list' => $delivery_option_list,
+                        'id_address' => $this->context->cart->id_address_delivery,
+                        'delivery_options' => $delivery_options,
+                        /*'delivery_option_list' => $delivery_option_list,*/
                         'delivery_option' => $delivery_option,
                         'KCO_SHOWLINK' => (int) Configuration::get('KCO_SHOWLINK'),
                         'layout' => $layout,
@@ -612,11 +657,25 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         } else {
             $this->context->smarty->assign('klarna_error', 'empty_cart');
         }
-        if (Configuration::get('KCO_LAYOUT') == 1) {
-            $this->setTemplate('kco_twocolumns.tpl');
-        } else {
-            $this->setTemplate('kco_height.tpl');
-        }
+
+        $this->setTemplate('module:klarnaofficial/views/templates/front/kco_checkout.tpl');
+    }
+    
+    protected function getCheckoutSession()
+    {
+        $deliveryOptionsFinder = new DeliveryOptionsFinder(
+            $this->context,
+            $this->getTranslator(),
+            $this->objectPresenter,
+            new PriceFormatter()
+        );
+
+        $session = new CheckoutSession(
+            $this->context,
+            $deliveryOptionsFinder
+        );
+
+        return $session;
     }
 
     protected function validateDeliveryOption($delivery_option)
@@ -871,8 +930,10 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
             return Tools::ps_round($cart_vat_amount / $cart_amount_te, 2);
         }
     }
+    
     public function cutNum($num, $precision = 2)
     {
         return floor($num).Tools::substr($num-floor($num), 1, $precision+1);
     }
+    
 }

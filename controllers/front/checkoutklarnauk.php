@@ -18,6 +18,10 @@
  *  International Registered Trademark & Property of Prestaworks AB
  */
 
+use Symfony\Component\Translation\TranslatorInterface;
+use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
+use PrestaShop\PrestaShop\Adapter\ObjectPresenter;
+
 class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
@@ -57,6 +61,10 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
             $this->context->cart->setDeliveryOption($this->context->cart->getDeliveryOption());
         }
         
+        //Make a check on reload
+        CartRule::autoRemoveFromCart($this->context);
+        CartRule::autoAddToCart($this->context);
+        
         $checkoutcart = array();
         $create  = array();
         
@@ -78,11 +86,7 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
         require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
 
         $layout = 'desktop';
-        //if($this->context->getMobileDevice())
-        //	$layout = 'mobile';
-        require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
-        $mobile_detect_class = new Mobile_Detect();
-        if ($mobile_detect_class->isMobile() or $mobile_detect_class->isMobile()) {
+        if (Context::getContext()->getDevice() == Context::DEVICE_MOBILE) {
             $layout = 'mobile';
         }
 
@@ -497,6 +501,15 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
                             $show_austria = true;
                         }
                         $this->assignSummaryInformations();
+                        
+                        $checkoutSession = $this->getCheckoutSession();
+                        $delivery_options = $checkoutSession->getDeliveryOptions();
+                        $delivery_options_finder_core = new DeliveryOptionsFinder($this->context,$this->getTranslator(),
+                            $this->objectPresenter,
+                            new PriceFormatter()
+                        );
+                        $delivery_option = $delivery_options_finder_core->getSelectedDeliveryOption();
+                    
                         $this->context->smarty->assign(array(
                             'no_active_countries' => $no_active_countries,
                             'show_germany' => $show_germany,
@@ -512,7 +525,8 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
                             'controllername' => 'checkoutklarnauk',
                             'free_shipping' => $free_shipping,
                             'token_cart' => $this->context->cart->secure_key,
-                            'delivery_option_list' => $delivery_option_list,
+                            'id_address' => $this->context->cart->id_address_delivery,
+                            'delivery_options' => $delivery_options,
                             'delivery_option' => $delivery_option,
                             'KCO_SHOWLINK' => (int) Configuration::get('KCO_SHOWLINK'),
                             'layout' => $layout,
@@ -529,11 +543,9 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
         } else {
             $this->context->smarty->assign('klarna_error', 'empty_cart');
         }
-        if (Configuration::get('KCO_LAYOUT') == 1) {
-            $this->setTemplate('kco_twocolumns.tpl');
-        } else {
-            $this->setTemplate('kco_height.tpl');
-        }
+        
+        $this->setTemplate('module:klarnaofficial/views/templates/front/kco_checkout.tpl');
+
     }
 
     protected function validateDeliveryOption($delivery_option)
@@ -772,5 +784,22 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
             );
         }
         return $connector;
+    }
+    
+    protected function getCheckoutSession()
+    {
+        $deliveryOptionsFinder = new DeliveryOptionsFinder(
+            $this->context,
+            $this->getTranslator(),
+            $this->objectPresenter,
+            new PriceFormatter()
+        );
+
+        $session = new CheckoutSession(
+            $this->context,
+            $deliveryOptionsFinder
+        );
+
+        return $session;
     }
 }

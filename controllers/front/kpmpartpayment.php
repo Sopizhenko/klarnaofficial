@@ -383,6 +383,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                     if (null !== $houseext) {
                         $kpm_streetname .= " ".$houseext;
                     }
+                    
                     $this->module->changeAddressOnCart(
                         Tools::getValue('kpm_firstname'),
                         Tools::getValue('kpm_lastname'),
@@ -518,9 +519,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
         $kpm_email = Tools::getValue('kpm_email', $customer->email);
 
         $layout = 'desktop';
-        require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
-        $mobile_detect_class = new Mobile_Detect();
-        if ($mobile_detect_class->isMobile() or $mobile_detect_class->isMobile()) {
+        if (Context::getContext()->getDevice() == Context::DEVICE_MOBILE) {
             $layout = 'mobile';
         }
 
@@ -967,7 +966,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             'kpm_getaddress_url' => $kpm_getaddress_url,
         ));
 
-        $this->setTemplate('kpm_partpayment.tpl');
+        $this->setTemplate('module:klarnaofficial/views/templates/front/kpm_partpayment.tpl');
     }
     public function cutNum($num, $precision = 2)
     {

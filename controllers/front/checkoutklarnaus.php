@@ -508,11 +508,9 @@ class KlarnaOfficialCheckoutKlarnaUsModuleFrontController extends ModuleFrontCon
         } else {
             $this->context->smarty->assign('klarna_error', 'empty_cart');
         }
-        if (Configuration::get('KCO_LAYOUT') == 1) {
-            $this->setTemplate('kco_twocolumns.tpl');
-        } else {
-            $this->setTemplate('kco_height.tpl');
-        }
+
+        $this->setTemplate('module:klarnaofficial/views/templates/front/kco_checkout.tpl');
+
     }
 
     protected function validateDeliveryOption($delivery_option)

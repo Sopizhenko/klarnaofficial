@@ -4,7 +4,9 @@ if ($country_information === false) {
     Tools::redirect('index.php?controller=order&step=1');
 }
 
-$tmp_address = new Address((int) ($this->context->cart->id_address_delivery));
+$id_address_tmpcheck = checkCustomerAddressId((int) $this->context->cart->id_address_delivery, $this->context);
+$tmp_address = new Address((int)$id_address_tmpcheck);
+
 $country = new Country($tmp_address->id_country);
 if ($country_information['purchase_country'] == 'SE') {
     $eid = (int) (Configuration::get('KCO_SWEDEN_EID'));
@@ -21,8 +23,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_SWEDEN_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_SWEDEN_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
     }
     if ($this->current_kco != 'NORDICS') {
@@ -43,8 +47,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_FINLAND_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_FINLAND_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
     }
     if ($this->current_kco != 'NORDICS') {
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
@@ -64,8 +70,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_NORWAY_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_NORWAY_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
     }
     if ($this->current_kco != 'NORDICS') {
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
@@ -85,8 +93,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_GERMANY_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_GERMANY_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
     }
     if ($this->current_kco != 'NORDICS') {
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
@@ -106,8 +116,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_AUSTRIA_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_AUSTRIA_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
     }
     if ($this->current_kco != 'NORDICS') {
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
@@ -127,8 +139,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_NL_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_NL_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnauk');
     }
     if ($this->current_kco != 'UKNL') {
@@ -139,7 +153,6 @@ if ($country_information['purchase_country'] == 'SE') {
     $sharedSecret = Configuration::get('KCO_UK_SECRET');
     $ssid = 'gb';
     if ($country->iso_code != 'GB') {
-        
         if ($this->context->cart->id_address_delivery==Configuration::get('KCO_UK_ADDR')) {
             $this->module->createAddress(
                 'GB',
@@ -150,8 +163,10 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_UK_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_UK_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnauk');
     }
     if ($this->current_kco != 'UKNL') {
@@ -173,11 +188,51 @@ if ($country_information['purchase_country'] == 'SE') {
             );
         }
         
-        $this->context->cart->id_address_delivery = Configuration::get('KCO_US_ADDR');
+        $this->context->cart->id_address_delivery = checkCustomerAddressId((int) Configuration::get('KCO_US_ADDR'), $this->context);
+        $this->context->cart->id_address_invoice = $this->context->cart->id_address_delivery;
         $this->context->cart->update();
+        SetNewAddressOnCart($this->context->cart->id_address_delivery, $this->context->cart->id);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnaus');
     }
     if ($this->current_kco != 'US') {
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnaus');
     }
+}
+
+function SetNewAddressOnCart($id_address_delivery, $id_cart)
+{
+    $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
+        'SET id_address_delivery='.(int) $id_address_delivery.
+        ' WHERE id_cart='.(int) $id_cart;
+        
+    Db::getInstance()->execute($update_sql);
+
+    $update_sql = 'UPDATE '._DB_PREFIX_.'customization '.
+        'SET id_address_delivery='.(int) $id_address_delivery.
+        ' WHERE id_cart='.(int) $id_cart;
+        
+    Db::getInstance()->execute($update_sql);
+
+}
+
+function checkCustomerAddressId($id_address, $context){    
+    if (isset($context->customer) && $context->customer->id > 0 && (int) $id_address > 0) {
+        $address_to_check = new Address((int) $id_address);
+        if ($address_to_check->id_customer != $context->customer->id) {
+            foreach($context->customer->getSimpleAddresses() as $simple_address) {
+                if ($simple_address["id_country"] == $address_to_check->id_country) {
+                    return $simple_address["id"];
+                }
+            }
+            unset($address_to_check->id);
+            $address_to_check->id_customer = $context->customer->id;
+            $address_to_check->add();
+            return $address_to_check->id;
+        } else {
+            return $id_address;
+        }
+    } else {
+        return $id_address;
+    }
+    return $id_address;
 }

@@ -119,7 +119,6 @@ class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController
         } catch (Klarna_Exception $e) {
             $this->context->smarty->assign('klarna_error', $e->getMessage());
         }
-        
-        $this->setTemplate('kco_thankyoupage.tpl');
+        $this->setTemplate('module:klarnaofficial/views/templates/front/kco_thankyoupage.tpl');
     }
 }

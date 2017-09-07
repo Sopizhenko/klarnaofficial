@@ -17,6 +17,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of Prestaworks AB
  */
+use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class KlarnaOfficial extends PaymentModule
 {
@@ -47,7 +48,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.11';
+        $this->version = '2.0.2';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -101,7 +102,6 @@ class KlarnaOfficial extends PaymentModule
             Configuration::deleteByName('KCO_AUSTRIA_EID') == false ||
             Configuration::deleteByName('KCO_AUTOFOCUS') == false ||
             Configuration::deleteByName('KCO_TESTMODE') == false ||
-            Configuration::deleteByName('KCO_LAYOUT') == false ||
             Configuration::deleteByName('KCO_NORWAY') == false ||
             Configuration::deleteByName('KCO_NORWAY_B2B') == false ||
             Configuration::deleteByName('KCO_FINLAND') == false ||
@@ -150,12 +150,12 @@ class KlarnaOfficial extends PaymentModule
     public function install()
     {
         if (parent::install() == false
-            || $this->registerHook('header') == false
-            || $this->registerHook('footer') == false
-            || $this->registerHook('updateOrderStatus') == false
+            || $this->registerHook('displayHeader') == false
+            || $this->registerHook('displayFooter') == false
+            || $this->registerHook('actionOrderStatusUpdate') == false
             || $this->registerHook('displayProductButtons') == false
-            || $this->registerHook('payment') == false
-            || $this->registerHook('paymentReturn') == false
+            || $this->registerHook('paymentOptions') == false
+            || $this->registerHook('displayOrderConfirmation') == false
             || $this->registerHook('displayAdminOrder') == false
             || Configuration::updateValue('KCO_ROUNDOFF', 0) == false
             || $this->setKCOCountrySettings() == false
@@ -180,8 +180,7 @@ class KlarnaOfficial extends PaymentModule
         $name = $this->l('Klarna accepted partpayment');
         $config_name = 'KPM_ACCEPTED_PP';
         $this->createOrderStatus($name, $states, $config_name, true);
-
-        $metas = array();
+        /*$metas = array();
         $metas[] = $this->setMeta('module-klarnaofficial-checkoutklarna');
         $metas[] = $this->setMeta('module-klarnaofficial-checkoutklarnauk');
         $metas[] = $this->setMeta('module-klarnaofficial-kpmpartpayment');
@@ -189,8 +188,7 @@ class KlarnaOfficial extends PaymentModule
         $metas[] = $this->setMeta('module-klarnaofficial-thankyouuk');
         foreach (Theme::getThemes() as $theme) {
             $theme->updateMetas($metas, false);
-        }
-            
+        }*/
         return true;
     }
     
@@ -248,12 +246,9 @@ class KlarnaOfficial extends PaymentModule
             $orderstate->save();
             Configuration::updateValue($config_name, $orderstate->id);
 
-            if (!imageResize(
+            if (!copy(
                 dirname(__FILE__).'/views/img/klarna_os.gif',
-                _PS_IMG_DIR_.'os/'.$orderstate->id.'.gif',
-                null,
-                null,
-                'gif'
+                _PS_IMG_DIR_.'os/'.$orderstate->id.'.gif'
             )) {
                 return false;
             }
@@ -336,7 +331,6 @@ class KlarnaOfficial extends PaymentModule
             Configuration::updateValue('KCO_GERMANY_EID', (int) Tools::getValue('KCO_GERMANY_EID'));
             Configuration::updateValue('KCO_AUSTRIA_EID', (int) Tools::getValue('KCO_AUSTRIA_EID'));
             Configuration::updateValue('KCO_ROUNDOFF', (int) Tools::getValue('KCO_ROUNDOFF'));
-            Configuration::updateValue('KCO_LAYOUT', (int) Tools::getValue('KCO_LAYOUT'));
             Configuration::updateValue('KCO_NORWAY', (int) Tools::getValue('KCO_NORWAY'));
             Configuration::updateValue('KCO_FINLAND', (int) Tools::getValue('KCO_FINLAND'));
             Configuration::updateValue('KCO_NL', (int) Tools::getValue('KCO_NL'));
@@ -1123,24 +1117,6 @@ class KlarnaOfficial extends PaymentModule
                     ),
                     'desc' => $this->l('Round off total value.'),
                 ),
-
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Use two column checkout'),
-                    'name' => 'KCO_LAYOUT',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'layout_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'layout_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Use the two column layout.'),
-                ),
                 
                 array(
                     'type' => 'switch',
@@ -1925,10 +1901,6 @@ class KlarnaOfficial extends PaymentModule
                 'KCO_FINLAND_SECRET',
                 Configuration::get('KCO_FINLAND_SECRET')
             ),
-            'KCO_LAYOUT' => Tools::getValue(
-                'KCO_LAYOUT',
-                Configuration::get('KCO_LAYOUT')
-            ),
             'KCO_UK' => Tools::getValue(
                 'KCO_UK',
                 Configuration::get('KCO_UK')
@@ -2316,7 +2288,7 @@ class KlarnaOfficial extends PaymentModule
             return;
         }
         $this->context->controller->addCSS(($this->_path).'views/css/kpm_common.css', 'all');
-        if (Configuration::get('KCO_IS_ACTIVE')) {
+        /*if (Configuration::get('KCO_IS_ACTIVE')) {
             $this->context->controller->addJS(($this->_path).'views/js/kco_common.js');
             $this->smarty->assign(
                 'kco_checkout_url',
@@ -2324,7 +2296,7 @@ class KlarnaOfficial extends PaymentModule
             );
 
             return $this->display(__FILE__, 'header.tpl');
-        }
+        }*/
     }
 
     /*public function hookTop($params)
@@ -2769,8 +2741,8 @@ class KlarnaOfficial extends PaymentModule
 
         return $k;
     }
-
-    public function hookPayment($params)
+    
+    public function hookPaymentOptions($params)
     {
         if (!$this->active) {
             return;
@@ -2821,20 +2793,52 @@ class KlarnaOfficial extends PaymentModule
         } else {
             $KCO_SHOW_IN_PAYMENTS = false;
         }
+        
+        $newOptions = array();
+        
         $KPM_SHOW_IN_PAYMENTS = Configuration::get('KPM_SHOW_IN_PAYMENTS');
-        $this->smarty->assign('KPM_SHOW_IN_PAYMENTS', $KPM_SHOW_IN_PAYMENTS);
-        $this->smarty->assign('KCO_SHOW_IN_PAYMENTS', $KCO_SHOW_IN_PAYMENTS);
-        $this->smarty->assign('hide_partpayment', $hide_partpayment);
-        $this->smarty->assign('hide_invoicepayment', $hide_invoicepayment);
-        $this->smarty->assign('KPM_LOGO', Configuration::get('KPM_LOGO'));
-        $this->smarty->assign('KPM_LOGO_ISO_CODE', $iso);
+        $KPM_LOGO = Configuration::get('KPM_LOGO');
+        $KPM_LOGO_ISO_CODE = $iso;
+            
+        if (true == $KPM_SHOW_IN_PAYMENTS && (false == $hide_partpayment || false == $hide_invoicepayment)) {
+            $newOption = new PaymentOption();
+            if (true == $hide_partpayment) {
+                $paymentText = $this->l('Pay by Invoice');
+            } elseif(true == $hide_invoicepayment) {
+                $paymentText = $this->l('Pay by Partpayment');
+            } else {
+                $paymentText = $this->l('Pay by Invoice / Partpayment');
+            }
+            
+            $paymentAdditionalText = '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/'.$KPM_LOGO_ISO_CODE.'/basic/'.$KPM_LOGO.'.png?width=200" />';
+            
+            $newOption->setCallToActionText($paymentText)
+                ->setAction($this->context->link->getModuleLink($this->name, 'kpmpartpayment', array(), true))
+                ->setAdditionalInformation($paymentAdditionalText);
 
-        return $this->display(__FILE__, 'kpm_payment.tpl');
+            $newOptions[] = $newOption;
+        }
+        
+        if (true == $KCO_SHOW_IN_PAYMENTS) {
+            $paymentAdditionalText = '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/'.$KPM_LOGO_ISO_CODE.'/basic/'.$KPM_LOGO.'.png?width=200" />';
+            
+            $newOption->setCallToActionText($this->l('Klarna Checkout'))
+                ->setAction($this->context->link->getModuleLink($this->name, 'checkoutklarna', array(), true))
+                ->setAdditionalInformation($paymentAdditionalText);
+
+            $newOptions[] = $newOption;
+        }
+        
+        return $newOptions;
     }
 
-    public function hookPaymentReturn($params)
+    public function hookdisplayOrderConfirmation($params)
     {
         if (!$this->active) {
+            return;
+        }
+        
+        if ($params["order"]->module != $this->name) {
             return;
         }
         
@@ -2865,15 +2869,21 @@ class KlarnaOfficial extends PaymentModule
                 $klarnaorder = new Klarna_Checkout_Order($connector, $checkoutId);
                 $klarnaorder->fetch();
                 $snippet = $klarnaorder['gui']['snippet'];
-                $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
-                $this->context->smarty->assign('orderid', $params["objOrder"]->id);
+                $this->context->smarty->assign('orderreference', $params["order"]->reference);
+                $this->context->smarty->assign('orderid', $params["order"]->id);
                 $this->context->smarty->assign('snippet', $snippet);
                 unset($_SESSION['klarna_checkout']);
                 return $this->display(__FILE__, 'kco_payment_return.tpl');
             } else {
+                return;
                 Tools::redirect('index.php');
             }
         } elseif (Tools::getIsset("kcotpv3")) {
+            
+            $sql = "SELECT reservation FROM "._DB_PREFIX_."klarna_orders WHERE id_order=".(int)$params["order"]->id;
+            $orderId = Db::getInstance()->getValue($sql);
+            
+            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
             $sid = Tools::getValue('sid');
             if ($sid == 'gb') {
                 $sharedSecret = Configuration::get('KCO_UK_SECRET');
@@ -2893,9 +2903,6 @@ class KlarnaOfficial extends PaymentModule
                     \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
                 );
 
-           
-                $orderId = Tools::getValue('klarna_order_id');
-
                 $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
                 $checkout->fetch();
             } else {
@@ -2905,24 +2912,23 @@ class KlarnaOfficial extends PaymentModule
                     \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
                 );
               
-                $orderId = Tools::getValue('klarna_order_id');
                 $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
                 $checkout->fetch();
             }
 
             $snippet = $checkout['html_snippet'];
             
-            $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
-            $this->context->smarty->assign('orderid', $params["objOrder"]->id);
+            $this->context->smarty->assign('orderreference', $params["order"]->reference);
+            $this->context->smarty->assign('orderid', $params["order"]->id);
             $this->context->smarty->assign('snippet', $snippet);
             unset($_SESSION['klarna_checkout_uk']);
             return $this->display(__FILE__, 'kco_payment_return.tpl');
         } else {
-            $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
-            $this->context->smarty->assign('orderid', $params["objOrder"]->id);
+            $this->context->smarty->assign('orderreference', $params["order"]->reference);
+            $this->context->smarty->assign('orderid', $params["order"]->id);
             return $this->display(__FILE__, 'kpm_payment_return.tpl');
         }
-    }
+    }   
 
     public function checkCurrency($cart)
     {

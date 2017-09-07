@@ -94,16 +94,10 @@ class KlarnaOfficialThankYouUkModuleFrontController extends ModuleFrontControlle
             if (!isset($result['id_order'])) {
                 //Give push a few extra seconds
                 sleep(2);
-                
-                $sql = 'SELECT id_order FROM '._DB_PREFIX_.'orders '.
-                'WHERE id_cart='.(int) ($checkout['merchant_reference2']);
-                
                 $result = Db::getInstance()->getRow($sql);
                 
                 if (!isset($result['id_order'])) {
                     sleep(3);
-                    $sql = 'SELECT id_order FROM '._DB_PREFIX_.'orders '.
-                    'WHERE id_cart='.(int) ($checkout['merchant_reference2']);
                     $result = Db::getInstance()->getRow($sql);
                 }
             }
@@ -145,7 +139,7 @@ class KlarnaOfficialThankYouUkModuleFrontController extends ModuleFrontControlle
             $this->context->smarty->assign('klarna_error', $e->getMessage());
         }
 
-        $this->setTemplate('kco_thankyoupage.tpl');
+        $this->setTemplate('module:klarnaofficial/views/templates/front/kco_thankyoupage.tpl');
     }
 
     public function displayOrderConfirmation($id_order)
