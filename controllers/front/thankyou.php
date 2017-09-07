@@ -99,7 +99,7 @@ class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController
                     '&sid='.
                     $sid.
                     '&id_cart='.
-                    $this->context->cart->id.
+                    $order_id2.
                     '&id_module='.
                     $this->module->id
                 );

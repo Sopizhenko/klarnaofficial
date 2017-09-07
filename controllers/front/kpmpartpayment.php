@@ -375,10 +375,18 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                     $kpm_phone = Tools::getValue('kpm_phone');
                     $kpm_mobilephone = Tools::getValue('kpm_mobilephone');
                     $klarna_phone = ($kpm_phone != '' ? $kpm_phone : $kpm_mobilephone);
+                    
+                    $kpm_streetname = Tools::getValue('kpm_streetname');
+                    if (null !== $housenumber) {
+                        $kpm_streetname .= " ".$housenumber;
+                    }
+                    if (null !== $houseext) {
+                        $kpm_streetname .= " ".$houseext;
+                    }
                     $this->module->changeAddressOnCart(
                         Tools::getValue('kpm_firstname'),
                         Tools::getValue('kpm_lastname'),
-                        Tools::getValue('kpm_streetname'),
+                        $kpm_streetname,
                         Tools::getValue('kpm_coname'),
                         Tools::getValue('kpm_company'),
                         Tools::getValue('kpm_zipcode'),

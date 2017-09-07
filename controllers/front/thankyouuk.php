@@ -122,7 +122,7 @@ class KlarnaOfficialThankYouUkModuleFrontController extends ModuleFrontControlle
                     '&sid='.
                     $sid.
                     '&id_cart='.
-                    $this->context->cart->id.
+                    (int) ($checkout['merchant_reference2']).
                     '&id_module='.
                     $this->module->id
                 );
