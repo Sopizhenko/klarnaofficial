@@ -24,7 +24,7 @@ function upgrade_module_2_0_1($module)
     $module->registerHook('displayOrderConfirmation');
     
     $sql = "SELECT `id_hook` FROM `"._DB_PREFIX_."hook` WHERE `name` = 'displayPaymentReturn'";
-    $id_hook = Db::getInstance()->getValue($sql);    
+    $id_hook = Db::getInstance()->getValue($sql);
     if ((int)$id_hook) {
         $module->unregisterHook($id_hook);
     }

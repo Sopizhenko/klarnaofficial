@@ -17,6 +17,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of Prestaworks AB
  */
+
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class KlarnaOfficial extends PaymentModule
@@ -2804,13 +2805,14 @@ class KlarnaOfficial extends PaymentModule
             $newOption = new PaymentOption();
             if (true == $hide_partpayment) {
                 $paymentText = $this->l('Pay by Invoice');
-            } elseif(true == $hide_invoicepayment) {
+            } elseif (true == $hide_invoicepayment) {
                 $paymentText = $this->l('Pay by Partpayment');
             } else {
                 $paymentText = $this->l('Pay by Invoice / Partpayment');
             }
             
-            $paymentAdditionalText = '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/'.$KPM_LOGO_ISO_CODE.'/basic/'.$KPM_LOGO.'.png?width=200" />';
+            $paymentAdditionalText = '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/'.
+                $KPM_LOGO_ISO_CODE.'/basic/'.$KPM_LOGO.'.png?width=200" />';
             
             $newOption->setCallToActionText($paymentText)
                 ->setAction($this->context->link->getModuleLink($this->name, 'kpmpartpayment', array(), true))
@@ -2820,7 +2822,8 @@ class KlarnaOfficial extends PaymentModule
         }
         
         if (true == $KCO_SHOW_IN_PAYMENTS) {
-            $paymentAdditionalText = '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/'.$KPM_LOGO_ISO_CODE.'/basic/'.$KPM_LOGO.'.png?width=200" />';
+            $paymentAdditionalText = '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/'.
+                $KPM_LOGO_ISO_CODE.'/basic/'.$KPM_LOGO.'.png?width=200" />';
             
             $newOption->setCallToActionText($this->l('Klarna Checkout'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'checkoutklarna', array(), true))
@@ -2879,7 +2882,6 @@ class KlarnaOfficial extends PaymentModule
                 Tools::redirect('index.php');
             }
         } elseif (Tools::getIsset("kcotpv3")) {
-            
             $sql = "SELECT reservation FROM "._DB_PREFIX_."klarna_orders WHERE id_order=".(int)$params["order"]->id;
             $orderId = Db::getInstance()->getValue($sql);
             
@@ -2928,7 +2930,7 @@ class KlarnaOfficial extends PaymentModule
             $this->context->smarty->assign('orderid', $params["order"]->id);
             return $this->display(__FILE__, 'kpm_payment_return.tpl');
         }
-    }   
+    }
 
     public function checkCurrency($cart)
     {

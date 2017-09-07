@@ -22,10 +22,16 @@ class CartController extends CartControllerCore
 {
     public function initContent()
     {
-        if ((int)Configuration::get('KCO_IS_ACTIVE') && Tools::getValue('action') === 'show' && (int)Tools::getValue('ajax') !== 1 && (int)Tools::getValue('update') !== 1 && (int)Tools::getValue('forceview') !== 1) {
-            Tools::redirect($this->context->link->getModuleLink('klarnaofficial', 'checkoutklarna', array(), Tools::usingSecureMode()));
-            die;
-        }
+        if (
+            (int)Configuration::get('KCO_IS_ACTIVE') &&
+            Tools::getValue('action') === 'show' &&
+            (int)Tools::getValue('ajax') !== 1 &&
+            (int)Tools::getValue('update') !== 1 &&
+            (int)Tools::getValue('forceview') !== 1
+            ) {
+                Tools::redirect($this->context->link->getModuleLink('klarnaofficial', 'checkoutklarna', array(), Tools::usingSecureMode()));
+                die;
+            }
         parent::initContent();
     }
 }

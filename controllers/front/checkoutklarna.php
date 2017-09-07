@@ -21,7 +21,7 @@
 use Symfony\Component\Translation\TranslatorInterface;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Adapter\ObjectPresenter;
- 
+
 class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
@@ -126,8 +126,13 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 }
                 $lastrate = "notset";
                 $has_different_rates = false;
-
-                foreach ($this->context->cart->getProducts(true, false, $this->context->cart->id_address_delivery) as $product) {
+                $cart_content = $this->context->cart->getProducts(
+                    true,
+                    false,
+                    $this->context->cart->id_address_delivery
+                );
+                    
+                foreach ($cart_content as $product) {
                     if ($lastrate == "notset") {
                         $lastrate = $product['rate'];
                     } elseif ($lastrate != $product['rate']) {
@@ -367,7 +372,6 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                                 $create['shipping_address']['organization_name'] = $addressObj->company;
                                 $create['shipping_address']['phone'] = $addressObj->phone_mobile;
                             }
-                            
                         }
                         
                         $create['purchase_country'] = $country_information['purchase_country'];
@@ -613,9 +617,12 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     // $deliveryoptionsfinder = new DeliveryOptionsfinder();
                     // $deliveryoptionsfinder->getDeliveryOptions();
                     //AS DONE IN ORDERCONTROLLER.php 73
-                    $delivery_options_finder_core = new DeliveryOptionsFinder($this->context,$this->getTranslator(),
-            $this->objectPresenter,
-            new PriceFormatter());
+                    $delivery_options_finder_core = new DeliveryOptionsFinder(
+                        $this->context,
+                        $this->getTranslator(),
+                        $this->objectPresenter,
+                        new PriceFormatter()
+                    );
                     $delivery_option = $delivery_options_finder_core->getSelectedDeliveryOption();
                     
                     $this->context->smarty->assign(array(

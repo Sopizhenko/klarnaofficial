@@ -504,7 +504,9 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
                         
                         $checkoutSession = $this->getCheckoutSession();
                         $delivery_options = $checkoutSession->getDeliveryOptions();
-                        $delivery_options_finder_core = new DeliveryOptionsFinder($this->context,$this->getTranslator(),
+                        $delivery_options_finder_core = new DeliveryOptionsFinder(
+                            $this->context,
+                            $this->getTranslator(),
                             $this->objectPresenter,
                             new PriceFormatter()
                         );
@@ -545,7 +547,6 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
         }
         
         $this->setTemplate('module:klarnaofficial/views/templates/front/kco_checkout.tpl');
-
     }
 
     protected function validateDeliveryOption($delivery_option)
