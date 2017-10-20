@@ -23,6 +23,12 @@ require_once(_PS_ROOT_DIR_.'/init.php');
 require_once(dirname(__FILE__).'/klarnaofficial.php');
 
 $klarnaofficial = new KlarnaOfficial();
+
+$cron_token = Tools::hash(Tools::hash(Tools::hash($klarnaofficial->name)));
+$entered_token = Tools::getValue("cron_token");
+if ($cron_token != $entered_token) {
+    exit;
+}
 $shops = Shop::getShops(true, null, true);
 
 $risk_status = $klarnaofficial->Pending_risk;
