@@ -275,7 +275,7 @@ body {
     <p>If you use Klarna KPM services it is possible to get a status from Klarna for Pending Invoice or Pending Partpayment.</p>
     <p>Orders with these statuses, should not be delivered until Klarna are complete with their evaluation.</p>
     <p>It is possible to set up a cronjob for the following url, it will make a check and change status of these orders as the status is changed in Klarna.</p>
-    <p><a href="../checkpendingorders.php" target="_blank" />Click here, to open.</a></p>
+    <p><a href="../checkpendingorders.php?cron_token=" id="cron_token" target="_blank" />Click here, to open.</a></p>
     <p>If you don't set up a cronjob for this, you will need to check these orders in Klarna Online or by clicking the button on the order details page.</p>
     
 
@@ -313,5 +313,19 @@ body {
 <script src="assets/js/bootstrap-popover.js"></script> 
 <script src="assets/js/bootstrap-button.js"></script> 
 <script src="assets/js/bootstrap-collapse.js"></script>
+<script type="text/javascript">
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+    var cron_token = getParameterByName('cron_token');
+    var currentLink = $("#cron_token").attr("href");
+    $("#cron_token").attr("href", currentLink+cron_token);
+</script>
 </body>
 </html>
