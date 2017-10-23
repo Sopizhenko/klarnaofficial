@@ -47,7 +47,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.12';
+        $this->version = '1.9.13';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -463,7 +463,7 @@ class KlarnaOfficial extends PaymentModule
         $PS_COUNTRY_DEFAULT = (int)Configuration::get('PS_COUNTRY_DEFAULT');
         $country = new Country($PS_COUNTRY_DEFAULT);
         
-        $cron_token = Tools::hash(Tools::hash(Tools::hash($this->name)));
+        $cron_token = Tools::encrypt(Tools::encrypt(Tools::encrypt($this->name)));
         
         $this->context->smarty->assign(array(
             'klarnaisocodedef' => $country->iso_code,
