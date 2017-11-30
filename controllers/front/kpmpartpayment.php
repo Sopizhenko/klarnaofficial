@@ -764,8 +764,8 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 $data['payment_methods'][] = $newPclass;
             }
             
-            $this->context->smarty->assign('terms_account', "Lule lisää");
-            $this->context->smarty->assign('terms_invoice', "Lule lisää");
+            $this->context->smarty->assign('terms_account', "Lue lisää");
+            $this->context->smarty->assign('terms_invoice', "Lue lisää");
         } elseif ($klarnaCountry == KlarnaCountry::AT) {
             $kpm_expected_language = array("de");
             $kpm_expected_language_display = "Deutch";

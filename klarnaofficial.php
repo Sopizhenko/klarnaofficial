@@ -3562,7 +3562,7 @@ class KlarnaOfficial extends PaymentModule
         $combosArray[$KPM_FI_EID] = Configuration::get('KPM_FI_SECRET', null, null, $id_shop);
         $combosArray[$KPM_DA_EID] = Configuration::get('KPM_DA_SECRET', null, null, $id_shop);
         $combosArray[$KPM_DE_EID] = Configuration::get('KPM_DE_SECRET', null, null, $id_shop);
-        $combosArray[$KPM_NL_EID] = Configuration::get('KPM_DE_SECRET', null, null, $id_shop);
+        $combosArray[$KPM_NL_EID] = Configuration::get('KPM_NL_SECRET', null, null, $id_shop);
         $combosArray[$KPM_AT_EID] = Configuration::get('KPM_AT_SECRET', null, null, $id_shop);
         $combosArray[$KCO_UK_EID] = Configuration::get('KCO_UK_SECRET', null, null, $id_shop);
         $combosArray[$KCO_US_EID] = Configuration::get('KCO_US_SECRET', null, null, $id_shop);
