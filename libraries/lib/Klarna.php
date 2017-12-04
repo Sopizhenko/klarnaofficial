@@ -3296,9 +3296,9 @@ class Klarna
 
             //Associate the PClass with this estore.
             array_unshift($pclass, $this->_eid);
-
             $storage->addPClass(new KlarnaPClass($pclass));
         }
+        
     }
 
     /**
@@ -3851,7 +3851,7 @@ class Klarna
      * Converts special characters to numeric htmlentities.
      *
      * <b>Note</b>:<br>
-     * If supplied string is encoded with UTF-8, o umlaut ("ö") will become two
+     * If supplied string is encoded with UTF-8, o umlaut ("??") will become two
      * HTML entities instead of one.
      *
      * @param string $str String to be converted.
@@ -3862,14 +3862,14 @@ class Klarna
     {
         $charset = 'ISO-8859-1';
 
-        if (!self::$htmlentities) {
-            self::$htmlentities = array();
-           // $table = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES, $charset);
-            $table = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
-            foreach ($table as $char => $entity) {
-                self::$htmlentities[$entity] = '&#'.ord($char).';';
-            }
-        }
+        // if (!self::$htmlentities) {
+            // self::$htmlentities = array();
+           // // $table = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES, $charset);
+            // $table = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
+            // foreach ($table as $char => $entity) {
+                // self::$htmlentities[$entity] = '&#'.ord($char).';';
+            // }
+        // }
 
         return str_replace(
             array_keys(

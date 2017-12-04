@@ -545,7 +545,7 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
     
     protected function cleanupAddressData($string)
     {
-        $string = preg_replace("/[^\p{L}\p{N} -]/u", '', $string);
+        $string = preg_replace("/[^\p{L}\p{N}\/ -]/u", '', $string);
         $string = trim($string);
         return $string;
     }

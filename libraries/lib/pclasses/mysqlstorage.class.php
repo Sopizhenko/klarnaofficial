@@ -117,7 +117,8 @@ class MySQLStorage extends PCStorage
      */
     public function connect()
     {
-        $this->link = mysql_connect($this->addr, $this->user, $this->passwd);
+        //$this->link = mysql_connect($this->addr, $this->user, $this->passwd);
+		$this->link = new mysqli($this->addr, $this->user, $this->passwd, $this->dbName);
         if ($this->link === false) {
             throw new Klarna_DatabaseException(
                 'Failed to connect to database! ('.mysql_error().')'
@@ -132,38 +133,38 @@ class MySQLStorage extends PCStorage
      */
     public function create()
     {
-        if (!mysql_query(
-            "CREATE DATABASE IF NOT EXISTS `{$this->dbName}`",
-            $this->link
-        )
-        ) {
-            throw new Klarna_DatabaseException(
-                'Failed to create! ('.mysql_error().')'
-            );
-        }
+        // if (!mysql_query(
+            // "CREATE DATABASE IF NOT EXISTS `{$this->dbName}`",
+            // $this->link
+        // )
+        // ) {
+            // throw new Klarna_DatabaseException(
+                // 'Failed to create! ('.mysql_error().')'
+            // );
+        // }
 
-        $create = mysql_query(
-            "CREATE TABLE IF NOT EXISTS `{$this->dbName}`.`{$this->dbTable}` (
-                `eid` int(10) unsigned NOT NULL,
-                `id` int(10) unsigned NOT NULL,
-                `type` tinyint(4) NOT NULL,
-                `description` varchar(255) NOT NULL,
-                `months` int(11) NOT NULL,
-                `interestrate` decimal(11,2) NOT NULL,
-                `invoicefee` decimal(11,2) NOT NULL,
-                `startfee` decimal(11,2) NOT NULL,
-                `minamount` decimal(11,2) NOT NULL,
-                `country` int(11) NOT NULL,
-                `expire` int(11) NOT NULL,
-                KEY `id` (`id`)
-            )", $this->link
-        );
+        // $create = mysql_query(
+            // "CREATE TABLE IF NOT EXISTS `{$this->dbName}`.`{$this->dbTable}` (
+                // `eid` int(10) unsigned NOT NULL,
+                // `id` int(10) unsigned NOT NULL,
+                // `type` tinyint(4) NOT NULL,
+                // `description` varchar(255) NOT NULL,
+                // `months` int(11) NOT NULL,
+                // `interestrate` decimal(11,2) NOT NULL,
+                // `invoicefee` decimal(11,2) NOT NULL,
+                // `startfee` decimal(11,2) NOT NULL,
+                // `minamount` decimal(11,2) NOT NULL,
+                // `country` int(11) NOT NULL,
+                // `expire` int(11) NOT NULL,
+                // KEY `id` (`id`)
+            // )", $this->link
+        // );
 
-        if (!$create) {
-            throw new Klarna_DatabaseException(
-                'Table not existing, failed to create! ('.mysql_error().')'
-            );
-        }
+        // if (!$create) {
+            // throw new Klarna_DatabaseException(
+                // 'Table not existing, failed to create! ('.mysql_error().')'
+            // );
+        // }
     }
 
     /**
@@ -237,16 +238,15 @@ class MySQLStorage extends PCStorage
     {
         $this->splitURI($uri);
         $this->connect();
-        $result = mysql_query(
-            "SELECT * FROM `{$this->dbName}`.`{$this->dbTable}`",
-            $this->link
+        $result = $this->link->query(
+            "SELECT * FROM `{$this->dbName}`.`{$this->dbTable}`"
         );
         if ($result === false) {
             throw new Klarna_DatabaseException(
-                'SELECT query failed! ('.mysql_error().')'
+                'SELECT query failed! ()'
             );
         }
-        while ($row = mysql_fetch_assoc($result)) {
+        while ($row = $result->fetch_assoc()) {
             $this->addPClass(new KlarnaPClass($row));
         }
     }
@@ -270,14 +270,14 @@ class MySQLStorage extends PCStorage
         foreach ($this->pclasses as $pclasses) {
             foreach ($pclasses as $pclass) {
                 //Remove the pclass if it exists.
-                mysql_query(
+                $this->link->query(
                     "DELETE FROM `{$this->dbName}`.`{$this->dbTable}`
                      WHERE `id` = '{$pclass->getId()}'
                      AND `eid` = '{$pclass->getEid()}'"
                 );
 
                 //Insert it again.
-                $result = mysql_query(
+                $result = $this->link->query(
                     "INSERT INTO `{$this->dbName}`.`{$this->dbTable}`
                        (`eid`,
                         `id`,
@@ -302,11 +302,11 @@ class MySQLStorage extends PCStorage
                         '{$pclass->getStartFee()}',
                         '{$pclass->getMinAmount()}',
                         '{$pclass->getCountry()}',
-                        '{$pclass->getExpire()}')", $this->link
+                        '{$pclass->getExpire()}')"
                 );
                 if ($result === false) {
                     throw new Klarna_DatabaseException(
-                        'INSERT INTO query failed! ('.mysql_error().')'
+                        'INSERT INTO query failed! ()'
                     );
                 }
             }
@@ -327,9 +327,8 @@ class MySQLStorage extends PCStorage
             unset($this->pclasses);
             $this->connect();
 
-            mysql_query(
-                "DELETE FROM `{$this->dbName}`.`{$this->dbTable}`",
-                $this->link
+            $this->link->query(
+                "DELETE FROM `{$this->dbName}`.`{$this->dbTable}`"
             );
         } catch (Exception $e) {
             throw new Klarna_DatabaseException(
