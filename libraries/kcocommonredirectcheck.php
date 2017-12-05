@@ -215,9 +215,13 @@ function SetNewAddressOnCart($id_address_delivery, $id_cart)
 
 }
 
-function checkCustomerAddressId($id_address, $context){    
+function checkCustomerAddressId($id_address, $context){
+    $address_to_check = new Address((int) $id_address);
+    if ($address_to_check->deleted==0) {
+        $sql_fix = "UPDATE "._DB_PREFIX_."address SET deleted=0,date_upd=NOW() WHERE id_address=$id_address";
+        Db::getInstance()->execute($sql_fix);
+    }
     if (isset($context->customer) && $context->customer->id > 0 && (int) $id_address > 0) {
-        $address_to_check = new Address((int) $id_address);
         if ($address_to_check->id_customer != $context->customer->id) {
             foreach($context->customer->getSimpleAddresses() as $simple_address) {
                 if ($simple_address["id_country"] == $address_to_check->id_country) {
@@ -231,8 +235,6 @@ function checkCustomerAddressId($id_address, $context){
         } else {
             return $id_address;
         }
-    } else {
-        return $id_address;
     }
     return $id_address;
 }

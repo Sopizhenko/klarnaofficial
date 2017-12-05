@@ -703,6 +703,11 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             
             if ($currencyIso == $kpm_expected_currency) {
                 $kpm_account = $k->getPClasses(KlarnaPClass::ACCOUNT);
+                $kpm_account = array_merge($k->getPClasses(KlarnaPClass::CAMPAIGN), $kpm_account);
+                $kpm_account = array_merge($k->getPClasses(KlarnaPClass::DELAY), $kpm_account);
+                $kpm_account = array_merge($k->getPClasses(KlarnaPClass::SPECIAL), $kpm_account);
+                $kpm_account = array_merge($k->getPClasses(KlarnaPClass::FIXED), $kpm_account);
+                
             } else {
                 $kpm_account = array();
             }
@@ -729,21 +734,32 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             
             foreach ($kpm_account as $pclass) {
                 $newPclass = array();
-                KlarnaCalc::calc_apr($kpm_total_order_value, $pclass, KlarnaFlags::CHECKOUT_PAGE);
-                $monthlycost = KlarnaCalc::calc_monthly_cost(
-                    $kpm_total_order_value,
-                    $pclass,
-                    KlarnaFlags::CHECKOUT_PAGE
-                );
-                KlarnaCalc::total_credit_purchase_cost(
-                    $kpm_total_order_value,
-                    $pclass,
-                    KlarnaFlags::CHECKOUT_PAGE
-                );
-
+                
                 $newPclass['pclass_id'] = $pclass->id;
-                $newPclass['title'] = $pclass->description;
-                $newPclass['group']['title'] = 'Erämaksu';
+                
+                if ($pclass->type ==  KlarnaPClass::DELAY) {
+                    $newPclass['group']['title'] = '';
+                    $monthlycost = 0;
+                    $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/$eid/".
+                    $klarna_locale.'/invoice';
+                } else {
+                    KlarnaCalc::calc_apr($kpm_total_order_value, $pclass, KlarnaFlags::CHECKOUT_PAGE);
+                    $monthlycost = KlarnaCalc::calc_monthly_cost(
+                        $kpm_total_order_value,
+                        $pclass,
+                        KlarnaFlags::CHECKOUT_PAGE
+                    );
+                    KlarnaCalc::total_credit_purchase_cost(
+                        $kpm_total_order_value,
+                        $pclass,
+                        KlarnaFlags::CHECKOUT_PAGE
+                    );
+                    $newPclass['group']['title'] = 'Erämaksu';
+                    $newPclass['terms']['uri'] = $termsuri;
+                }
+
+                $newPclass['title'] = html_entity_decode($pclass->description);
+                
                 
                 $newPclass['details']['rente']['label'] = 'Vuosikorko';
                 $newPclass['details']['rente']['value'] = $pclass->interestRate;
@@ -759,7 +775,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 
                 $newPclass['extra_info'] = '';
                 
-                $newPclass['terms']['uri'] = $termsuri;
+                
                 $newPclass['logo']['uri'] = $logourl;
                 $data['payment_methods'][] = $newPclass;
             }

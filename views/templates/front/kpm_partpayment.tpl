@@ -64,6 +64,12 @@
                                     {/if}
                                     <a href="{$kpm_plan.terms.uri|escape:'htmlall':'UTF-8'}{if $klarna_invoice_fee > 0}{if $kpm_iso_code=='se' || $kpm_iso_code=='no' || $kpm_iso_code=='de'}{$klarna_invoice_fee|escape:'htmlall':'UTF-8'}{/if}{/if}" target="_blank" class="kpm_terms_link">({if isset($terms_invoice)}{$terms_invoice|escape:'htmlall':'UTF-8'}{else}{l s='Terms invoice' mod='klarnaofficial'}{/if})</a>
                                     <br />
+                                {elseif $kpm_plan.group.title==""}
+                                 <!--Delay-->
+                                <input type="radio" onclick="javascript:toggleKPMSpecialUseCase('');" value="{$kpm_plan.pclass_id|escape:'htmlall':'UTF-8'}" id="{$kpm_plan.pclass_id|escape:'htmlall':'UTF-8'}" name="kpm_pclass"{if $kpm_plan.pclass_id==$kpm_pclass} checked="checked"{/if} />
+                                <label for="{$kpm_plan.pclass_id|escape:'htmlall':'UTF-8'}" class="kpm_description">{$kpm_plan.title|escape:'htmlall':'UTF-8'}</label>
+                                <a href="{$kpm_plan.terms.uri|escape:'htmlall':'UTF-8'}" target="_blank" class="kpm_terms_link">({if isset($terms_invoice)}{$terms_invoice|escape:'htmlall':'UTF-8'}{else}{l s='Terms invoice' mod='klarnaofficial'}{/if})</a>
+                                <br />
                                 {else}
                                     <!-- Partpayments -->
                                     <input type="radio" onclick="javascript:toggleKPMSpecialUseCase({$kpm_plan.pclass_id|escape:'htmlall':'UTF-8'});" value="{$kpm_plan.pclass_id|escape:'htmlall':'UTF-8'}" id="{$kpm_plan.pclass_id|escape:'htmlall':'UTF-8'}" name="kpm_pclass"{if $kpm_plan.pclass_id==$kpm_pclass} checked="checked"{/if} />

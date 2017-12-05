@@ -49,7 +49,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.4';
+        $this->version = '2.0.5';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3129,7 +3129,7 @@ class KlarnaOfficial extends PaymentModule
         $us_done = false;
         $nl_done = false;
 
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_SVERIGE_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_SVERIGE_DEFAULT\'';
         $id_address_sweden = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_sweden) > 0) {
             Configuration::updateValue('KCO_SWEDEN_ADDR', $id_address_sweden);
@@ -3150,7 +3150,7 @@ class KlarnaOfficial extends PaymentModule
             }
         }
 
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_UNITED_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_UNITED_DEFAULT\'';
         $id_address_us = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_us) > 0) {
             Configuration::updateValue('KCO_US_ADDR', $id_address_us);
@@ -3171,7 +3171,7 @@ class KlarnaOfficial extends PaymentModule
             }
         }
         
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_NL_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_NL_DEFAULT\'';
         $id_address_nl = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_nl) > 0) {
             Configuration::updateValue('KCO_NL_ADDR', $id_address_nl);
@@ -3192,7 +3192,7 @@ class KlarnaOfficial extends PaymentModule
             }
         }
         
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_NORGE_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_NORGE_DEFAULT\'';
         $id_address_norway = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_norway) > 0) {
             Configuration::updateValue('KCO_NORWAY_ADDR', $id_address_norway);
@@ -3211,7 +3211,7 @@ class KlarnaOfficial extends PaymentModule
                 $norway_done = true;
             }
         }
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_FINLAND_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_FINLAND_DEFAULT\'';
         $id_address_finland = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_finland) > 0) {
             Configuration::updateValue('KCO_FINLAND_ADDR', $id_address_finland);
@@ -3232,7 +3232,7 @@ class KlarnaOfficial extends PaymentModule
             }
         }
 
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_GERMANY_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_GERMANY_DEFAULT\'';
         $id_address_germany = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_germany) > 0) {
             Configuration::updateValue('KCO_GERMANY_ADDR', $id_address_germany);
@@ -3252,7 +3252,7 @@ class KlarnaOfficial extends PaymentModule
             }
         }
         
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_AUSTRIA_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_AUSTRIA_DEFAULT\'';
         $id_address_austria = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_austria) > 0) {
             Configuration::updateValue('KCO_AUSTRIA_ADDR', $id_address_austria);
@@ -3272,7 +3272,7 @@ class KlarnaOfficial extends PaymentModule
             }
         }
 
-        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE alias=\'KCO_UK_DEFAULT\'';
+        $sql = 'SELECT id_address FROM '._DB_PREFIX_.'address WHERE deleted=0 AND alias=\'KCO_UK_DEFAULT\'';
         $id_address_uk = Db::getInstance()->getValue($sql);
         if ((int) ($id_address_uk) > 0) {
             Configuration::updateValue('KCO_UK_ADDR', $id_address_uk);
@@ -3680,7 +3680,7 @@ class KlarnaOfficial extends PaymentModule
         "alias='$alias', company='', lastname='$country',firstname='Person', ".
         "address1='Standardgatan 1', address2='', postcode='12345',city='$city', ".
         "other='', phone='1234567890', phone_mobile='',vat_number='', ".
-        "dni='', active='', deleted='',date_upd=NOW(), ".
+        "dni='', active=1, deleted=0,date_upd=NOW(), ".
         "id_country=$id_country WHERE id_address=$addressidtoupd";
         
         Db::getInstance()->execute($sql_fix);
