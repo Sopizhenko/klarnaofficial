@@ -106,7 +106,7 @@
                         <input class="kco-sel-list__item__radio" type="radio" name="delivery_option[{$id_address|intval}]" onchange="$('#klarnacarrier').submit()" id="delivery_option_{$id_address|intval}_{$option@index|escape:'htmlall':'UTF-8'}" value="{$key|escape:'htmlall':'UTF-8'}" {if isset($delivery_option[$id_address|intval]) && $delivery_option[$id_address|intval] == $key}checked="checked"{/if} />
                         <label for="delivery_option_{$id_address|escape:'htmlall':'UTF-8'}_{$option@index|escape:'htmlall':'UTF-8'}" class="kco-sel-list__item__label">
                             <span class="kco-sel-list__item__status">
-                                <i class="icon-ok"></i>
+                                <i class="icon-ok icon-check"></i>
                             </span>
                             <span class="kco-sel-list__item__title">
                                 {if $option.unique_carrier}
