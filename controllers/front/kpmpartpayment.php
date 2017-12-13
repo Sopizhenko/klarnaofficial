@@ -737,7 +737,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 
                 $newPclass['pclass_id'] = $pclass->id;
                 
-                if ($pclass->type ==  KlarnaPClass::DELAY) {
+                if (KlarnaPClass::DELAY == $pclass->type) {
                     $newPclass['group']['title'] = '';
                     $monthlycost = 0;
                     $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/$eid/".
@@ -755,7 +755,14 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                         KlarnaFlags::CHECKOUT_PAGE
                     );
                     $newPclass['group']['title'] = 'Erämaksu';
-                    $newPclass['terms']['uri'] = $termsuri;
+                    
+                    if (KlarnaPClass::CAMPAIGN == $pclass->type) {
+                        $months = $pclass->months;
+                        $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/eid/fi_fi/fixed_amount_$months";
+                    } else {
+                        $newPclass['terms']['uri'] = $termsuri;
+                    }
+                    
                 }
 
                 $newPclass['title'] = html_entity_decode($pclass->description);
