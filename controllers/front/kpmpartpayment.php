@@ -708,7 +708,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 $kpm_account = array_merge($k->getPClasses(KlarnaPClass::DELAY), $kpm_account);
                 $kpm_account = array_merge($k->getPClasses(KlarnaPClass::SPECIAL), $kpm_account);
                 $kpm_account = array_merge($k->getPClasses(KlarnaPClass::FIXED), $kpm_account);
-                
             } else {
                 $kpm_account = array();
             }
