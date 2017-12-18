@@ -248,15 +248,13 @@ class KlarnaOfficial extends PaymentModule
             $orderstate->save();
             Configuration::updateValue($config_name, $orderstate->id);
 
-            if (!imageResize(
+            ImageManager::resize(
                 dirname(__FILE__).'/views/img/klarna_os.gif',
                 _PS_IMG_DIR_.'os/'.$orderstate->id.'.gif',
                 null,
                 null,
                 'gif'
-            )) {
-                return false;
-            }
+            );
         }
     }
 
