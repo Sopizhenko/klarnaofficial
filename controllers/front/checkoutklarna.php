@@ -520,14 +520,14 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         );
                     }
 
-                    if ($id_country > 0) {
-                        $delivery_option_list = $this->context->cart->getDeliveryOptionList(
-                            new Country($id_country),
-                            true
-                        );
-                    } else {
-                        $delivery_option_list = $this->context->cart->getDeliveryOptionList();
-                    }
+                    // if ($id_country > 0) {
+                        // $delivery_option_list = $this->context->cart->getDeliveryOptionList(
+                            // new Country($id_country),
+                            // true
+                        // );
+                    // } else {
+                        // $delivery_option_list = $this->context->cart->getDeliveryOptionList();
+                    // }
 
                     $free_fees_price = 0;
                     $configuration = Configuration::getMultiple(

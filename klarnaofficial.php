@@ -2880,7 +2880,6 @@ class KlarnaOfficial extends PaymentModule
                 unset($_SESSION['klarna_checkout']);
                 return $this->display(__FILE__, 'kco_payment_return.tpl');
             } else {
-                return;
                 Tools::redirect('index.php');
             }
         } elseif (Tools::getIsset("kcotpv3")) {

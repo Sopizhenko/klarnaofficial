@@ -403,14 +403,14 @@ class KlarnaOfficialCheckoutKlarnaUkModuleFrontController extends ModuleFrontCon
                             Message::getMessageByCartId((int) ($this->context->cart->id))
                         );
 
-                        if ($id_country > 0) {
-                            $delivery_option_list = $this->context->cart->getDeliveryOptionList(
-                                new Country($id_country),
-                                true
-                            );
-                        } else {
-                            $delivery_option_list = $this->context->cart->getDeliveryOptionList();
-                        }
+                        // if ($id_country > 0) {
+                            // $delivery_option_list = $this->context->cart->getDeliveryOptionList(
+                                // new Country($id_country),
+                                // true
+                            // );
+                        // } else {
+                            // $delivery_option_list = $this->context->cart->getDeliveryOptionList();
+                        // }
 
                         $free_shipping = false;
                         foreach ($this->context->cart->getCartRules() as $rule) {
