@@ -28,6 +28,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
     {
         parent::setMedia();
         $this->context->controller->addCSS(_MODULE_DIR_.'klarnaofficial/views/css/kpm_css.css', 'all');
+        $this->addJqueryPlugin(array('fancybox'));
         $this->addJS(_MODULE_DIR_.'klarnaofficial/views/js/kpm_common.js');
     }
 
