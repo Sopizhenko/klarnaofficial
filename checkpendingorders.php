@@ -31,7 +31,7 @@ if ($cron_token != $entered_token) {
 }
 $shops = Shop::getShops(true, null, true);
 
-$risk_status = $klarnaofficial->Pending_risk;
+$risk_status = pSQL($klarnaofficial->Pending_risk);
 $sql = "SELECT id_order FROM "._DB_PREFIX_."klarna_orders WHERE risk_status='$risk_status';";
 
 $result = Db::getInstance()->executeS($sql);
