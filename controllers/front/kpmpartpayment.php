@@ -339,7 +339,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                         }
                         if ((int) $result[1] == 2) {
                             $order_status = Configuration::get('KPM_PENDING_PP', null, null, $this->context->shop->id);
-                            $risk_status = $this->module->Pending_risk;
+                            $risk_status = pSQL($this->module->Pending_risk);
                         }
                         $reservation_number = $result[0];
                     } else {
@@ -358,7 +358,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                                 null,
                                 $this->context->shop->id
                             );
-                            $risk_status = $this->module->Pending_risk;
+                            $risk_status = pSQL($this->module->Pending_risk);
                         }
                         $reservation_number = $result[0];
                     }
@@ -738,7 +738,7 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 
                 $newPclass['pclass_id'] = $pclass->id;
                 
-                if ($pclass->type ==  KlarnaPClass::DELAY) {
+                if ($pclass->type ==  KlarnaPClass::DELAY || $pclass->type ==  KlarnaPClass::SPECIAL) {
                     $newPclass['group']['title'] = '';
                     $monthlycost = 0;
                 } else {
