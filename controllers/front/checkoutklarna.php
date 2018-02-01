@@ -285,7 +285,6 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         );
                     $total_discounts += $value_real;
                 }
-//echo "<pre>"; print_r($checkoutcart);echo "</pre>";exit;
                 if ($round_diff != 0) {
                     $checkoutcart[] = array(
                         'reference' => '',
