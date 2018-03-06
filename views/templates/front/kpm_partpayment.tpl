@@ -92,7 +92,7 @@
 
                             {/foreach}
                             {if isset($special_usecase)}
-                            <div>{$special_usecase|escape:'quotes':'UTF-8'}</div>
+                                <div>{$special_usecase nofilter}</div>
                             {/if}
                             </div>
                             
