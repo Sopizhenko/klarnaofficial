@@ -590,7 +590,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $show_prefil_link = false;
                         }
                     
-                    
                         $this->context->smarty->assign(array(
                             'no_active_countries' => $no_active_countries,
                             'show_prefil_link' => $show_prefil_link,
