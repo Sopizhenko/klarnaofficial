@@ -1,11 +1,11 @@
 <?php
-
 /**
  * Cancel an authorized order.
  *
  * For a cancellation to be successful, there must be no captures on the order.
  */
-require_once dirname(dirname(dirname(__DIR__))).'/vendor/autoload.php';
+
+require_once dirname(dirname(dirname(__DIR__))) . '/vendor/autoload.php';
 
 $merchantId = getenv('MERCHANT_ID') ?: '0';
 $sharedSecret = getenv('SHARED_SECRET') ?: 'sharedSecret';

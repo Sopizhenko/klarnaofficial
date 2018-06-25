@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +16,7 @@
  *
  * File containing the UserAgent class.
  */
+
 namespace Klarna\Rest\Transport;
 
 use GuzzleHttp\ClientInterface;
@@ -27,29 +27,22 @@ use GuzzleHttp\ClientInterface;
 class UserAgent implements UserAgentInterface
 {
     /**
-     * Name of the SDK.
+     * Name of the SDK
      */
     const NAME = 'Prestaworks.Klarna.kco_rest_php';
 
     /**
      * Version of the SDK.
      */
-    const VERSION = '2.1.0';
+    const VERSION = '2.2.0';
 
     /**
      * Components of the user agent.
      *
      * @var array
      */
-    protected $fields;
+    protected $fields = [];
 
-    /**
-     * Constructs a user agent instance.
-     */
-    public function __construct()
-    {
-        $this->fields = [];
-    }
 
     /**
      * Sets the specified field.
@@ -64,7 +57,7 @@ class UserAgent implements UserAgentInterface
     public function setField($key, $name, $version = '', array $options = [])
     {
         $field = [
-            'name' => $name,
+            'name' => $name
         ];
 
         if (!empty($version)) {
@@ -117,9 +110,9 @@ class UserAgent implements UserAgentInterface
     {
         $agent = new static();
 
-        $options = ['Guzzle/'.ClientInterface::VERSION];
+        $options = ['Guzzle/' . ClientInterface::VERSION];
         if (extension_loaded('curl')) {
-            $options[] = 'curl/'.curl_version()['version'];
+            $options[] = 'curl/' . curl_version()['version'];
         }
 
         return $agent

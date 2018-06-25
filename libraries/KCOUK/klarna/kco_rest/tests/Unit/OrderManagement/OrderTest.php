@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +16,15 @@
  *
  * File containing tests for the Order class.
  */
+
 namespace Klarna\Tests\Unit\Rest\OrderManagement;
 
+use GuzzleHttp\Exception\RequestException;
+use Klarna\Rest\OrderManagement\Capture;
 use Klarna\Rest\OrderManagement\Order;
 use Klarna\Rest\Tests\Unit\TestCase;
 use Klarna\Rest\Transport\Connector;
+use Klarna\Rest\Transport\Exception\ConnectorException;
 
 /**
  * Unit test cases for the order resource.
@@ -30,6 +33,8 @@ class OrderTest extends TestCase
 {
     /**
      * Make sure the identifier is retrievable.
+     *
+     * @return void
      */
     public function testGetId()
     {
@@ -40,6 +45,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure fetched data is accessible.
+     *
+     * @return void
      */
     public function testFetch()
     {
@@ -47,8 +54,7 @@ class OrderTest extends TestCase
             ->method('createRequest')
             ->with(
                 '/ordermanagement/v1/orders/12345',
-                'GET',
-                []
+                'GET'
             )
             ->will($this->returnValue($this->request));
 
@@ -69,7 +75,7 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('application/json'));
+            ->will($this->returnValue(['application/json']));
 
         $data = [
             'data' => 'from response json',
@@ -77,18 +83,18 @@ class OrderTest extends TestCase
             'captures' => [
                 [
                     'capture_id' => '1002',
-                    'data' => 'also from json',
+                    'data' => 'also from json'
                 ],
                 [
                     'capture_id' => '1003',
-                    'data' => 'something else',
-                ],
-            ],
+                    'data' => 'something else'
+                ]
+            ]
         ];
 
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($data));
+            ->method('getBody')
+            ->will($this->returnValue(\GuzzleHttp\json_encode($data)));
 
         $order = new Order($this->connector, '12345');
         $order['data'] = 'is overwritten';
@@ -113,6 +119,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testFetchInvalidStatusCode()
     {
@@ -147,6 +155,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure a non-JSON response results in an exception.
+     *
+     * @return void
      */
     public function testFetchNotJson()
     {
@@ -176,7 +186,7 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('text/plain'));
+            ->will($this->returnValue(['text/plain']));
 
         $order = new Order($this->connector, '12345');
         $order['data'] = 'is overwritten';
@@ -191,6 +201,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that the correct request is sent.
+     *
+     * @return void
      */
     public function testAcknowledge()
     {
@@ -199,7 +211,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/acknowledge',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -218,6 +230,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testAcknowledgeInvalidStatusCode()
     {
@@ -226,7 +240,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/acknowledge',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -251,6 +265,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that the correct request is sent.
+     *
+     * @return void
      */
     public function testCancel()
     {
@@ -259,7 +275,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/cancel',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -278,6 +294,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testCancelInvalidStatusCode()
     {
@@ -286,7 +304,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/cancel',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -311,6 +329,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure the correct data is sent.
+     *
+     * @return void
      */
     public function testUpdateAuthorization()
     {
@@ -321,7 +341,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/authorization',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -340,6 +361,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testUpdateAuthorizationInvalidStatusCode()
     {
@@ -350,7 +373,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/authorization',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -375,6 +399,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that the correct request is sent.
+     *
+     * @return void
      */
     public function testExtendAuthorizationTime()
     {
@@ -383,7 +409,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/extend-authorization-time',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -402,6 +428,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testExtendAuthorizationTimeInvalidStatusCode()
     {
@@ -410,7 +438,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/extend-authorization-time',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -435,6 +463,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure the correct data is sent.
+     *
+     * @return void
      */
     public function testUpdateMerchantReferences()
     {
@@ -445,7 +475,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/merchant-references',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -464,6 +495,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testUpdateMerchantReferencesInvalidStatusCode()
     {
@@ -474,7 +507,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/merchant-references',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -499,6 +533,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure the correct data is sent.
+     *
+     * @return void
      */
     public function testUpdateCustomerDetails()
     {
@@ -509,7 +545,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/customer-details',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -528,6 +565,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testUpdateCustomerDetailsInvalidStatusCode()
     {
@@ -538,7 +577,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/customer-details',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -563,6 +603,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure the correct data is sent.
+     *
+     * @return void
      */
     public function testRefund()
     {
@@ -573,7 +615,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/refunds',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -592,6 +635,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testRefundInvalidStatusCode()
     {
@@ -602,7 +647,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/refunds',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -627,6 +673,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that the correct request is sent.
+     *
+     * @return void
      */
     public function testReleaseRemainingAuthorization()
     {
@@ -635,7 +683,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/release-remaining-authorization',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -654,6 +702,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testReleaseRemainingAuthorizationInvalidStatusCode()
     {
@@ -662,7 +712,7 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/release-remaining-authorization',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -687,6 +737,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that a capture is created properly.
+     *
+     * @return void
      */
     public function testCreateCapture()
     {
@@ -697,7 +749,8 @@ class OrderTest extends TestCase
             ->with(
                 '/ordermanagement/v1/orders/12345/captures',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -718,7 +771,7 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Location')
-            ->will($this->returnValue('http://somewhere/a-path'));
+            ->will($this->returnValue(['http://somewhere/a-path']));
 
         $order = new Order($this->connector, '12345');
         $capture = $order->createCapture($data);
@@ -728,6 +781,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that a capture is fetched.
+     *
+     * @return void
      */
     public function testFetchCapture()
     {
@@ -735,8 +790,7 @@ class OrderTest extends TestCase
             ->method('createRequest')
             ->with(
                 '/ordermanagement/v1/orders/12345/captures/2',
-                'GET',
-                []
+                'GET'
             )
             ->will($this->returnValue($this->request));
 
@@ -757,16 +811,16 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('application/json'));
+            ->will($this->returnValue(['application/json']));
 
         $data = [
             'data' => 'from response json',
-            'capture_id' => '2',
+            'capture_id' => '2'
         ];
 
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($data));
+            ->method('getBody')
+            ->will($this->returnValue(\GuzzleHttp\json_encode($data)));
 
         $order = new Order($this->connector, '12345');
         $capture = $order->fetchCapture('2');
@@ -777,6 +831,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that an existing capture is refreshed before returned.
+     *
+     * @return void
      */
     public function testFetchCaptureExisting()
     {
@@ -785,7 +841,7 @@ class OrderTest extends TestCase
 
         $order = new Order($this->connector, '12345');
 
-        $order['captures'][] = $this->getMockBuilder('Klarna\Rest\OrderManagement\Capture')
+        $order['captures'][] = $this->getMockBuilder(Capture::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -796,7 +852,7 @@ class OrderTest extends TestCase
         $order['captures'][0]->expects($this->never())
             ->method('fetch');
 
-        $order['captures'][] = $this->getMockBuilder('Klarna\Rest\OrderManagement\Capture')
+        $order['captures'][] = $this->getMockBuilder(Capture::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -813,6 +869,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure that a new capture is fetched if it is not in the resource.
+     *
+     * @return void
      */
     public function testFetchCaptureNoCache()
     {
@@ -820,8 +878,7 @@ class OrderTest extends TestCase
             ->method('createRequest')
             ->with(
                 '/ordermanagement/v1/orders/12345/captures/2',
-                'GET',
-                []
+                'GET'
             )
             ->will($this->returnValue($this->request));
 
@@ -842,19 +899,19 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('application/json'));
+            ->will($this->returnValue(['application/json']));
 
         $data = [
             'data' => 'from response json',
-            'capture_id' => '2',
+            'capture_id' => '2'
         ];
 
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($data));
+            ->method('getBody')
+            ->will($this->returnValue(\GuzzleHttp\json_encode($data)));
 
         $order = new Order($this->connector, '12345');
-        $order['captures'][] = $this->getMockBuilder('Klarna\Rest\OrderManagement\Capture')
+        $order['captures'][] = $this->getMockBuilder(Capture::class)
             ->disableOriginalConstructor()
             ->getMock();
 

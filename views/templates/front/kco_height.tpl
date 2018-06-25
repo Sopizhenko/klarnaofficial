@@ -141,6 +141,11 @@
             <h4 class="kco-title kco-title--step">
                 <span class="kco-title--step__nbr">1</span> {l s='Carrier' mod='klarnaofficial'}
             </h4>
+            {if $show_prefil_link}
+            <div class="kco-infobox">
+            <a href="{$link->getModuleLink('klarnaofficial', $controllername, ['oktoprefill'=>true], true)|escape:'html':'UTF-8'}">{l s='Prefill payment window' mod='klarnaofficial'}</a>
+            </div>
+            {/if}
             {if $no_active_countries > 1}
 			<form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="kco_change_country">
 				<select name="kco_change_country" class="kco-select kco-select--full kco-select--margin" onchange="$('#kco_change_country').submit();">

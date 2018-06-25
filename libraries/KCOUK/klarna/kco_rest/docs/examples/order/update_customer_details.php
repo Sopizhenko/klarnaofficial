@@ -1,11 +1,11 @@
 <?php
-
 /**
  * Update billing and/or shipping address for an order.
  *
  * This is subject to customer credit check.
  */
-require_once dirname(dirname(dirname(__DIR__))).'/vendor/autoload.php';
+
+require_once dirname(dirname(dirname(__DIR__))) . '/vendor/autoload.php';
 
 $merchantId = getenv('MERCHANT_ID') ?: '0';
 $sharedSecret = getenv('SHARED_SECRET') ?: 'sharedSecret';
@@ -19,12 +19,12 @@ $connector = Klarna\Rest\Transport\Connector::create(
 
 $order = new Klarna\Rest\OrderManagement\Order($connector, $orderId);
 $order->updateCustomerDetails([
-    'billing_address' => [
-        'email' => 'user@example.com',
-        'phone' => '57-3895734',
+    "billing_address" => [
+        "email" => "user@example.com",
+        "phone" => "57-3895734"
     ],
-    'shipping_address' => [
-        'email' => 'user@example.com',
-        'phone' => '57-3895734',
-    ],
+    "shipping_address" => [
+        "email" => "user@example.com",
+        "phone" => "57-3895734"
+    ]
 ]);

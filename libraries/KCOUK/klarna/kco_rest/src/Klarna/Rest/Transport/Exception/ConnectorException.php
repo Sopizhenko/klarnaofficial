@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +16,7 @@
  *
  * File containing the ConnectorException class.
  */
+
 namespace Klarna\Rest\Transport\Exception;
 
 use GuzzleHttp\Exception\RequestException;
@@ -51,8 +51,8 @@ class ConnectorException extends \RuntimeException
     /**
      * Constructs a connector exception instance.
      *
-     * @param array            $data Error data
-     * @param RequestException $prev Previous exception
+     * @param array             $data Error data
+     * @param RequestException  $prev Previous exception
      */
     public function __construct(
         array $data,

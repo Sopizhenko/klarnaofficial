@@ -47,7 +47,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.16';
+        $this->version = '1.9.20';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -96,11 +96,34 @@ class KlarnaOfficial extends PaymentModule
             Configuration::deleteByName('KCO_NL_EID') == false ||
             Configuration::deleteByName('KCO_SWEDEN_EID') == false ||
             Configuration::deleteByName('KCO_NORWAY_EID') == false ||
-            Configuration::deleteByName('KCO_FINLAND_EID') == false ||
             Configuration::deleteByName('KCO_GERMANY_EID') == false ||
             Configuration::deleteByName('KCO_AUSTRIA_EID') == false ||
+            Configuration::deleteByName('KCO_TITLEMAN') == false ||
+            Configuration::deleteByName('KCO_PREFILL') == false ||
+            Configuration::deleteByName('KCO_SHOW_SHIPDETAILS') == false ||
             Configuration::deleteByName('KCO_AUTOFOCUS') == false ||
+            Configuration::deleteByName('KCO_SHOW_SUBTOT') == false ||
             Configuration::deleteByName('KCO_TESTMODE') == false ||
+            
+            Configuration::deleteByName('KCO_NIN_MANDATORY') == false ||
+            Configuration::deleteByName('KCO_ALLOWED_TYPES') == false ||
+            Configuration::deleteByName('KCOV3_SWEDEN') == false ||
+            Configuration::deleteByName('KCOV3_SWEDEN_EID') == false ||
+            Configuration::deleteByName('KCOV3_SWEDEN_SECRET') == false ||
+            Configuration::deleteByName('KCOV3_FINLAND_SECRET') == false ||
+            Configuration::deleteByName('KCOV3_FINLAND') == false ||
+            Configuration::deleteByName('KCOV3_FINLAND_EID') == false ||
+            Configuration::deleteByName('KCOV3_NORWAY_SECRET') == false ||
+            Configuration::deleteByName('KCOV3_NORWAY') == false ||
+            Configuration::deleteByName('KCOV3_NORWAY_EID') == false ||
+            Configuration::deleteByName('KCOV3_GERMANY_SECRET') == false ||
+            Configuration::deleteByName('KCOV3_DE_PREFILNOT') == false ||
+            Configuration::deleteByName('KCOV3_GERMANY') == false ||
+            Configuration::deleteByName('KCOV3_GERMANY_EID') == false ||
+            Configuration::deleteByName('KCOV3_AUSTRIA_SECRET') == false ||
+            Configuration::deleteByName('KCOV3_AUSTRIA') == false ||
+            Configuration::deleteByName('KCOV3_AUSTRIA_EID') == false ||
+            
             Configuration::deleteByName('KCO_LAYOUT') == false ||
             Configuration::deleteByName('KCO_NORWAY') == false ||
             Configuration::deleteByName('KCO_NORWAY_B2B') == false ||
@@ -126,6 +149,7 @@ class KlarnaOfficial extends PaymentModule
             Configuration::deleteByName('KPM_FI_SECRET') == false ||
             Configuration::deleteByName('KPM_DA_EID') == false ||
             Configuration::deleteByName('KPM_DA_SECRET') == false ||
+            Configuration::deleteByName('KCO_DE_PREFILNOT') == false ||
             Configuration::deleteByName('KPM_DE_EID') == false ||
             Configuration::deleteByName('KPM_DE_SECRET') == false ||
             Configuration::deleteByName('KPM_NL_EID') == false ||
@@ -139,6 +163,9 @@ class KlarnaOfficial extends PaymentModule
             Configuration::deleteByName('KPM_DISABLE_INVOICE') == false ||
             Configuration::deleteByName('KPM_SHOW_IN_PAYMENTS') == false ||
             Configuration::deleteByName('KCO_ADD_NEWSLETTERBOX') == false ||
+            Configuration::deleteByName('KCO_RADIUSBORDER') == false ||
+            Configuration::deleteByName('KCO_TERMS_PAGE') == false ||
+            Configuration::deleteByName('KCO_CANCEL_PAGE') == false ||
             Configuration::deleteByName('KPM_ACCEPTED_PP') == false
         ) {
             return false;
@@ -180,6 +207,18 @@ class KlarnaOfficial extends PaymentModule
         $name = $this->l('Klarna accepted partpayment');
         $config_name = 'KPM_ACCEPTED_PP';
         $this->createOrderStatus($name, $states, $config_name, true);
+        
+        $name = $this->l('Klarna pending payment');
+        $config_name = 'KCO_PENDING_PAYMENT';
+        $this->createOrderStatus($name, $states, $config_name, false);
+        
+        $name = $this->l('Klarna payment accepted');
+        $config_name = 'KCO_PENDING_PAYMENT_ACCEPTED';
+        $this->createOrderStatus($name, $states, $config_name, false);
+        
+        $name = $this->l('Klarna payment accepted');
+        $config_name = 'KCO_PENDING_PAYMENT_REJECTED';
+        $this->createOrderStatus($name, $states, $config_name, false);
 
         $metas = array();
         $metas[] = $this->setMeta('module-klarnaofficial-checkoutklarna');
@@ -240,7 +279,11 @@ class KlarnaOfficial extends PaymentModule
             $orderstate->name = $names;
             $orderstate->send_email = false;
             $orderstate->invoice = true;
-            $orderstate->color = '#008cd4';
+            if ("KCO_PENDING_PAYMENT_REJECTED"==$config_name) {
+                $orderstate->color = '#DC143C';
+            } else {
+                $orderstate->color = '#008cd4';
+            }
             $orderstate->unremovable = true;
             $orderstate->hidden = true;
             $orderstate->logable = true;
@@ -301,14 +344,13 @@ class KlarnaOfficial extends PaymentModule
             Configuration::updateValue('KCO_ACTIVATE_STATE', (int) Tools::getValue('KCO_ACTIVATE_STATE'));
             Configuration::updateValue('KCO_CANCEL_STATE', (int) Tools::getValue('KCO_CANCEL_STATE'));
             Configuration::updateValue('KCO_SENDTYPE', (int) Tools::getValue('KCO_SENDTYPE'));
-            Configuration::updateValue('KCO_ALLOWSEPADDR', (int) Tools::getValue('KCO_ALLOWSEPADDR'));
             Configuration::updateValue('KCO_SHOWPRODUCTPAGE', (int) Tools::getValue('KCO_SHOWPRODUCTPAGE'));
             Configuration::updateValue('KCO_PRODUCTPAGELAYOUT', Tools::getValue('KCO_PRODUCTPAGELAYOUT'));
             Configuration::updateValue('KCO_FOOTERLAYOUT', Tools::getValue('KCO_FOOTERLAYOUT'));
             Configuration::updateValue('KCO_TESTMODE', (int) Tools::getValue('KCO_TESTMODE'));
             $isSaved = true;
         }
-        if (Tools::isSubmit('btnKCOSubmit')) {
+        if (Tools::isSubmit('btnKCOCommonSubmit')) {
             Configuration::updateValue('KCO_COLORBUTTON', Tools::getValue('KCO_COLORBUTTON'));
             Configuration::updateValue('KCO_ADD_NEWSLETTERBOX', (int) Tools::getValue('KCO_ADD_NEWSLETTERBOX'));
             Configuration::updateValue('KCO_SHOW_IN_PAYMENTS', (int) Tools::getValue('KCO_SHOW_IN_PAYMENTS'));
@@ -316,44 +358,78 @@ class KlarnaOfficial extends PaymentModule
             Configuration::updateValue('KCO_COLORCHECKBOX', Tools::getValue('KCO_COLORCHECKBOX'));
             Configuration::updateValue('KCO_COLORCHECKBOXMARK', Tools::getValue('KCO_COLORCHECKBOXMARK'));
             Configuration::updateValue('KCO_COLORHEADER', Tools::getValue('KCO_COLORHEADER'));
+            Configuration::updateValue('KCO_RADIUSBORDER', Tools::getValue('KCO_RADIUSBORDER'));
             Configuration::updateValue('KCO_COLORLINK', Tools::getValue('KCO_COLORLINK'));
+            Configuration::updateValue('KCO_ROUNDOFF', (int) Tools::getValue('KCO_ROUNDOFF'));
+            Configuration::updateValue('KCO_LAYOUT', (int) Tools::getValue('KCO_LAYOUT'));
+            Configuration::updateValue('KCO_ORDERID', (int) Tools::getValue('KCO_ORDERID'));
+            Configuration::updateValue('KCO_IS_ACTIVE', (int) Tools::getValue('KCO_IS_ACTIVE'));
+            Configuration::updateValue('KCO_SHOWLINK', (int) Tools::getValue('KCO_SHOWLINK'));
+            Configuration::updateValue('KCO_CALLBACK_CHECK', (int) Tools::getValue('KCO_CALLBACK_CHECK'));
+            Configuration::updateValue('KCO_AUTOFOCUS', (int) Tools::getValue('KCO_AUTOFOCUS'));
+            Configuration::updateValue('KCO_SHOW_SHIPDETAILS', (int) Tools::getValue('KCO_SHOW_SHIPDETAILS'));
+            Configuration::updateValue('KCO_SHOW_SUBTOT', (int) Tools::getValue('KCO_SHOW_SUBTOT'));
+            Configuration::updateValue('KCO_NIN_MANDATORY', (int) Tools::getValue('KCO_NIN_MANDATORY'));
+            Configuration::updateValue('KCO_ALLOWED_TYPES', (int) Tools::getValue('KCO_ALLOWED_TYPES'));
+            Configuration::updateValue('KCO_TERMS_PAGE', (int) Tools::getValue('KCO_TERMS_PAGE'));
+            Configuration::updateValue('KCO_CANCEL_PAGE', (int) Tools::getValue('KCO_CANCEL_PAGE'));
+            Configuration::updateValue('KCO_FORCEPHONE', (int) Tools::getValue('KCO_FORCEPHONE'));
+            Configuration::updateValue('KCO_FORCESSN', (int) Tools::getValue('KCO_FORCESSN'));
+            Configuration::updateValue('KCO_ALLOWSEPADDR', (int) Tools::getValue('KCO_ALLOWSEPADDR'));
+            Configuration::updateValue('KCO_TITLEMAN', (int) Tools::getValue('KCO_TITLEMAN'));
+            Configuration::updateValue('KCO_PREFILL', (int) Tools::getValue('KCO_PREFILL'));
+            Configuration::updateValue('KCO_DOBMAN', (int) Tools::getValue('KCO_DOBMAN'));
+            $isSaved = true;
+        }
+        if (Tools::isSubmit('btnKCOV3Submit')) {
             Configuration::updateValue('KCO_UK_SECRET', Tools::getValue('KCO_UK_SECRET'));
             Configuration::updateValue('KCO_US_SECRET', Tools::getValue('KCO_US_SECRET'));
-            Configuration::updateValue('KCO_SWEDEN_SECRET', Tools::getValue('KCO_SWEDEN_SECRET'));
-            Configuration::updateValue('KCO_NORWAY_SECRET', Tools::getValue('KCO_NORWAY_SECRET'));
-            Configuration::updateValue('KCO_FINLAND_SECRET', Tools::getValue('KCO_FINLAND_SECRET'));
-            Configuration::updateValue('KCO_GERMANY_SECRET', Tools::getValue('KCO_GERMANY_SECRET'));
-            Configuration::updateValue('KCO_AUSTRIA_SECRET', Tools::getValue('KCO_AUSTRIA_SECRET'));
             Configuration::updateValue('KCO_NL_SECRET', Tools::getValue('KCO_NL_SECRET'));
             Configuration::updateValue('KCO_UK_EID', Tools::getValue('KCO_UK_EID'));
             Configuration::updateValue('KCO_US_EID', Tools::getValue('KCO_US_EID'));
             Configuration::updateValue('KCO_NL_EID', Tools::getValue('KCO_NL_EID'));
+            Configuration::updateValue('KCOV3_SWEDEN_EID', Tools::getValue('KCOV3_SWEDEN_EID'));
+            Configuration::updateValue('KCOV3_SWEDEN_SECRET', Tools::getValue('KCOV3_SWEDEN_SECRET'));
+            Configuration::updateValue('KCOV3_FINLAND_SECRET', Tools::getValue('KCOV3_FINLAND_SECRET'));
+            Configuration::updateValue('KCOV3_FINLAND_EID', Tools::getValue('KCOV3_FINLAND_EID'));
+            Configuration::updateValue('KCOV3_NORWAY_SECRET', Tools::getValue('KCOV3_NORWAY_SECRET'));
+            Configuration::updateValue('KCOV3_NORWAY_EID', Tools::getValue('KCOV3_NORWAY_EID'));
+            Configuration::updateValue('KCOV3_GERMANY_SECRET', Tools::getValue('KCOV3_GERMANY_SECRET'));
+            Configuration::updateValue('KCOV3_GERMANY_EID', Tools::getValue('KCOV3_GERMANY_EID'));
+            Configuration::updateValue('KCOV3_AUSTRIA_SECRET', Tools::getValue('KCOV3_AUSTRIA_SECRET'));
+            Configuration::updateValue('KCOV3_AUSTRIA_EID', Tools::getValue('KCOV3_AUSTRIA_EID'));
+            Configuration::updateValue('KCOV3_DE_PREFILNOT', (int) Tools::getValue('KCOV3_DE_PREFILNOT'));
+            Configuration::updateValue('KCO_NL', (int) Tools::getValue('KCO_NL'));
+            Configuration::updateValue('KCO_UK', (int) Tools::getValue('KCO_UK'));
+            Configuration::updateValue('KCO_US', (int) Tools::getValue('KCO_US'));
+            Configuration::updateValue('KCOV3_AUSTRIA', (int) Tools::getValue('KCOV3_AUSTRIA'));
+            Configuration::updateValue('KCOV3_GERMANY', (int) Tools::getValue('KCOV3_GERMANY'));
+            Configuration::updateValue('KCOV3_NORWAY', (int) Tools::getValue('KCOV3_NORWAY'));
+            Configuration::updateValue('KCOV3_FINLAND', (int) Tools::getValue('KCOV3_FINLAND'));
+            Configuration::updateValue('KCOV3_SWEDEN', (int) Tools::getValue('KCOV3_SWEDEN'));
+            $isSaved = true;
+        }
+        if (Tools::isSubmit('btnKCOSubmit')) {
+            Configuration::updateValue('KCO_SWEDEN_SECRET', Tools::getValue('KCO_SWEDEN_SECRET'));
+            Configuration::updateValue('KCO_NORWAY_SECRET', Tools::getValue('KCO_NORWAY_SECRET'));
+            Configuration::updateValue('KCO_FINLAND_SECRET', Tools::getValue('KCO_FINLAND_SECRET'));
+            Configuration::updateValue('KCO_DE_PREFILNOT', (int)Tools::getValue('KCO_DE_PREFILNOT'));
+            Configuration::updateValue('KCO_DE_PREFILNOT', (int)Tools::getValue('KCO_DE_PREFILNOT'));
+            Configuration::updateValue('KCO_GERMANY_SECRET', Tools::getValue('KCO_GERMANY_SECRET'));
+            Configuration::updateValue('KCO_AUSTRIA_SECRET', Tools::getValue('KCO_AUSTRIA_SECRET'));
             Configuration::updateValue('KCO_SWEDEN_EID', (int) Tools::getValue('KCO_SWEDEN_EID'));
             Configuration::updateValue('KCO_NORWAY_EID', (int) Tools::getValue('KCO_NORWAY_EID'));
             Configuration::updateValue('KCO_FINLAND_EID', (int) Tools::getValue('KCO_FINLAND_EID'));
             Configuration::updateValue('KCO_GERMANY_EID', (int) Tools::getValue('KCO_GERMANY_EID'));
             Configuration::updateValue('KCO_AUSTRIA_EID', (int) Tools::getValue('KCO_AUSTRIA_EID'));
-            Configuration::updateValue('KCO_ROUNDOFF', (int) Tools::getValue('KCO_ROUNDOFF'));
-            Configuration::updateValue('KCO_LAYOUT', (int) Tools::getValue('KCO_LAYOUT'));
             Configuration::updateValue('KCO_NORWAY', (int) Tools::getValue('KCO_NORWAY'));
             Configuration::updateValue('KCO_FINLAND', (int) Tools::getValue('KCO_FINLAND'));
-            Configuration::updateValue('KCO_NL', (int) Tools::getValue('KCO_NL'));
-            Configuration::updateValue('KCO_UK', (int) Tools::getValue('KCO_UK'));
-            Configuration::updateValue('KCO_US', (int) Tools::getValue('KCO_US'));
             Configuration::updateValue('KCO_SWEDEN_B2B', (int) Tools::getValue('KCO_SWEDEN_B2B'));
             Configuration::updateValue('KCO_NORWAY_B2B', (int) Tools::getValue('KCO_NORWAY_B2B'));
             Configuration::updateValue('KCO_FINLAND_B2B', (int) Tools::getValue('KCO_FINLAND_B2B'));
             Configuration::updateValue('KCO_SWEDEN', (int) Tools::getValue('KCO_SWEDEN'));
             Configuration::updateValue('KCO_AUSTRIA', (int) Tools::getValue('KCO_AUSTRIA'));
             Configuration::updateValue('KCO_GERMANY', (int) Tools::getValue('KCO_GERMANY'));
-            Configuration::updateValue('KCO_ORDERID', (int) Tools::getValue('KCO_ORDERID'));
-            Configuration::updateValue('KCO_IS_ACTIVE', (int) Tools::getValue('KCO_IS_ACTIVE'));
-            Configuration::updateValue('KCO_SHOWLINK', (int) Tools::getValue('KCO_SHOWLINK'));
-            Configuration::updateValue('KCO_CALLBACK_CHECK', (int) Tools::getValue('KCO_CALLBACK_CHECK'));
-            Configuration::updateValue('KCO_AUTOFOCUS', Tools::getValue('KCO_AUTOFOCUS'));
-            Configuration::updateValue('KCO_FORCEPHONE', (int) Tools::getValue('KCO_FORCEPHONE'));
-            Configuration::updateValue('KCO_FORCESSN', (int) Tools::getValue('KCO_FORCESSN'));
-            Configuration::updateValue('KCO_ALLOWSEPADDR', (int) Tools::getValue('KCO_ALLOWSEPADDR'));
             $isSaved = true;
         }
         $invoice_fee_not_found = false;
@@ -472,6 +548,8 @@ class KlarnaOfficial extends PaymentModule
             'invoice_fee_not_found' => $invoice_fee_not_found,
             'commonform' => $this->createCommonForm(),
             'kpmform' => $this->createKPMForm(),
+            'kcocommonform' => $this->createKCOCommonForm(),
+            'kcov3form' => $this->createKCOV3Form(),
             'kcoform' => $this->createKCOForm(),
             'pclasslist' => $this->renderPclassList(),
             'REQUEST_URI' => Tools::safeOutput($_SERVER['REQUEST_URI']),
@@ -751,6 +829,483 @@ class KlarnaOfficial extends PaymentModule
         $helper->submit_action = 'btnCommonSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).
         '&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigFieldsValues(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
+        );
+
+        return $helper->generateForm($fields_form);
+    }
+    public function createKCOCommonForm()
+    {
+        $cms_pages = CMS::listCms(null, false, false);
+                
+        $fields_form = array();
+        $fields_form[0]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('KCO Settings'),
+                    'icon' => 'icon-AdminAdmin',
+                  ),
+                'input' => array(
+                //KCO: GENERAL
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Active KCO in this shop'),
+                    'name' => 'KCO_IS_ACTIVE',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'kco_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'kco_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Activate KCO for this show, if set to no, KPM will be used.'),
+                ),
+
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Send id_order or order identifier'),
+                    'name' => 'KCO_ORDERID',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'orderidentifier_on',
+                            'value' => 1,
+                            'label' => $this->l('id_order'), ),
+                        array(
+                            'id' => 'orderidentifier_off',
+                            'value' => 0,
+                            'label' => $this->l('Reference'), ),
+                    ),
+                    'desc' => $this->l('Order identifier sent to Klarna Online, Yes = order reference, No = id_order.'),
+                ),
+
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Round off total'),
+                    'name' => 'KCO_ROUNDOFF',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'roundoff_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'roundoff_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Round off total value.'),
+                ),
+
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Use two column checkout'),
+                    'name' => 'KCO_LAYOUT',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'layout_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'layout_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Use the two column layout.'),
+                ),
+                
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Force phone')." *",
+                    'name' => 'KCO_FORCEPHONE',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'forcephone_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'forcephone_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Force customers to enter phone number in KCO'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Force SSN')." *",
+                    'name' => 'KCO_FORCESSN',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'forcessn_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'forcessn_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Force customers to enter social security number in KCO'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Allow separate delivery address'),
+                    'name' => 'KCO_ALLOWSEPADDR',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'kco_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'kco_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Allow customer to choose different delivery and invoice address.'),
+                ),
+                
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Activate Autofocus'),
+                    'name' => 'KCO_AUTOFOCUS',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'autofocus_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'autofocus_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Recommended setting is no.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show shipping details'),
+                    'name' => 'KCO_SHOW_SHIPDETAILS',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'showship_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'showship_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Show carrier delay info on thank you page.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show subtotal'),
+                    'name' => 'KCO_SHOW_SUBTOT',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'showsubtot_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'showsubtot_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Show subtotal kco v3.'),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Allowed customer types')." *",
+                    'name' => 'KCO_ALLOWED_TYPES',
+                    'desc' => $this->l('Only for KCO V3.'),
+                    'options' => array(
+                        'query' => array(
+                        array(
+                            'value' => 0,
+                            'label' => $this->l('All customer types')),
+                        array(
+                            'value' => 1,
+                            'label' => $this->l('Private customers (b2c)')),
+                        array(
+                            'value' => 2,
+                            'label' => $this->l('Company customers (b2b)')),
+                    ),
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('National identification number mandatory')." *",
+                    'name' => 'KCO_NIN_MANDATORY',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'nidnum_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'nidnum_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Makes national id number mandatory for KCO V3'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Activate Callback'),
+                    'name' => 'KCO_CALLBACK_CHECK',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'callback_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'callback_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('A quick check is done before order is accepted that the cart has not been modified, requires SSL support.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show link to old checkout'),
+                    'name' => 'KCO_SHOWLINK',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'showlink_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'showlink_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Show a link to the old checkout.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show link to KCO in checkout'),
+                    'name' => 'KCO_SHOW_IN_PAYMENTS',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'showlink_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'showlink_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Show a link to KCO in the old checkout.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Date of birth mandatory')." *",
+                    'name' => 'KCO_DOBMAN',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'kcodobman_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'kcodobman_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Require that customer enters date of birth.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Title mandatory (only V3)')." *",
+                    'name' => 'KCO_TITLEMAN',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'kcotitle_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'kcotitle_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Require that customer enters title.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Prefill customer info'),
+                    'name' => 'KCO_PREFILL',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'coprefill_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'kcoprefill_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('IF customer is logged in, prefill info'),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Offer newsletter signup'),
+                    'name' => 'KCO_ADD_NEWSLETTERBOX',
+                    'desc' => $this->l('Show checkbox in kco window.'),
+                    'options' => array(
+                        'query' => array(
+                        array(
+                            'value' => 0,
+                            'label' => $this->l('Yes, show sign up box'), ),
+                        array(
+                            'value' => 1,
+                            'label' => $this->l('Yes, show sign up box (prechecked)'), ),
+                        array(
+                            'value' => 2,
+                            'label' => $this->l('No, do not show (all customers set to subscribers)'), ),
+                        array(
+                            'value' => 3,
+                            'label' => $this->l('No, do not show, customers are not set as subscribers'), ),
+                    ),
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Terms page'),
+                    'name' => 'KCO_TERMS_PAGE',
+                    'desc' => $this->l('Set CMS page that contains the terms and conditions.'),
+                    'options' => array(
+                        'query' => $cms_pages,
+                        'id' => 'id_cms',
+                        'name' => 'meta_title',
+                    ),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Cancelation terms page')." *",
+                    'name' => 'KCO_CANCEL_PAGE',
+                    'desc' => $this->l('Set CMS page that contains the cancelation terms.'),
+                    'options' => array(
+                        'query' => $cms_pages,
+                        'id' => 'id_cms',
+                        'name' => 'meta_title',
+                    ),
+                ),
+
+                //KCO
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $fields_form[1]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Color settings'),
+                    'icon' => 'icon-AdminParentPreferences',
+                  ),
+                'input' => array(
+                //KCO: COLOR SETTINGS
+                array(
+                        'type' => 'color',
+                        'class' => 'color mColorPickerInput',
+                        'label' => $this->l('Color buttons'),
+                        'name' => 'KCO_COLORBUTTON',
+                        'desc' => $this->l('Adjust the color of buttons in KCO window.'),
+                        'required' => false,
+                    ),
+                array(
+                        'type' => 'color',
+                        'class' => 'color mColorPickerInput',
+                        'label' => $this->l('Color button text'),
+                        'name' => 'KCO_COLORBUTTONTEXT',
+                        'desc' => $this->l('Adjust the color of texts on buttons in KCO window.'),
+                        'required' => false,
+                    ),
+                array(
+                        'type' => 'color',
+                        'class' => 'color mColorPickerInput',
+                        'label' => $this->l('Color checkbox'),
+                        'name' => 'KCO_COLORCHECKBOX',
+                        'desc' => $this->l('Adjust the color of checkbox in KCO window.'),
+                        'required' => false,
+                    ),
+                array(
+                        'type' => 'color',
+                        'class' => 'color mColorPickerInput',
+                        'label' => $this->l('Color checkbox marker'),
+                        'name' => 'KCO_COLORCHECKBOXMARK',
+                        'desc' => $this->l('Adjust the color of checkbox marker in KCO window.'),
+                        'required' => false,
+                    ),
+                array(
+                        'type' => 'color',
+                        'class' => 'color mColorPickerInput',
+                        'label' => $this->l('Color header'),
+                        'name' => 'KCO_COLORHEADER',
+                        'desc' => $this->l('Adjust the color of titles in KCO window.'),
+                        'required' => false,
+                    ),
+                array(
+                        'type' => 'color',
+                        'class' => 'color mColorPickerInput',
+                        'label' => $this->l('Color link'),
+                        'desc' => $this->l('Adjust the color of all links in KCO window.'),
+                        'name' => 'KCO_COLORLINK',
+                        'required' => false,
+                    ),
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Radius border'),
+                        'desc' => $this->l('Set the radius border'),
+                        'name' => 'KCO_RADIUSBORDER',
+                        'class' => 'fixed-width-lg',
+                        'required' => false,
+                    ),
+                //KCO
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->table = $this->table;
+        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
+        $helper->default_form_language = $lang->id;
+        if (Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG')) {
+            $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG');
+        } else {
+            $helper->allow_employee_form_lang = 0;
+        }
+        $helper->submit_action = 'btnKCOCommonSubmit';
+        $helper->currentIndex = $this->context->link->getAdminLink(
+            'AdminModules',
+            false
+        ).'&configure='.$this->name.
+        '&tab_module='.$this->tab.'&module_name='.$this->name;
+        
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFieldsValues(),
@@ -1061,235 +1616,48 @@ class KlarnaOfficial extends PaymentModule
 
         return $helper->generateForm($fields_form);
     }
-    public function createKCOForm()
+    public function createKCOV3Form()
     {
         $fields_form = array();
+
         $fields_form[0]['form'] = array(
                 'legend' => array(
-                    'title' => $this->l('KCO Settings'),
-                    'icon' => 'icon-AdminAdmin',
+                    'title' => $this->l('United kingdom'),
+                    'icon' => 'icon-AdminParentLocalization',
                   ),
                 'input' => array(
-                //KCO: GENERAL
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Active KCO in this shop'),
-                    'name' => 'KCO_IS_ACTIVE',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'kco_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'kco_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
+                //KCO: UK
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO UK'),
+                        'name' => 'KCO_UK',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'uk_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'uk_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for UK, GBP and EN language required.'),
                     ),
-                    'desc' => $this->l('Activate KCO for this show, if set to no, KPM will be used.'),
-                ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCO_UK_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
 
                 array(
-                    'type' => 'switch',
-                    'label' => $this->l('Send id_order or order identifier'),
-                    'name' => 'KCO_ORDERID',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'orderidentifier_on',
-                            'value' => 1,
-                            'label' => $this->l('id_order'), ),
-                        array(
-                            'id' => 'orderidentifier_off',
-                            'value' => 0,
-                            'label' => $this->l('Reference'), ),
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCO_UK_SECRET',
+                        'required' => true,
                     ),
-                    'desc' => $this->l('Order identifier sent to Klarna Online, Yes = order reference, No = id_order.'),
-                ),
-
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Round off total'),
-                    'name' => 'KCO_ROUNDOFF',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'roundoff_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'roundoff_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Round off total value.'),
-                ),
-
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Use two column checkout'),
-                    'name' => 'KCO_LAYOUT',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'layout_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'layout_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Use the two column layout.'),
-                ),
-                
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Force phone'),
-                    'name' => 'KCO_FORCEPHONE',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'forcephone_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'forcephone_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Force customers to enter phone number in KCO'),
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Force SSN'),
-                    'name' => 'KCO_FORCESSN',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'forcessn_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'forcessn_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Force customers to enter social security number in KCO'),
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Allow separate delivery address'),
-                    'name' => 'KCO_ALLOWSEPADDR',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'kco_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'kco_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Allow customer to choose different delivery and invoice address.'),
-                ),
-                
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Activate Autofocus'),
-                    'name' => 'KCO_AUTOFOCUS',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'autofocus_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'autofocus_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Recommended setting is no.'),
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Activate Callback'),
-                    'name' => 'KCO_CALLBACK_CHECK',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'callback_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'callback_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('A quick check is done before order is accepted that the cart has not been modified, requires SSL support.'),
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Show link to old checkout'),
-                    'name' => 'KCO_SHOWLINK',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'showlink_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'showlink_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Show a link to the old checkout.'),
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Show link to KCO in checkout'),
-                    'name' => 'KCO_SHOW_IN_PAYMENTS',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'showlink_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'showlink_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Show a link to KCO in the old checkout.'),
-                ),
-                
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Offer newsletter signup'),
-                    'name' => 'KCO_ADD_NEWSLETTERBOX',
-                    'desc' => $this->l('Show checkbox in kco window.'),
-                    'options' => array(
-                        'query' => array(
-                        array(
-                            'value' => 0,
-                            'label' => $this->l('Yes, show sign up box'), ),
-                        array(
-                            'value' => 1,
-                            'label' => $this->l('Yes, show sign up box (prechecked)'), ),
-                        array(
-                            'value' => 2,
-                            'label' => $this->l('No, do not show (all customers set to subscribers)'), ),
-                        array(
-                            'value' => 3,
-                            'label' => $this->l('No, do not show, customers are not set as subscribers'), ),
-                    ),
-                        'id' => 'value',
-                        'name' => 'label',
-                    ),
-                ),
-
-                //KCO
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -1298,67 +1666,363 @@ class KlarnaOfficial extends PaymentModule
 
         $fields_form[1]['form'] = array(
                 'legend' => array(
-                    'title' => $this->l('Color settings'),
-                    'icon' => 'icon-AdminParentPreferences',
+                    'title' => $this->l('United states'),
+                    'icon' => 'icon-AdminParentLocalization',
                   ),
                 'input' => array(
-                //KCO: COLOR SETTINGS
-                array(
-                        'type' => 'color',
-                        'class' => 'color mColorPickerInput',
-                        'label' => $this->l('Color buttons'),
-                        'name' => 'KCO_COLORBUTTON',
-                        'desc' => $this->l('Adjust the color of buttons in KCO window.'),
-                        'required' => false,
+                //KCO: US
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO US'),
+                        'name' => 'KCO_US',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'us_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'us_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for US, USD and EN language required.'),
                     ),
-                array(
-                        'type' => 'color',
-                        'class' => 'color mColorPickerInput',
-                        'label' => $this->l('Color button text'),
-                        'name' => 'KCO_COLORBUTTONTEXT',
-                        'desc' => $this->l('Adjust the color of texts on buttons in KCO window.'),
-                        'required' => false,
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCO_US_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
                     ),
+
                 array(
-                        'type' => 'color',
-                        'class' => 'color mColorPickerInput',
-                        'label' => $this->l('Color checkbox'),
-                        'name' => 'KCO_COLORCHECKBOX',
-                        'desc' => $this->l('Adjust the color of checkbox in KCO window.'),
-                        'required' => false,
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCO_US_SECRET',
+                        'required' => true,
                     ),
-                array(
-                        'type' => 'color',
-                        'class' => 'color mColorPickerInput',
-                        'label' => $this->l('Color checkbox marker'),
-                        'name' => 'KCO_COLORCHECKBOXMARK',
-                        'desc' => $this->l('Adjust the color of checkbox marker in KCO window.'),
-                        'required' => false,
-                    ),
-                array(
-                        'type' => 'color',
-                        'class' => 'color mColorPickerInput',
-                        'label' => $this->l('Color header'),
-                        'name' => 'KCO_COLORHEADER',
-                        'desc' => $this->l('Adjust the color of titles in KCO window.'),
-                        'required' => false,
-                    ),
-                array(
-                        'type' => 'color',
-                        'class' => 'color mColorPickerInput',
-                        'label' => $this->l('Color link'),
-                        'desc' => $this->l('Adjust the color of all links in KCO window.'),
-                        'name' => 'KCO_COLORLINK',
-                        'required' => false,
-                    ),
-                //KCO
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
                 ),
         );
-
+        
+        
+        
         $fields_form[2]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Netherlands'),
+                    'icon' => 'icon-AdminParentLocalization',
+                  ),
+                'input' => array(
+                //KCO: NL
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO NL'),
+                        'name' => 'KCO_NL',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'nl_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'nl_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for NL, EUR and NL language required.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCO_NL_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
+
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCO_NL_SECRET',
+                        'required' => true,
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $fields_form[3]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Sweden'),
+                    'icon' => 'icon-AdminParentLocalization',
+                  ),
+                'input' => array(
+                //KCOV3: SV
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO SV'),
+                        'name' => 'KCOV3_SWEDEN',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'sv3_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'sv3_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for SV, SEK and SV language required.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCOV3_SWEDEN_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
+
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCOV3_SWEDEN_SECRET',
+                        'required' => true,
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $fields_form[4]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Finland'),
+                    'icon' => 'icon-AdminParentLocalization',
+                  ),
+                'input' => array(
+                //KCOV3: FI
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO FI'),
+                        'name' => 'KCOV3_FINLAND',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'fi3_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'fi3_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for FI, EUR and SV or FI language required.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCOV3_FINLAND_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
+
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCOV3_FINLAND_SECRET',
+                        'required' => true,
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $fields_form[5]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Norway'),
+                    'icon' => 'icon-AdminParentLocalization',
+                  ),
+                'input' => array(
+                //KCOV3: No
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO NO'),
+                        'name' => 'KCOV3_NORWAY',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'no3_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'no3_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for NO, NOK and NO language required.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCOV3_NORWAY_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
+
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCOV3_NORWAY_SECRET',
+                        'required' => true,
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $fields_form[6]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Germany'),
+                    'icon' => 'icon-AdminParentLocalization',
+                  ),
+                'input' => array(
+                //KCOV3: DE
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO DE'),
+                        'name' => 'KCOV3_GERMANY',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'de3_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'de3_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for DE, EUR and DE language required.'),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active Prefill notification'),
+                        'name' => 'KCOV3_DE_PREFILNOT',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'deprefill3_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'deprefill3_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate prefill notification for DE.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCOV3_GERMANY_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
+
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCOV3_GERMANY_SECRET',
+                        'required' => true,
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $fields_form[7]['form'] = array(
+                'legend' => array(
+                    'title' => $this->l('Austria'),
+                    'icon' => 'icon-AdminParentLocalization',
+                  ),
+                'input' => array(
+                //KCOV3: AT
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Active KCO AT'),
+                        'name' => 'KCOV3_AUSTRIA',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'at3_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'at3_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate KCO for Austria, EUR and DE language required.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('EID'),
+                        'name' => 'KCOV3_AUSTRIA_EID',
+                        'class' => 'fixed-width-lg',
+                        'required' => true,
+                    ),
+
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Shared secret'),
+                        'name' => 'KCOV3_AUSTRIA_SECRET',
+                        'required' => true,
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+        );
+        
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->table = $this->table;
+        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
+        $helper->default_form_language = $lang->id;
+        if (Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG')) {
+            $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG');
+        } else {
+            $helper->allow_employee_form_lang = 0;
+        }
+        $helper->submit_action = 'btnKCOV3Submit';
+        $helper->currentIndex = $this->context->link->getAdminLink(
+            'AdminModules',
+            false
+        ).'&configure='.$this->name.
+        '&tab_module='.$this->tab.'&module_name='.$this->name;
+        
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigFieldsValues(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
+        );
+
+        return $helper->generateForm($fields_form);
+    }
+    
+    public function createKCOForm()
+    {
+        $fields_form = array();
+
+        $fields_form[0]['form'] = array(
                 'legend' => array(
                     'title' => $this->l('Sweden'),
                     'icon' => 'icon-AdminParentLocalization',
@@ -1428,7 +2092,7 @@ class KlarnaOfficial extends PaymentModule
                 ),
         );
 
-        $fields_form[3]['form'] = array(
+        $fields_form[1]['form'] = array(
                 'legend' => array(
                     'title' => $this->l('Norway'),
                     'icon' => 'icon-AdminParentLocalization',
@@ -1497,7 +2161,7 @@ class KlarnaOfficial extends PaymentModule
                 ),
         );
 
-        $fields_form[4]['form'] = array(
+        $fields_form[2]['form'] = array(
                 'legend' => array(
                     'title' => $this->l('Finland'),
                     'icon' => 'icon-AdminParentLocalization',
@@ -1566,7 +2230,7 @@ class KlarnaOfficial extends PaymentModule
                 ),
         );
 
-        $fields_form[5]['form'] = array(
+        $fields_form[3]['form'] = array(
                 'legend' => array(
                     'title' => $this->l('Germany'),
                     'icon' => 'icon-AdminParentLocalization',
@@ -1591,6 +2255,23 @@ class KlarnaOfficial extends PaymentModule
                         'desc' => $this->l('Activate KCO for Germany, EUR and DE language required.'),
                     ),
                     array(
+                        'type' => 'switch',
+                        'label' => $this->l('Prefill notification'),
+                        'name' => 'KCO_DE_PREFILNOT',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'germanyprefill_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'germanyprefill_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate Prefill notification.'),
+                    ),
+                    array(
                         'type' => 'text',
                         'label' => $this->l('EID'),
                         'name' => 'KCO_GERMANY_EID',
@@ -1610,51 +2291,7 @@ class KlarnaOfficial extends PaymentModule
                 ),
         );
 
-        $fields_form[6]['form'] = array(
-                'legend' => array(
-                    'title' => $this->l('United kingdom'),
-                    'icon' => 'icon-AdminParentLocalization',
-                  ),
-                'input' => array(
-                //KCO: UK
-                    array(
-                        'type' => 'switch',
-                        'label' => $this->l('Active KCO UK'),
-                        'name' => 'KCO_UK',
-                        'is_bool' => true,
-                        'values' => array(
-                            array(
-                                'id' => 'uk_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes'), ),
-                            array(
-                                'id' => 'uk_off',
-                                'value' => 0,
-                                'label' => $this->l('No'), ),
-                        ),
-                        'desc' => $this->l('Activate KCO for UK, GBP and EN language required.'),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('EID'),
-                        'name' => 'KCO_UK_EID',
-                        'class' => 'fixed-width-lg',
-                        'required' => true,
-                    ),
-
-                array(
-                        'type' => 'text',
-                        'label' => $this->l('Shared secret'),
-                        'name' => 'KCO_UK_SECRET',
-                        'required' => true,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-        );
-        
-        $fields_form[7]['form'] = array(
+        $fields_form[4]['form'] = array(
                 'legend' => array(
                     'title' => $this->l('Austria'),
                     'icon' => 'icon-AdminParentLocalization',
@@ -1690,96 +2327,6 @@ class KlarnaOfficial extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Shared secret'),
                         'name' => 'KCO_AUSTRIA_SECRET',
-                        'required' => true,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-        );
-
-        $fields_form[8]['form'] = array(
-                'legend' => array(
-                    'title' => $this->l('United states'),
-                    'icon' => 'icon-AdminParentLocalization',
-                  ),
-                'input' => array(
-                //KCO: US
-                    array(
-                        'type' => 'switch',
-                        'label' => $this->l('Active KCO US'),
-                        'name' => 'KCO_US',
-                        'is_bool' => true,
-                        'values' => array(
-                            array(
-                                'id' => 'us_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes'), ),
-                            array(
-                                'id' => 'us_off',
-                                'value' => 0,
-                                'label' => $this->l('No'), ),
-                        ),
-                        'desc' => $this->l('Activate KCO for US, USD and EN language required.'),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('EID'),
-                        'name' => 'KCO_US_EID',
-                        'class' => 'fixed-width-lg',
-                        'required' => true,
-                    ),
-
-                array(
-                        'type' => 'text',
-                        'label' => $this->l('Shared secret'),
-                        'name' => 'KCO_US_SECRET',
-                        'required' => true,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-        );
-        
-        
-        
-        $fields_form[9]['form'] = array(
-                'legend' => array(
-                    'title' => $this->l('Netherlands'),
-                    'icon' => 'icon-AdminParentLocalization',
-                  ),
-                'input' => array(
-                //KCO: NL
-                    array(
-                        'type' => 'switch',
-                        'label' => $this->l('Active KCO NL'),
-                        'name' => 'KCO_NL',
-                        'is_bool' => true,
-                        'values' => array(
-                            array(
-                                'id' => 'nl_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes'), ),
-                            array(
-                                'id' => 'nl_off',
-                                'value' => 0,
-                                'label' => $this->l('No'), ),
-                        ),
-                        'desc' => $this->l('Activate KCO for NL, EUR and NL language required.'),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('EID'),
-                        'name' => 'KCO_NL_EID',
-                        'class' => 'fixed-width-lg',
-                        'required' => true,
-                    ),
-
-                array(
-                        'type' => 'text',
-                        'label' => $this->l('Shared secret'),
-                        'name' => 'KCO_NL_SECRET',
                         'required' => true,
                     ),
                 ),
@@ -1846,6 +2393,22 @@ class KlarnaOfficial extends PaymentModule
                 'KCO_COLORHEADER',
                 Configuration::get('KCO_COLORHEADER')
             ),
+            'KCO_RADIUSBORDER' => Tools::getValue(
+                'KCO_RADIUSBORDER',
+                Configuration::get('KCO_RADIUSBORDER')
+            ),
+            'KCO_DOBMAN' => Tools::getValue(
+                'KCO_DOBMAN',
+                Configuration::get('KCO_DOBMAN')
+            ),
+            'KCO_TITLEMAN' => Tools::getValue(
+                'KCO_TITLEMAN',
+                Configuration::get('KCO_TITLEMAN')
+            ),
+            'KCO_PREFILL' => Tools::getValue(
+                'KCO_PREFILL',
+                Configuration::get('KCO_PREFILL')
+            ),
             'KCO_COLORLINK' => Tools::getValue(
                 'KCO_COLORLINK',
                 Configuration::get('KCO_COLORLINK')
@@ -1878,6 +2441,14 @@ class KlarnaOfficial extends PaymentModule
                 'KCO_SWEDEN_EID',
                 Configuration::get('KCO_SWEDEN_EID')
             ),
+            'KCO_TERMS_PAGE' => Tools::getValue(
+                'KCO_TERMS_PAGE',
+                Configuration::get('KCO_TERMS_PAGE')
+            ),
+            'KCO_CANCEL_PAGE' => Tools::getValue(
+                'KCO_CANCEL_PAGE',
+                Configuration::get('KCO_CANCEL_PAGE')
+            ),
             'KCO_FINLAND_EID' => Tools::getValue(
                 'KCO_FINLAND_EID',
                 Configuration::get('KCO_FINLAND_EID')
@@ -1885,6 +2456,10 @@ class KlarnaOfficial extends PaymentModule
             'KCO_GERMANY_EID' => Tools::getValue(
                 'KCO_GERMANY_EID',
                 Configuration::get('KCO_GERMANY_EID')
+            ),
+            'KCO_DE_PREFILNOT' => Tools::getValue(
+                'KCO_DE_PREFILNOT',
+                Configuration::get('KCO_DE_PREFILNOT')
             ),
             'KCO_AUSTRIA_EID' => Tools::getValue(
                 'KCO_AUSTRIA_EID',
@@ -2002,6 +2577,22 @@ class KlarnaOfficial extends PaymentModule
                 'KCO_AUTOFOCUS',
                 Configuration::get('KCO_AUTOFOCUS')
             ),
+            'KCO_SHOW_SHIPDETAILS' => Tools::getValue(
+                'KCO_SHOW_SHIPDETAILS',
+                Configuration::get('KCO_SHOW_SHIPDETAILS')
+            ),
+            'KCO_SHOW_SUBTOT' => Tools::getValue(
+                'KCO_SHOW_SUBTOT',
+                Configuration::get('KCO_SHOW_SUBTOT')
+            ),
+            'KCO_ALLOWED_TYPES' => Tools::getValue(
+                'KCO_ALLOWED_TYPES',
+                Configuration::get('KCO_ALLOWED_TYPES')
+            ),
+            'KCO_NIN_MANDATORY' => Tools::getValue(
+                'KCO_NIN_MANDATORY',
+                Configuration::get('KCO_NIN_MANDATORY')
+            ),
             'KPM_NL_SECRET' => Tools::getValue(
                 'KPM_NL_SECRET',
                 Configuration::get('KPM_NL_SECRET')
@@ -2097,6 +2688,70 @@ class KlarnaOfficial extends PaymentModule
             'KCO_FORCESSN' => Tools::getValue(
                 'KCO_FORCESSN',
                 Configuration::get('KCO_FORCESSN')
+            ),
+            'KCOV3_SWEDEN' => Tools::getValue(
+                'KCOV3_SWEDEN',
+                Configuration::get('KCOV3_SWEDEN')
+            ),
+            'KCOV3_SWEDEN_EID' => Tools::getValue(
+                'KCOV3_SWEDEN_EID',
+                Configuration::get('KCOV3_SWEDEN_EID')
+            ),
+            'KCOV3_SWEDEN_SECRET' => Tools::getValue(
+                'KCOV3_SWEDEN_SECRET',
+                Configuration::get('KCOV3_SWEDEN_SECRET')
+            ),
+            'KCOV3_FINLAND_SECRET' => Tools::getValue(
+                'KCOV3_FINLAND_SECRET',
+                Configuration::get('KCOV3_FINLAND_SECRET')
+            ),
+            'KCOV3_FINLAND' => Tools::getValue(
+                'KCOV3_FINLAND',
+                Configuration::get('KCOV3_FINLAND')
+            ),
+            'KCOV3_FINLAND_EID' => Tools::getValue(
+                'KCOV3_FINLAND_EID',
+                Configuration::get('KCOV3_FINLAND_EID')
+            ),
+            'KCOV3_NORWAY_SECRET' => Tools::getValue(
+                'KCOV3_NORWAY_SECRET',
+                Configuration::get('KCOV3_NORWAY_SECRET')
+            ),
+            'KCOV3_NORWAY' => Tools::getValue(
+                'KCOV3_NORWAY',
+                Configuration::get('KCOV3_NORWAY')
+            ),
+            'KCOV3_NORWAY_EID' => Tools::getValue(
+                'KCOV3_NORWAY_EID',
+                Configuration::get('KCOV3_NORWAY_EID')
+            ),
+            'KCOV3_GERMANY_SECRET' => Tools::getValue(
+                'KCOV3_GERMANY_SECRET',
+                Configuration::get('KCOV3_GERMANY_SECRET')
+            ),
+            'KCOV3_DE_PREFILNOT' => Tools::getValue(
+                'KCOV3_DE_PREFILNOT',
+                Configuration::get('KCOV3_DE_PREFILNOT')
+            ),
+            'KCOV3_GERMANY' => Tools::getValue(
+                'KCOV3_GERMANY',
+                Configuration::get('KCOV3_GERMANY')
+            ),
+            'KCOV3_GERMANY_EID' => Tools::getValue(
+                'KCOV3_GERMANY_EID',
+                Configuration::get('KCOV3_GERMANY_EID')
+            ),
+            'KCOV3_AUSTRIA_SECRET' => Tools::getValue(
+                'KCOV3_AUSTRIA_SECRET',
+                Configuration::get('KCOV3_AUSTRIA_SECRET')
+            ),
+            'KCOV3_AUSTRIA' => Tools::getValue(
+                'KCOV3_AUSTRIA',
+                Configuration::get('KCOV3_AUSTRIA')
+            ),
+            'KCOV3_AUSTRIA_EID' => Tools::getValue(
+                'KCOV3_AUSTRIA_EID',
+                Configuration::get('KCOV3_AUSTRIA_EID')
             ),
         );
     }
@@ -2875,6 +3530,7 @@ class KlarnaOfficial extends PaymentModule
                 Tools::redirect('index.php');
             }
         } elseif (Tools::getIsset("kcotpv3")) {
+            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
             $sid = Tools::getValue('sid');
             if ($sid == 'gb') {
                 $sharedSecret = Configuration::get('KCO_UK_SECRET');
@@ -2885,6 +3541,21 @@ class KlarnaOfficial extends PaymentModule
             } elseif ($sid == 'nl') {
                 $sharedSecret = Configuration::get('KCO_NL_SECRET');
                 $merchantId = Configuration::get('KCO_NL_EID');
+            } elseif ($sid == 'se') {
+                $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
+                $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
+            } elseif ($sid == 'de') {
+                $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
+                $merchantId = Configuration::get('KCOV3_GERMANY_EID');
+            } elseif ($sid == 'at') {
+                $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
+                $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
+            } elseif ($sid == 'fi') {
+                $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
+                $merchantId = Configuration::get('KCOV3_FINLAND_EID');
+            } elseif ($sid == 'no') {
+                $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
+                $merchantId = Configuration::get('KCOV3_NORWAY_EID');
             }
 
             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
@@ -2916,7 +3587,9 @@ class KlarnaOfficial extends PaymentModule
             $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
             $this->context->smarty->assign('orderid', $params["objOrder"]->id);
             $this->context->smarty->assign('snippet', $snippet);
-            unset($_SESSION['klarna_checkout_uk']);
+            if (isset($_SESSION['klarna_checkout_uk'])) {
+                unset($_SESSION['klarna_checkout_uk']);
+            }
             return $this->display(__FILE__, 'kco_payment_return.tpl');
         } else {
             $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
@@ -3525,7 +4198,7 @@ class KlarnaOfficial extends PaymentModule
         return 'en_gb';
     }
 
-    private function getAllEIDSScombinations($id_shop)
+    public function getAllEIDSScombinations($id_shop)
     {
         $combosArray = array();
         $KCO_SWEDEN_EID = Configuration::get('KCO_SWEDEN_EID', null, null, $id_shop);
@@ -3675,5 +4348,93 @@ class KlarnaOfficial extends PaymentModule
         "id_country=$id_country WHERE id_address=$addressidtoupd";
         
         Db::getInstance()->execute($sql_fix);
+    }
+    
+    public function getKlarnaCountryInformation($currency_iso_code, $language_iso_code)
+    {
+        if (!Configuration::get('KCO_IS_ACTIVE')) {
+            return false;
+        }
+        
+        if ($language_iso_code == 'nb' || $language_iso_code == 'nn') {
+            $language_iso_code = 'no';
+        }
+        
+        $sweden_is_active = (Configuration::get('KCO_SWEDEN') == 0 ? Configuration::get('KCOV3_SWEDEN') : Configuration::get('KCO_SWEDEN'));
+        $norway_is_active = (Configuration::get('KCO_NORWAY') == 0 ? Configuration::get('KCOV3_NORWAY') : Configuration::get('KCO_NORWAY'));
+        $uk_is_active = (Configuration::get('KCO_UK') == 0 ? Configuration::get('KCOV3_UK') : Configuration::get('KCO_UK'));
+        $finland_is_active = (Configuration::get('KCO_FINLAND') == 0 ? Configuration::get('KCOV3_FINLAND') : Configuration::get('KCO_FINLAND'));
+        $germany_is_active = (Configuration::get('KCO_GERMANY') == 0 ? Configuration::get('KCOV3_GERMANY') : Configuration::get('KCO_GERMANY'));
+        $austria_is_active = (Configuration::get('KCO_AUSTRIA') == 0 ? Configuration::get('KCOV3_AUSTRIA') : Configuration::get('KCO_AUSTRIA'));
+        $nl_is_active = (Configuration::get('KCO_NL') == 0 ? Configuration::get('KCOV3_NL') : Configuration::get('KCO_NL'));
+        $us_is_active = Configuration::get('KCO_US');
+        
+        if ($currency_iso_code == 'SEK' &&
+         $sweden_is_active == 1) {
+            return array('locale' => 'sv-se', 'purchase_currency' => 'SEK', 'purchase_country' => 'SE');
+        } elseif ($currency_iso_code == 'NOK' &&
+        $norway_is_active == 1) {
+            return array('locale' => 'nb-no', 'purchase_currency' => 'NOK', 'purchase_country' => 'NO');
+        } elseif ($currency_iso_code == 'GBP' &&
+        $uk_is_active == 1) {
+            return array('locale' => 'en-gb', 'purchase_currency' => 'GBP', 'purchase_country' => 'GB');
+        } elseif ($currency_iso_code == 'USD' &&
+        $us_is_active == 1) {
+            return array('locale' => 'en-us', 'purchase_currency' => 'USD', 'purchase_country' => 'US');
+        } elseif ($currency_iso_code == 'EUR' &&
+        $language_iso_code == 'fi' &&
+        $finland_is_active == 1) {
+            return array('locale' => 'fi-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
+        } elseif ($currency_iso_code == 'EUR' &&
+        $language_iso_code == 'sv' &&
+        $finland_is_active == 1) {
+            return array('locale' => 'sv-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
+        } elseif ($currency_iso_code == 'EUR' &&
+        $language_iso_code == 'de' &&
+        $germany_is_active == 1) {
+            return array('locale' => 'de-de', 'purchase_currency' => 'EUR', 'purchase_country' => 'DE');
+        } elseif ($currency_iso_code == 'EUR' &&
+        $language_iso_code == 'de' &&
+        $austria_is_active == 1) {
+            return array('locale' => 'de-at', 'purchase_currency' => 'EUR', 'purchase_country' => 'AT');
+        } elseif ($currency_iso_code == 'EUR' &&
+        $language_iso_code == 'nl' &&
+        $nl_is_active == 1) {
+            return array('locale' => 'nl-nl', 'purchase_currency' => 'EUR', 'purchase_country' => 'NL');
+        } else {
+            $id_shop_country = (int)Configuration::get('PS_SHOP_COUNTRY_ID');
+            $shop_country = new Country($id_shop_country);
+            
+            if ($shop_country->iso_code == 'FI' && Configuration::get('KCO_FINLAND') == 1 && $language_iso_code == 'sv') {
+                return array('locale' => 'sv-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
+            } elseif ($shop_country->iso_code == 'FI' && Configuration::get('KCO_FINLAND') == 1 && $language_iso_code != 'sv') {
+                return array('locale' => 'fi-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
+            } elseif ($shop_country->iso_code == 'SV' && Configuration::get('KCO_SWEDEN') == 1) {
+                return array('locale' => 'sv-se', 'purchase_currency' => 'SEK', 'purchase_country' => 'SE');
+            } elseif ($shop_country->iso_code == 'NO' && Configuration::get('KCO_NORWAY') == 1) {
+                return array('locale' => 'nb-no', 'purchase_currency' => 'NOK', 'purchase_country' => 'NO');
+            } elseif ($shop_country->iso_code == 'DE' && Configuration::get('KCO_GERMANY') == 1) {
+                return array('locale' => 'de-de', 'purchase_currency' => 'EUR', 'purchase_country' => 'DE');
+            } elseif ($shop_country->iso_code == 'AT' && Configuration::get('KCO_AUSTRIA') == 1) {
+                return array('locale' => 'de-at', 'purchase_currency' => 'EUR', 'purchase_country' => 'AT');
+            } elseif ($shop_country->iso_code == 'NL' && Configuration::get('KCO_NL') == 1) {
+                return array('locale' => 'nl-nl', 'purchase_currency' => 'EUR', 'purchase_country' => 'NL');
+            } elseif ($shop_country->iso_code == 'UK' && Configuration::get('KCO_UK') == 1) {
+                return array('locale' => 'en-gb', 'purchase_currency' => 'GBP', 'purchase_country' => 'GB');
+            } elseif ($shop_country->iso_code == 'FI' && Configuration::get('KCOV3_FINLAND') == 1 && $language_iso_code == 'sv') {
+                return array('locale' => 'sv-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
+            } elseif ($shop_country->iso_code == 'FI' && Configuration::get('KCOV3_FINLAND') == 1 && $language_iso_code != 'sv') {
+                return array('locale' => 'fi-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
+            } elseif ($shop_country->iso_code == 'SE' && Configuration::get('KCOV3_SWEDEN') == 1) {
+                return array('locale' => 'sv-se', 'purchase_currency' => 'SEK', 'purchase_country' => 'SE');
+            } elseif ($shop_country->iso_code == 'NO' && Configuration::get('KCOV3_NORWAY') == 1) {
+                return array('locale' => 'nb-no', 'purchase_currency' => 'NOK', 'purchase_country' => 'NO');
+            } elseif ($shop_country->iso_code == 'DE' && Configuration::get('KCOV3_GERMANY') == 1) {
+                return array('locale' => 'de-de', 'purchase_currency' => 'EUR', 'purchase_country' => 'DE');
+            } elseif ($shop_country->iso_code == 'AT' && Configuration::get('KCOV3_AUSTRIA') == 1) {
+                return array('locale' => 'de-at', 'purchase_currency' => 'EUR', 'purchase_country' => 'AT');
+            }
+        }
+        return false;
     }
 }

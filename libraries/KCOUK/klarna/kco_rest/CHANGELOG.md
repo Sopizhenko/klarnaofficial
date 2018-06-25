@@ -1,3 +1,13 @@
+## v3.0.1 - 2017-01-16
+- smaller fixes
+
+## v3.0.0 - 2017-12-12
+
+- support for guzzle >6.0
+
+## v2.2.0 - 2015-12-7
+- **NEW META-13** Allow for 201 response on refund - *Joakim.L*
+
 ## v2.1.0 - 2015-07-29
 - **NEW MINT-2262** Support Guzzle 5.x versions - *Omer.K, Joakim.L*
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp;
 
 /**
@@ -16,25 +15,25 @@ class UriTemplate
     private $variables;
 
     /** @var array Hash for quick operator lookups */
-    private static $operatorHash = array(
-        '' => array('prefix' => '',  'joiner' => ',', 'query' => false),
-        '+' => array('prefix' => '',  'joiner' => ',', 'query' => false),
-        '#' => array('prefix' => '#', 'joiner' => ',', 'query' => false),
-        '.' => array('prefix' => '.', 'joiner' => '.', 'query' => false),
-        '/' => array('prefix' => '/', 'joiner' => '/', 'query' => false),
-        ';' => array('prefix' => ';', 'joiner' => ';', 'query' => true),
-        '?' => array('prefix' => '?', 'joiner' => '&', 'query' => true),
-        '&' => array('prefix' => '&', 'joiner' => '&', 'query' => true),
-    );
+    private static $operatorHash = [
+        ''  => ['prefix' => '',  'joiner' => ',', 'query' => false],
+        '+' => ['prefix' => '',  'joiner' => ',', 'query' => false],
+        '#' => ['prefix' => '#', 'joiner' => ',', 'query' => false],
+        '.' => ['prefix' => '.', 'joiner' => '.', 'query' => false],
+        '/' => ['prefix' => '/', 'joiner' => '/', 'query' => false],
+        ';' => ['prefix' => ';', 'joiner' => ';', 'query' => true],
+        '?' => ['prefix' => '?', 'joiner' => '&', 'query' => true],
+        '&' => ['prefix' => '&', 'joiner' => '&', 'query' => true]
+    ];
 
     /** @var array Delimiters */
-    private static $delims = array(':', '/', '?', '#', '[', ']', '@', '!', '$',
-        '&', '\'', '(', ')', '*', '+', ',', ';', '=', );
+    private static $delims = [':', '/', '?', '#', '[', ']', '@', '!', '$',
+        '&', '\'', '(', ')', '*', '+', ',', ';', '='];
 
     /** @var array Percent encoded delimiters */
-    private static $delimsPct = array('%3A', '%2F', '%3F', '%23', '%5B', '%5D',
+    private static $delimsPct = ['%3A', '%2F', '%3F', '%23', '%5B', '%5D',
         '%40', '%21', '%24', '%26', '%27', '%28', '%29', '%2A', '%2B', '%2C',
-        '%3B', '%3D', );
+        '%3B', '%3D'];
 
     public function expand($template, array $variables)
     {
@@ -53,7 +52,7 @@ class UriTemplate
     }
 
     /**
-     * Parse an expression into parts.
+     * Parse an expression into parts
      *
      * @param string $expression Expression to parse
      *
@@ -61,7 +60,7 @@ class UriTemplate
      */
     private function parseExpression($expression)
     {
-        $result = array();
+        $result = [];
 
         if (isset(self::$operatorHash[$expression[0]])) {
             $result['operator'] = $expression[0];
@@ -72,12 +71,12 @@ class UriTemplate
 
         foreach (explode(',', $expression) as $value) {
             $value = trim($value);
-            $varspec = array();
+            $varspec = [];
             if ($colonPos = strpos($value, ':')) {
                 $varspec['value'] = substr($value, 0, $colonPos);
                 $varspec['modifier'] = ':';
                 $varspec['position'] = (int) substr($value, $colonPos + 1);
-            } elseif (substr($value, -1) == '*') {
+            } elseif (substr($value, -1) === '*') {
                 $varspec['modifier'] = '*';
                 $varspec['value'] = substr($value, 0, -1);
             } else {
@@ -91,7 +90,7 @@ class UriTemplate
     }
 
     /**
-     * Process an expansion.
+     * Process an expansion
      *
      * @param array $matches Matches met in the preg_replace_callback
      *
@@ -99,9 +98,9 @@ class UriTemplate
      */
     private function expandMatch(array $matches)
     {
-        static $rfc1738to3986 = array('+' => '%20', '%7e' => '~');
+        static $rfc1738to3986 = ['+' => '%20', '%7e' => '~'];
 
-        $replacements = array();
+        $replacements = [];
         $parsed = self::parseExpression($matches[1]);
         $prefix = self::$operatorHash[$parsed['operator']]['prefix'];
         $joiner = self::$operatorHash[$parsed['operator']]['joiner'];
@@ -118,7 +117,7 @@ class UriTemplate
 
             if (is_array($variable)) {
                 $isAssoc = $this->isAssoc($variable);
-                $kvp = array();
+                $kvp = [];
                 foreach ($variable as $key => $var) {
                     if ($isAssoc) {
                         $key = rawurlencode($key);
@@ -129,14 +128,14 @@ class UriTemplate
 
                     if (!$isNestedArray) {
                         $var = rawurlencode($var);
-                        if ($parsed['operator'] == '+' ||
-                            $parsed['operator'] == '#'
+                        if ($parsed['operator'] === '+' ||
+                            $parsed['operator'] === '#'
                         ) {
                             $var = $this->decodeReserved($var);
                         }
                     }
 
-                    if ($value['modifier'] == '*') {
+                    if ($value['modifier'] === '*') {
                         if ($isAssoc) {
                             if ($isNestedArray) {
                                 // Nested arrays must allow for deeply nested
@@ -146,10 +145,10 @@ class UriTemplate
                                     $rfc1738to3986
                                 );
                             } else {
-                                $var = $key.'='.$var;
+                                $var = $key . '=' . $var;
                             }
                         } elseif ($key > 0 && $actuallyUseQuery) {
-                            $var = $value['value'].'='.$var;
+                            $var = $value['value'] . '=' . $var;
                         }
                     }
 
@@ -158,7 +157,7 @@ class UriTemplate
 
                 if (empty($variable)) {
                     $actuallyUseQuery = false;
-                } elseif ($value['modifier'] == '*') {
+                } elseif ($value['modifier'] === '*') {
                     $expanded = implode($joiner, $kvp);
                     if ($isAssoc) {
                         // Don't prepend the value name when using the explode
@@ -172,26 +171,26 @@ class UriTemplate
                         // a comma separated list of keys followed by their
                         // respective values.
                         foreach ($kvp as $k => &$v) {
-                            $v = $k.','.$v;
+                            $v = $k . ',' . $v;
                         }
                     }
                     $expanded = implode(',', $kvp);
                 }
             } else {
-                if ($value['modifier'] == ':') {
+                if ($value['modifier'] === ':') {
                     $variable = substr($variable, 0, $value['position']);
                 }
                 $expanded = rawurlencode($variable);
-                if ($parsed['operator'] == '+' || $parsed['operator'] == '#') {
+                if ($parsed['operator'] === '+' || $parsed['operator'] === '#') {
                     $expanded = $this->decodeReserved($expanded);
                 }
             }
 
             if ($actuallyUseQuery) {
-                if (!$expanded && $joiner != '&') {
+                if (!$expanded && $joiner !== '&') {
                     $expanded = $value['value'];
                 } else {
-                    $expanded = $value['value'].'='.$expanded;
+                    $expanded = $value['value'] . '=' . $expanded;
                 }
             }
 
@@ -200,7 +199,7 @@ class UriTemplate
 
         $ret = implode($joiner, $replacements);
         if ($ret && $prefix) {
-            return $prefix.$ret;
+            return $prefix . $ret;
         }
 
         return $ret;

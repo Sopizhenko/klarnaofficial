@@ -59,4 +59,20 @@ $(document).ready(function(){
 			return false;
 		}
 	});
+    $('#pane7 .sidebar .nav-tabs a').each(function(){
+		var fieldset_arr = $(this).attr('data-fieldset').split(',');
+		if($.inArray(pwd_refer, fieldset_arr) > -1)
+		{
+			$(this).trigger('click');
+			return false;
+		}
+	});
+    $('#pane8 .sidebar .nav-tabs a').each(function(){
+		var fieldset_arr = $(this).attr('data-fieldset').split(',');
+		if($.inArray(pwd_refer, fieldset_arr) > -1)
+		{
+			$(this).trigger('click');
+			return false;
+		}
+	});
 });

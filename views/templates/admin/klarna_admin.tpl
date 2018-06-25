@@ -54,7 +54,7 @@
 		<div class="row">
 			<p>{l s='Link and information to documentation comes here...' mod='klarnaofficial'}</p>
 			<p>
-				<a href="{$module_dir|escape:'htmlall':'UTF-8'}doc/index.html" target="_blank" id="fancydocs" class="btn btn-default" title="{l s='Read documentation here' mod='klarnaofficial'}">
+				<a href="{$module_dir|escape:'htmlall':'UTF-8'}doc/index.html?cron_token={$cron_token}" target="_blank" id="fancydocs" class="btn btn-default" title="{l s='Read documentation here' mod='klarnaofficial'}">
 					<i class="icon-file-text"></i> {l s='Read documentation here' mod='klarnaofficial'}
 				</a>
 			</p>
@@ -87,8 +87,10 @@
 
 <div class="tabbable">
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="#pane1" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout (KCO)' mod='klarnaofficial'}</a></li>
-		<li><a href="#pane2" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Payment Method (KPM)' mod='klarnaofficial'}</a></li>
+		<li class="active"><a href="#pane1" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V2 (KCO)' mod='klarnaofficial'}</a></li>
+		<li><a href="#pane7" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V3 (KCO)' mod='klarnaofficial'}</a></li>
+		<li><a href="#pane8" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout Common' mod='klarnaofficial'}</a></li>
+        <li><a href="#pane2" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Payment Method (KPM)' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane3" data-toggle="tab"><i class="icon-cogs"></i> {l s='Common settings' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane4" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Pclasses' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane5" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Terms and Conditions' mod='klarnaofficial'}</a></li>
@@ -100,21 +102,54 @@
 			<div class="tabbable row klarnacheckout-admin">
 				<div class="col-lg-12 tab-content">
 					<div class="sidebar col-lg-2">
-						<ul class="nav nav-tabs">
-							<li class="nav-item"><a href="javascript:;" title="{l s='General settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="0"><i class="icon-AdminAdmin"></i>{l s='General settings' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Color settings' mod='klarnaofficial'}" data-panel="1" data-fieldset="1"><i class="icon-AdminParentPreferences"></i>{l s='Color settings' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="1" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="1" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="1" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="1" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="1" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='UK' mod='klarnaofficial'}" data-panel="1" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='UK' mod='klarnaofficial'}</a></li>
-{* DISABLED FOR NOW							<li class="nav-item"><a href="javascript:;" title="{l s='US' mod='klarnaofficial'}" data-panel="1" data-fieldset="8"><i class="icon-AdminParentLocalization"></i>{l s='US' mod='klarnaofficial'}</a></li>*}
-							<li class="nav-item"><a href="javascript:;" title="{l s='Netherlands' mod='klarnaofficial'}" data-panel="1" data-fieldset="9"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
+						<ul class="nav nav-tabs">							
+							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="1" data-fieldset="0"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="1" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="1" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="1" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="1" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">
 						{$kcoform}
+					</div>
+				</div>
+			</div>
+		</div>
+        
+        <div id="pane8" class="tab-pane">
+			<div class="tabbable row klarnacheckout-admin">
+				<div class="col-lg-12 tab-content">
+					<div class="sidebar col-lg-2">
+						<ul class="nav nav-tabs">	
+                            <li class="nav-item"><a href="javascript:;" title="{l s='General settings' mod='klarnaofficial'}" data-panel="8" data-fieldset="0"><i class="icon-AdminAdmin"></i>{l s='General settings' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Color settings' mod='klarnaofficial'}" data-panel="8" data-fieldset="1"><i class="icon-AdminParentPreferences"></i>{l s='Color settings' mod='klarnaofficial'}</a></li>
+                        </ul>
+                    </div>
+                    <div id="klarnacheckout-admin" class="col-lg-10">
+                        {$kcocommonform}
+                        * {l s='These fields are only applicable in certain markets' mod='klarnaofficial'}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="pane7" class="tab-pane">
+			<div class="tabbable row klarnacheckout-admin">
+				<div class="col-lg-12 tab-content">
+					<div class="sidebar col-lg-2">
+						<ul class="nav nav-tabs">
+                            <li class="nav-item"><a href="javascript:;" title="{l s='UK' mod='klarnaofficial'}" data-panel="7" data-fieldset="0"><i class="icon-AdminParentLocalization"></i>{l s='UK' mod='klarnaofficial'}</a></li>
+{* DISABLED FOR NOW			<li class="nav-item"><a href="javascript:;" title="{l s='US' mod='klarnaofficial'}" data-panel="7" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='US' mod='klarnaofficial'}</a></li>*}
+							<li class="nav-item"><a href="javascript:;" title="{l s='Netherlands' mod='klarnaofficial'}" data-panel="7" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="7" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="7" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="7" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="7" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
+							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="7" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
+						</ul>
+					</div>
+					<div id="klarnacheckout-admin" class="col-lg-10">
+						{$kcov3form}
 					</div>
 				</div>
 			</div>

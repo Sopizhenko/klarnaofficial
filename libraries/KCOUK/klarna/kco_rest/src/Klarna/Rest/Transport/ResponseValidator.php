@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +16,10 @@
  *
  * File containing the ResponseValidator class.
  */
+
 namespace Klarna\Rest\Transport;
 
-use GuzzleHttp\Message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * HTTP response validator helper class.
@@ -56,7 +56,7 @@ class ResponseValidator
     /**
      * Asserts the HTTP response status code.
      *
-     * @param string $status Expected status code
+     * @param string|string[] $status Expected status code(s)
      *
      * @throws \RuntimeException If status code does not match
      *
@@ -65,7 +65,13 @@ class ResponseValidator
     public function status($status)
     {
         $httpStatus = (string) $this->response->getStatusCode();
-        if ($httpStatus !== $status) {
+        if (is_array($status) && !in_array($httpStatus, $status)) {
+            throw new \RuntimeException(
+                "Unexpected response status code: {$httpStatus}"
+            );
+        }
+
+        if (is_string($status) && $httpStatus !== $status) {
             throw new \RuntimeException(
                 "Unexpected response status code: {$httpStatus}"
             );
@@ -91,9 +97,10 @@ class ResponseValidator
         }
 
         $contentType = $this->response->getHeader('Content-Type');
-        if ($contentType !== $mediaType) {
+
+        if (!in_array($mediaType, $contentType)) {
             throw new \RuntimeException(
-                "Unexpected Content-Type header received: {$contentType}"
+                'Unexpected Content-Type header received: ' . implode(',', $contentType)
             );
         }
 
@@ -110,7 +117,7 @@ class ResponseValidator
      */
     public function getJson()
     {
-        return $this->response->json();
+        return \json_decode($this->response->getBody(), true);
     }
 
     /**
@@ -126,6 +133,6 @@ class ResponseValidator
             throw new \RuntimeException('Response is missing a Location header');
         }
 
-        return $this->response->getHeader('Location');
+        return $this->response->getHeader('Location')[0];
     }
 }

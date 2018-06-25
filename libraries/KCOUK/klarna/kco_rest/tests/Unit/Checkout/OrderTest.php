@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +16,14 @@
  *
  * File containing tests for the Order class.
  */
+
 namespace Klarna\Tests\Unit\Rest\Checkout;
 
+use GuzzleHttp\Exception\RequestException;
 use Klarna\Rest\Checkout\Order;
 use Klarna\Rest\Tests\Unit\TestCase;
 use Klarna\Rest\Transport\Connector;
+use Klarna\Rest\Transport\Exception\ConnectorException;
 
 /**
  * Unit test cases for the checkout order resource.
@@ -30,6 +32,8 @@ class OrderTest extends TestCase
 {
     /**
      * Make sure the identifier is retrievable.
+     *
+     * @return void
      */
     public function testGetId()
     {
@@ -44,6 +48,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure the correct data is sent and location is updated.
+     *
+     * @return void
      */
     public function testCreate()
     {
@@ -54,7 +60,8 @@ class OrderTest extends TestCase
             ->with(
                 '/checkout/v3/orders',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                \json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -75,7 +82,7 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Location')
-            ->will($this->returnValue('http://somewhere/a-path'));
+            ->will($this->returnValue(['http://somewhere/a-path']));
 
         $order = new Order($this->connector);
         $location = $order->create($data)
@@ -86,6 +93,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testCreateInvalidStatusCode()
     {
@@ -114,6 +123,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure a missing location header in the response results in an exception.
+     *
+     * @return void
      */
     public function testCreateNoLocation()
     {
@@ -147,6 +158,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure the correct data is sent and that the replied data is accessible.
+     *
+     * @return void
      */
     public function testUpdate()
     {
@@ -157,7 +170,8 @@ class OrderTest extends TestCase
             ->with(
                 '/checkout/v3/orders/12345',
                 'POST',
-                ['json' => $updateData]
+                ['Content-Type' => 'application/json'],
+                \json_encode($updateData)
             )
             ->will($this->returnValue($this->request));
 
@@ -178,16 +192,16 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('application/json'));
+            ->will($this->returnValue(['application/json']));
 
         $data = [
             'data' => 'from response json',
-            'order_id' => '12345',
+            'order_id' => '12345'
         ];
 
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($data));
+            ->method('getBody')
+            ->will($this->returnValue(\GuzzleHttp\json_encode($data)));
 
         $order = new Order($this->connector, '12345');
         $order['order_id'] = '12345';
@@ -201,6 +215,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testUpdateInvalidStatusCode()
     {
@@ -229,6 +245,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure a non-JSON response results in an exception.
+     *
+     * @return void
      */
     public function testUpdateNotJson()
     {
@@ -253,7 +271,7 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('text/plain'));
+            ->will($this->returnValue(['text/plain']));
 
         $order = new Order($this->connector);
 
@@ -267,6 +285,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure fetched data is accessible.
+     *
+     * @return void
      */
     public function testFetch()
     {
@@ -296,16 +316,16 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('application/json'));
+            ->will($this->returnValue(['application/json']));
 
         $data = [
             'data' => 'from response json',
-            'order_id' => '12345',
+            'order_id' => '12345'
         ];
 
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($data));
+            ->method('getBody')
+            ->will($this->returnValue(\GuzzleHttp\json_encode($data)));
 
         $order = new Order($this->connector, '12345');
         $order['data'] = 'is overwritten';
@@ -318,6 +338,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testFetchInvalidStatusCode()
     {
@@ -352,6 +374,8 @@ class OrderTest extends TestCase
 
     /**
      * Make sure a non-JSON response results in an exception.
+     *
+     * @return void
      */
     public function testFetchNotJson()
     {
@@ -381,7 +405,7 @@ class OrderTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('text/plain'));
+            ->will($this->returnValue(['text/plain']));
 
         $order = new Order($this->connector, '12345');
         $order['data'] = 'is overwritten';
