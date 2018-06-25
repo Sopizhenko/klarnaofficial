@@ -289,7 +289,11 @@ class KlarnaOfficialPushUkModuleFrontController extends ModuleFrontController
 
                     $new_delivery_options = array();
                     $new_delivery_options[(int) ($delivery_address_id)] = $cart->id_carrier.',';
-                    $new_delivery_options_serialized = serialize($new_delivery_options);
+                    if (version_compare(_PS_VERSION_, '1.7.3.0', '<')) {
+                        $new_delivery_options_serialized = serialize($new_delivery_options);
+                    } else {
+                        $new_delivery_options_serialized = json_encode($new_delivery_options);
+                    }
                     
                     $update_sql = 'UPDATE '._DB_PREFIX_.'cart '.
                         'SET delivery_option=\''.
