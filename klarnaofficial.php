@@ -216,7 +216,7 @@ class KlarnaOfficial extends PaymentModule
         $config_name = 'KCO_PENDING_PAYMENT_ACCEPTED';
         $this->createOrderStatus($name, $states, $config_name, false);
         
-        $name = $this->l('Klarna payment accepted');
+        $name = $this->l('Klarna payment rejected');
         $config_name = 'KCO_PENDING_PAYMENT_REJECTED';
         $this->createOrderStatus($name, $states, $config_name, false);
 
@@ -4216,6 +4216,17 @@ class KlarnaOfficial extends PaymentModule
         $KCO_UK_EID = Configuration::get('KCO_UK_EID', null, null, $id_shop);
         $KCO_US_EID = Configuration::get('KCO_US_EID', null, null, $id_shop);
         $KCO_NL_EID = Configuration::get('KCO_NL_EID', null, null, $id_shop);
+        $KCOV3_SWEDEN_EID = Configuration::get('KCOV3_SWEDEN_EID', null, null, $id_shop);
+        $KCOV3_NORWAY_EID = Configuration::get('KCOV3_NORWAY_EID', null, null, $id_shop);
+        $KCOV3_FINLAND_EID = Configuration::get('KCOV3_FINLAND_EID', null, null, $id_shop);
+        $KCOV3_GERMANY_EID = Configuration::get('KCOV3_GERMANY_EID', null, null, $id_shop);
+        $KCOV3_AUSTRIA_EID = Configuration::get('KCOV3_AUSTRIA_EID', null, null, $id_shop);
+        
+        $combosArray[$KCOV3_SWEDEN_EID] = Configuration::get('KCOV3_SWEDEN_SECRET', null, null, $id_shop);
+        $combosArray[$KCOV3_NORWAY_EID] = Configuration::get('KCOV3_NORWAY_SECRET', null, null, $id_shop);
+        $combosArray[$KCOV3_FINLAND_EID] = Configuration::get('KCOV3_FINLAND_SECRET', null, null, $id_shop);
+        $combosArray[$KCOV3_GERMANY_EID] = Configuration::get('KCOV3_GERMANY_SECRET', null, null, $id_shop);
+        $combosArray[$KCOV3_AUSTRIA_EID] = Configuration::get('KCOV3_AUSTRIA_SECRET', null, null, $id_shop);
         $combosArray[$KCO_AUSTRIA_EID] = Configuration::get('KCO_AUSTRIA_SECRET', null, null, $id_shop);
         $combosArray[$KCO_SWEDEN_EID] = Configuration::get('KCO_SWEDEN_SECRET', null, null, $id_shop);
         $combosArray[$KCO_NORWAY_EID] = Configuration::get('KCO_NORWAY_SECRET', null, null, $id_shop);
