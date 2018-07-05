@@ -29,11 +29,11 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnaorder = Tools::jsonDecode($klarnadata, true);
         
-        $myFile = dirname(__FILE__)."/testFile.txt";
-        $fh = fopen($myFile, 'a') or die("can't open file");
-        $stringData = $klarnadata.PHP_EOL.PHP_EOL;
-        fwrite($fh, $stringData);
-        fclose($fh);
+        // $myFile = dirname(__FILE__)."/testFile.txt";
+        // $fh = fopen($myFile, 'a') or die("can't open file");
+        // $stringData = $klarnadata.PHP_EOL.PHP_EOL;
+        // fwrite($fh, $stringData);
+        // fclose($fh);
         
         if (isset($klarnaorder["merchant_reference2"])) {
             //This is a KCO V3 ORDER
