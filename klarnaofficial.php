@@ -47,7 +47,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.21';
+        $this->version = '1.9.23';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3482,7 +3482,11 @@ class KlarnaOfficial extends PaymentModule
         $this->smarty->assign('KCO_SHOW_IN_PAYMENTS', $KCO_SHOW_IN_PAYMENTS);
         $this->smarty->assign('hide_partpayment', $hide_partpayment);
         $this->smarty->assign('hide_invoicepayment', $hide_invoicepayment);
-        $this->smarty->assign('KPM_LOGO', Configuration::get('KPM_LOGO'));
+        $KPM_LOGO = Configuration::get('KPM_LOGO');
+        if ("" == $KPM_LOGO) {
+            $KPM_LOGO = "blue-black";
+        }
+        $this->smarty->assign('KPM_LOGO', $KPM_LOGO);
         $this->smarty->assign('KPM_LOGO_ISO_CODE', $iso);
 
         return $this->display(__FILE__, 'kpm_payment.tpl');
@@ -4380,6 +4384,29 @@ class KlarnaOfficial extends PaymentModule
         $nl_is_active = (Configuration::get('KCO_NL') == 0 ? Configuration::get('KCOV3_NL') : Configuration::get('KCO_NL'));
         $us_is_active = Configuration::get('KCO_US');
         
+        $forceAustria = false;
+        $forceGermany = false;
+        
+        if (isset($this->context->cart) && (int) $this->context->cart->id_address_delivery > 0) {
+            $tmp_address = new Address((int) ($this->context->cart->id_address_delivery));
+            $id_country_austria = (int) Country::getByIso('AT');
+            $id_country_germany = (int) Country::getByIso('DE');
+            
+            if (Configuration::get('KCO_AUSTRIA') == 1 &&
+                $currency_iso_code == 'EUR' &&
+                $language_iso_code == 'de' &&
+                $tmp_address->id_country == $id_country_austria
+            ) {
+                $forceAustria = true;
+            } elseif (Configuration::get('KCO_GERMANY') == 1 &&
+                $currency_iso_code == 'EUR' &&
+                $language_iso_code == 'de' &&
+                $tmp_address->id_country == $id_country_germany
+            ) {
+                $forceGermany = true;
+            }
+        }
+        
         if ($currency_iso_code == 'SEK' &&
          $sweden_is_active == 1) {
             return array('locale' => 'sv-se', 'purchase_currency' => 'SEK', 'purchase_country' => 'SE');
@@ -4402,11 +4429,13 @@ class KlarnaOfficial extends PaymentModule
             return array('locale' => 'sv-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
         } elseif ($currency_iso_code == 'EUR' &&
         $language_iso_code == 'de' &&
-        $germany_is_active == 1) {
+        $germany_is_active == 1 &&
+        $forceAustria == false) {
             return array('locale' => 'de-de', 'purchase_currency' => 'EUR', 'purchase_country' => 'DE');
         } elseif ($currency_iso_code == 'EUR' &&
         $language_iso_code == 'de' &&
-        $austria_is_active == 1) {
+        $austria_is_active == 1 &&
+        $forceGermany == false) {
             return array('locale' => 'de-at', 'purchase_currency' => 'EUR', 'purchase_country' => 'AT');
         } elseif ($currency_iso_code == 'EUR' &&
         $language_iso_code == 'nl' &&

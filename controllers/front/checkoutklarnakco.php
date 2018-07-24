@@ -379,7 +379,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         if (1 == (int)Configuration::get('KCO_ALLOWED_TYPES')) {
                             $create['options']['allowed_customer_types'] = array("person");
                         } elseif (2 == (int)Configuration::get('KCO_ALLOWED_TYPES')) {
-                            $create['options']['allowed_customer_types'] = array("company");
+                            $create['options']['allowed_customer_types'] = array("organization");
+                        } else {
+                            $create['options']['allowed_customer_types'] = array("person", "organization");
                         }
 
                         if (Configuration::get('KCO_PREFILL')) {

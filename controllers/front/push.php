@@ -77,7 +77,15 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 $secret = $conf['KCO_NORWAY_SECRET'];
             }
 
-            session_start();
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+            } else {
+                if (session_id() === '') {
+                    session_start();
+                }
+            }
             Klarna_Checkout_Order::$contentType = 'application/vnd.klarna.checkout.aggregated-order-v2+json';
             $connector = Klarna_Checkout_Connector::create($secret);
 
