@@ -35,7 +35,15 @@ class KlarnaOfficialThankYouModuleFrontController extends ModuleFrontController
         parent::init();
         require_once dirname(__FILE__).'/../../libraries/Checkout.php';
 
-        session_start();
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+        } else {
+            if (session_id() === '') {
+                session_start();
+            }
+        }
         if (!isset($_SESSION['klarna_checkout'])) {
             Tools::redirect('index.php');
         }
