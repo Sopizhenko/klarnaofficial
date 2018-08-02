@@ -249,9 +249,7 @@
 </form>
 {/if}
 <script type="text/javascript">
-{literal}
-$(".kpm_terms_link").fancybox({'width':'360px','autoScale':true,'transitionIn':'swing','transitionOut':'swing','type':'iframe'});
-{/literal}
+
 var kpm_md5key='{$kpm_md5key}';
 var kpm_getaddress_url='{$kpm_getaddress_url}';
 

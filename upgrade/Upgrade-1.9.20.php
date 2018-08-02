@@ -18,25 +18,12 @@
  *  International Registered Trademark & Property of Prestaworks AB
  */
 
-class CartController extends CartControllerCore
+function upgrade_module_1_9_20($module)
 {
-    public function initContent()
-    {
-        if ((int)Configuration::get('KCO_IS_ACTIVE') &&
-            Tools::getValue('action') === 'show' &&
-            (int)Tools::getValue('ajax') !== 1 &&
-            (int)Tools::getValue('update') !== 1 &&
-            (int)Tools::getValue('forceview') !== 1
-            ) {
-                $url = $this->context->link->getModuleLink(
-                    'klarnaofficial',
-                    'checkoutklarna',
-                    array(),
-                    Tools::usingSecureMode()
-                );
-                Tools::redirect($url);
-                die;
-        }
-        parent::initContent();
-    }
+    $states = OrderState::getOrderStates(Configuration::get('PS_LANG_DEFAULT'));
+    $name = 'Klarna payment rejected';
+    $config_name = 'KCO_PENDING_PAYMENT_REJECTED';
+    $module->createOrderStatus($name, $states, $config_name, false);
+  
+    return true;
 }

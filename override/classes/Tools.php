@@ -22,15 +22,39 @@ class Tools extends ToolsCore
 {
     public static function switchLanguage(Context $context = null)
     {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+        } else {
+            if (session_id() === '') {
+                session_start();
+            }
+        }
         if (isset($_SESSION['klarna_checkout'])) {
             unset($_SESSION['klarna_checkout']);
+        }
+        if (isset($_SESSION['klarna_checkout_uk'])) {
+            unset($_SESSION['klarna_checkout_uk']);
         }
         return parent::switchLanguage($context);
     }
     public static function setCurrency($cookie)
     {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+        } else {
+            if (session_id() === '') {
+                session_start();
+            }
+        }
         if (isset($_SESSION['klarna_checkout'])) {
             unset($_SESSION['klarna_checkout']);
+        }
+        if (isset($_SESSION['klarna_checkout_uk'])) {
+            unset($_SESSION['klarna_checkout_uk']);
         }
         return parent::setCurrency($cookie);
     }

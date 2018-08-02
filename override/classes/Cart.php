@@ -18,25 +18,10 @@
  *  International Registered Trademark & Property of Prestaworks AB
  */
 
-class CartController extends CartControllerCore
+class Cart extends CartCore
 {
-    public function initContent()
+    public function getDeliveryOption($default_country = null, $dontAutoSelectOptions = false, $use_cache = false)
     {
-        if ((int)Configuration::get('KCO_IS_ACTIVE') &&
-            Tools::getValue('action') === 'show' &&
-            (int)Tools::getValue('ajax') !== 1 &&
-            (int)Tools::getValue('update') !== 1 &&
-            (int)Tools::getValue('forceview') !== 1
-            ) {
-                $url = $this->context->link->getModuleLink(
-                    'klarnaofficial',
-                    'checkoutklarna',
-                    array(),
-                    Tools::usingSecureMode()
-                );
-                Tools::redirect($url);
-                die;
-        }
-        parent::initContent();
+        return parent::getDeliveryOption($default_country, $dontAutoSelectOptions, $use_cache);
     }
 }

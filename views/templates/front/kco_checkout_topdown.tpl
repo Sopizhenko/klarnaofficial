@@ -118,17 +118,19 @@
 
 		<div class="cart-grid-body kco-box col-xs-12">
             <div class="card">
+                <div class="card-block">
+                    <span class="kco-step-heading">{l s='Step 1' mod='klarnaofficial'}</span>
+                    <h1 class="h1">
+                        {l s='Shipping' mod='klarnaofficial'}
+                    </h1>
+                </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="xcard">
-                            <div class="card-block">
-                                <span class="kco-step-heading">{l s='Step 1' mod='klarnaofficial'}</span>
-                                <h1 class="h1">
-                                    {l s='Shipping' mod='klarnaofficial'}
-                                </h1>
-                            </div>
                                 <div class="card-block">
-                                    <span class="kco-step-heading">{l s='Carrier' mod='klarnaofficial'}</span>
+                                    <span class="kco-step-heading">
+                                        {l s='Carrier' mod='klarnaofficial'}
+                                    </span>
                                     {if $no_active_countries > 1}
                                     <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="kco_change_country">
                                         <select name="kco_change_country" class="kco-select kco-select--full kco-select--margin" onchange="$('#kco_change_country').submit();">
@@ -175,9 +177,10 @@
                                         {/foreach}
                                     </ul>
                                     </form>
-                            </div>
+                                </div>
                         </div>
-                        
+                    </div>
+                    <div class="col-md-6">
                         <div class="xcard">
                                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
                                     <div class="">
@@ -195,60 +198,56 @@
                                     </div><!-- /.kco-target -->
                                 </form><!-- /#klarnamessage -->
                         </div>
-                        <div class="xcard">
-                            {if $giftAllowed==1}
-                                <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnagift">
-                                    <div class="card-block">
-                                        <h1 class="h1 kco-trigger {if !$message.message}kco-trigger--inactive{/if}">
-                                            {l s='Gift-wrapping' mod='klarnaofficial'}
-                                        </h1>
-                                    </div>
-                                    <div class="kco-target" {if $gift_message == '' && (!isset($gift) || $gift==0)}style="display: none;"{/if}>
-                                        <div class="card-block">
-                                            <p id="giftmessagearea_long">
-                                                <textarea id="gift_message" name="gift_message" class="kco-input kco-input--area kco-input--full" placeholder="{l s='Gift message (optional)' mod='klarnaofficial'}">{$gift_message|escape:'htmlall':'UTF-8'}</textarea>
-                                                <input type="hidden" name="savegift" id="savegift" value="1" />
-                                                <button type="submit" name="savegiftbutton" id="savegiftbutton" class="btn btn-primary">
-                                                    <span>{l s='Save' mod='klarnaofficial'}</span>
-                                                </button>
-                                                <span class="kco-check-group fl-r">
-                                                    <input type="checkbox" onchange="$('#klarnagift').submit();" class="giftwrapping_radio" id="gift" name="gift" value="1"{if isset($gift) AND $gift==1} checked="checked"{/if} />
-                                                    <span id="giftwrappingextracost">{l s='Additional cost:' mod='klarnaofficial'} {Tools::displayPrice($gift_wrapping_price)}</span>
-                                                </span>
-                                            </p><!-- /#giftmessagearea_long -->
-                                        </div>
-                                    </div><!-- /.kco-target -->
-                                </form><!-- /#klarnagift -->
-                            {/if}
-                        </div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="xcard">
+                </div>
+                <div class="xcard">
+                    {if $giftAllowed==1}
+                        <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnagift">
                             <div class="card-block">
-                                <span class="kco-step-heading">{l s='Step 2' mod='klarnaofficial'}</span>
-                                <h1 class="h1">
-                                    {l s='Pay for your order' mod='klarnaofficial'}
-                                    <span>
-                                        {if isset($KCO_SHOWLINK) && $KCO_SHOWLINK}
-                                            <a
-                                                href="{$link->getPageLink('order', true, NULL, 'step=1')|escape:'html':'UTF-8'}"
-                                                class="alternative_methods"
-                                                title="{l s='Alternative payment methods' mod='klarnaofficial'}">
-                                                <span>{l s='Alternative payment methods' mod='klarnaofficial'}<i class="icon-chevron-right right"></i></span>
-                                            </a>
-                                        {/if}
-                                    </span>
+                                <h1 class="h1 kco-trigger {if !$message.message}kco-trigger--inactive{/if}">
+                                    {l s='Gift-wrapping' mod='klarnaofficial'}
                                 </h1>
                             </div>
-                            <div class="card-block">
-                                <div id="checkoutdiv">{$klarna_checkout nofilter}</div>
-                            </div>
-                        </div>
+                            <div class="kco-target" {if $gift_message == '' && (!isset($gift) || $gift==0)}style="display: none;"{/if}>
+                                <div class="card-block">
+                                    <p id="giftmessagearea_long">
+                                        <textarea id="gift_message" name="gift_message" class="kco-input kco-input--area kco-input--full" placeholder="{l s='Gift message (optional)' mod='klarnaofficial'}">{$gift_message|escape:'htmlall':'UTF-8'}</textarea>
+                                        <input type="hidden" name="savegift" id="savegift" value="1" />
+                                        <button type="submit" name="savegiftbutton" id="savegiftbutton" class="btn btn-primary">
+                                            <span>{l s='Save' mod='klarnaofficial'}</span>
+                                        </button>
+                                        <span class="kco-check-group fl-r">
+                                            <input type="checkbox" onchange="$('#klarnagift').submit();" class="giftwrapping_radio" id="gift" name="gift" value="1"{if isset($gift) AND $gift==1} checked="checked"{/if} />
+                                            <span id="giftwrappingextracost">{l s='Additional cost:' mod='klarnaofficial'} {Tools::displayPrice($gift_wrapping_price)}</span>
+                                        </span>
+                                    </p><!-- /#giftmessagearea_long -->
+                                </div>
+                            </div><!-- /.kco-target -->
+                        </form><!-- /#klarnagift -->
+                    {/if}
+                </div>
+                <div class="xcard">
+                    <div class="card-block">
+                        <span class="kco-step-heading">{l s='Step 2' mod='klarnaofficial'}</span>
+                        <h1 class="h1">
+                            {l s='Pay for your order' mod='klarnaofficial'}
+                            <span>
+                                {if isset($KCO_SHOWLINK) && $KCO_SHOWLINK}
+                                    <a
+                                        href="{$link->getPageLink('order', true, NULL, 'step=1')|escape:'html':'UTF-8'}"
+                                        class="alternative_methods"
+                                        title="{l s='Alternative payment methods' mod='klarnaofficial'}">
+                                        <span>{l s='Alternative payment methods' mod='klarnaofficial'}<i class="icon-chevron-right right"></i></span>
+                                    </a>
+                                {/if}
+                            </span>
+                        </h1>
+                    </div>
+                    <div class="card-block">
+                    <div id="checkoutdiv">{$klarna_checkout nofilter}</div>
                     </div>
                 </div>
             </div>
-
-
         </div>
 <!-- /#checkoutdiv.col-xs-12 -->
 </div><!-- /#height_kco_div -->

@@ -54,6 +54,7 @@ function showinfobox(pclass)
 $(document).ready(function()
 {
     toggleKPMSpecialUseCase();
+    $(".kpm_terms_link").fancybox({'width':'360px','autoScale':true,'transitionIn':'swing','transitionOut':'swing','type':'iframe'});
 });
 function kpmfetchaddress(ssn)
 {

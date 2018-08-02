@@ -32,8 +32,8 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         if (isset($klarnaorder["merchant_reference2"])) {
             //This is a KCO V3 ORDER
             //Convert Data
-            $klarnaorder["merchant_reference"]["orderid2"] = $klarnadata["merchant_reference2"];
-            $klarnaorder["cart"]["items"] = $klarnadata["order_lines"];
+            $klarnaorder["merchant_reference"]["orderid2"] = $klarnaorder["merchant_reference2"];
+            $klarnaorder["cart"]["items"] = $klarnaorder["order_lines"];
         }
         
         //DO THE CHECKS ON THE CART
@@ -171,7 +171,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
             if (Tools::getIsset("v3")) {
                 $url = $this->context->link->getModuleLink(
                     'klarnaofficial',
-                    'checkoutklarnauk',
+                    'checkoutklarnakco',
                     array("changed" => 1),
                     true
                 );

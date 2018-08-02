@@ -28,7 +28,8 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
     {
         parent::setMedia();
         $this->context->controller->addCSS(_MODULE_DIR_.'klarnaofficial/views/css/kpm_css.css', 'all');
-        $this->addJS(_MODULE_DIR_.'klarnaofficial/views/js/kpm_common.js');
+        $this->context->controller->addJqueryPlugin('fancybox');
+        $this->context->controller->addJS(_MODULE_DIR_.'klarnaofficial/views/js/kpm_common.js');
     }
 
     public function initContent()
@@ -707,7 +708,6 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 $kpm_account = array_merge($k->getPClasses(KlarnaPClass::DELAY), $kpm_account);
                 $kpm_account = array_merge($k->getPClasses(KlarnaPClass::SPECIAL), $kpm_account);
                 $kpm_account = array_merge($k->getPClasses(KlarnaPClass::FIXED), $kpm_account);
-                
             } else {
                 $kpm_account = array();
             }
@@ -758,11 +758,11 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                     
                     if (KlarnaPClass::CAMPAIGN == $pclass->type) {
                         $months = $pclass->months;
-                        $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/eid/fi_fi/fixed_amount_$months";
+                        $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/$eid/".
+                        "fi_fi/fixed_amount_$months";
                     } else {
                         $newPclass['terms']['uri'] = $termsuri;
                     }
-                    
                 }
 
                 $newPclass['title'] = html_entity_decode($pclass->description);

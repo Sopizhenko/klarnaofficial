@@ -77,7 +77,6 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 $secret = $conf['KCO_NORWAY_SECRET'];
             }
 
-            session_start();
             Klarna_Checkout_Order::$contentType = 'application/vnd.klarna.checkout.aggregated-order-v2+json';
             $connector = Klarna_Checkout_Connector::create($secret);
 
@@ -174,7 +173,12 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                 } elseif ($newsletter_setting == 2) {
                     $newsletter = 1;
                 }
-                $id_customer = (int) (Customer::customerExists($shipping['email'], true, true));
+                if (0 == (int)$cart->id_customer) {
+                    $id_customer = (int) (Customer::customerExists($shipping['email'], true, true));
+                } else {
+                    $id_customer = (int)$cart->id_customer;
+                }
+                
                 if ($id_customer > 0) {
                     $customer = new Customer($id_customer);
                     if ($newsletter == 1) {
@@ -183,21 +187,6 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                         Db::getInstance()->execute(pSQL($sql_update_customer));
                     }
                 } else {
-                    //add customer
-                    $password = Tools::passwdGen(8);
-                    $customer = new Customer();
-                    $customer->firstname = $this->module->truncateValue($shipping['given_name'], 32, true);
-                    $customer->lastname = $this->module->truncateValue($shipping['family_name'], 32, true);
-                    $customer->email = $shipping['email'];
-                    $customer->passwd = Tools::encrypt($password);
-                    $customer->is_guest = 0;
-                    $customer->id_default_group = (int) (Configuration::get('PS_CUSTOMER_GROUP', null, $cart->id_shop));
-                    //$customer->id_default_group = (int)(Configuration::get('PS_GUEST_GROUP', null, $cart->id_shop));
-                    $customer->newsletter = $newsletter;
-                    $customer->optin = 0;
-                    $customer->active = 1;
-                    //Check gender
-                    
                     if (isset($klarnacustomer['gender']) && $klarnacustomer['gender'] == 'male') {
                         //MALE
                         $sql = "SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=0";
@@ -211,34 +200,24 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                         $sql = "SELECT id_gender FROM `"._DB_PREFIX_."gender` WHERE type=2";
                         $id_gender = Db::getInstance()->getValue($sql);
                     } else {
-                        $id_gender = 0;
+                        $id_gender = 9;
                     }
-                    $customer->id_gender = $id_gender;
-                    
-                    //Set dateofbirth
                     if (isset($klarnacustomer['date_of_birth'])) {
                         $date_of_birth = $klarnacustomer['date_of_birth'];
                     } else {
                         $date_of_birth = "";
                     }
                     
-                    if (Tools::strlen($date_of_birth) > 0) {
-                        if (Validate::isBirthDate($date_of_birth)) {
-                            $customer->birthday = $date_of_birth;
-                        }
-                    }
-                    
-                    $customer->add();
-                    if (!$this->sendConfirmationMail($customer, $cart->id_lang, $password)) {
-                        Logger::addLog(
-                            'KCO: Failed sending welcome mail to: '.$shipping['email'],
-                            1,
-                            null,
-                            null,
-                            null,
-                            true
-                        );
-                    }
+                    $customer = $this->module->createNewCustomer(
+                        $shipping['given_name'],
+                        $shipping['family_name'],
+                        $shipping['email'],
+                        $newsletter,
+                        $id_gender,
+                        $date_of_birth,
+                        $cart->id_shop,
+                        $cart->id_lang
+                    );
                 }
                 //Check if address already exists, if not, add
                 $delivery_address_id = 0;
@@ -522,32 +501,7 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
         }
         return $returnValue;
     }
-    //FOR CANCEL RESERVATION
 
-    protected function sendConfirmationMail($customer, $id_lang, $psw)
-    {
-        if (!Configuration::get('PS_CUSTOMER_CREATION_EMAIL')) {
-            return true;
-        }
-        try {
-            return Mail::Send(
-                $id_lang,
-                'account',
-                Mail::l('Welcome!', $id_lang),
-                array(
-                    '{firstname}' => $customer->firstname,
-                    '{lastname}' => $customer->lastname,
-                    '{email}' => $customer->email,
-                    '{passwd}' => $psw, ),
-                $customer->email,
-                $customer->firstname.' '.$customer->lastname
-            );
-        } catch (Exception $e) {
-            Logger::addLog('Klarna Checkout: '.htmlspecialchars($e->getMessage()), 1, null, null, null, true);
-
-            return false;
-        }
-    }
     
     protected function cleanupAddressData($string)
     {
