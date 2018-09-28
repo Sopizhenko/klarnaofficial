@@ -49,7 +49,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.8';
+        $this->version = '2.0.9';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3774,8 +3774,8 @@ class KlarnaOfficial extends PaymentModule
             $address->id_country = $invocie_country_id;
             $address->id_customer = $customer->id;
             
-            if ($shipping_state_id > 0) {
-                $address->id_state = $shipping_state_id;
+            if (isset($invoice_state_id) && $invoice_state_id > 0) {
+                $address->id_state = $invoice_state_id;
             }
                 
             $address->alias = 'Klarna Address';
@@ -3800,7 +3800,7 @@ class KlarnaOfficial extends PaymentModule
                 $address->address1 = $shipping['street_address'];
             }
 
-            if ($shipping_state_id > 0) {
+            if (isset($shipping_state_id) && $shipping_state_id > 0) {
                 $address->id_state = $shipping_state_id;
             }
                 
