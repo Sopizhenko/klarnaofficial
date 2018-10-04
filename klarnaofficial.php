@@ -49,7 +49,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.9';
+        $this->version = '2.0.10';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3108,6 +3108,11 @@ class KlarnaOfficial extends PaymentModule
                 if ($reservation_number != '') {
                     try {
                         if ($eid == Configuration::get('KCO_UK_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_SWEDEN_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_FINLAND_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_NORWAY_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_GERMANY_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_AUSTRIA_EID', null, null, $order->id_shop) ||
                         $eid == Configuration::get('KCO_NL_EID', null, null, $order->id_shop)) {
                             require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
                             
@@ -3207,6 +3212,11 @@ class KlarnaOfficial extends PaymentModule
                         $risk_status = '';
 
                         if ($eid == Configuration::get('KCO_UK_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_SWEDEN_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_FINLAND_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_NORWAY_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_GERMANY_EID', null, null, $order->id_shop) ||
+                        $eid == Configuration::get('KCOV3_AUSTRIA_EID', null, null, $order->id_shop) ||
                         $eid == Configuration::get('KCO_NL_EID', null, null, $order->id_shop)) {
                             require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
                             

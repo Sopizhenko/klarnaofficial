@@ -22,39 +22,50 @@ class Tools extends ToolsCore
 {
     public static function switchLanguage(Context $context = null)
     {
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-        } else {
-            if (session_id() === '') {
-                session_start();
-            }
+        if (!$context) {
+            $context = Context::getContext();
         }
-        if (isset($_SESSION['klarna_checkout'])) {
-            unset($_SESSION['klarna_checkout']);
-        }
-        if (isset($_SESSION['klarna_checkout_uk'])) {
-            unset($_SESSION['klarna_checkout_uk']);
+        $old_id_lang = $context->cookie->id_lang;
+        if (($iso = Tools::getValue('isolang')) && Validate::isLanguageIsoCode($iso) && ($new_id_lang = (int)Language::getIdByIso($iso))) {
+            if ($new_id_lang != $old_id_lang) {
+               if (version_compare(phpversion(), '5.4.0', '>=')) {
+                    if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                    }
+                } else {
+                    if (session_id() === '') {
+                        session_start();
+                    }
+                }
+                if (isset($_SESSION['klarna_checkout'])) {
+                    unset($_SESSION['klarna_checkout']);
+                }
+                if (isset($_SESSION['klarna_checkout_uk'])) {
+                    unset($_SESSION['klarna_checkout_uk']);
+                }
+            }
         }
         return parent::switchLanguage($context);
     }
+    
     public static function setCurrency($cookie)
     {
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+        if (Tools::getIsset('SubmitCurrency')) {
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+            } else {
+                if (session_id() === '') {
+                    session_start();
+                }
             }
-        } else {
-            if (session_id() === '') {
-                session_start();
+            if (isset($_SESSION['klarna_checkout'])) {
+                unset($_SESSION['klarna_checkout']);
             }
-        }
-        if (isset($_SESSION['klarna_checkout'])) {
-            unset($_SESSION['klarna_checkout']);
-        }
-        if (isset($_SESSION['klarna_checkout_uk'])) {
-            unset($_SESSION['klarna_checkout_uk']);
+            if (isset($_SESSION['klarna_checkout_uk'])) {
+                unset($_SESSION['klarna_checkout_uk']);
+            }
         }
         return parent::setCurrency($cookie);
     }
