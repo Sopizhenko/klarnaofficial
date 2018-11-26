@@ -775,7 +775,8 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
                 
                 if (0 == $pclass->type) {
                     $months = $pclass->months;
-                    $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/eid/fi_fi/fixed_amount_$months";
+                    $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/".
+                    $eid."/fi_fi/fixed_amount_".$months;
                 } else {
                     $newPclass['terms']['uri'] = $termsuri;
                 }

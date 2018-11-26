@@ -133,9 +133,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         // print_r($country_information);
         // print_r($this->context->cart);
         // print_r($carrieraddress);
-        foreach($this->context->cart->getDeliveryOptionList() as $options) {
-            foreach($options as $option) {
-                foreach($option["carrier_list"] as $carrieroption) {
+        foreach ($this->context->cart->getDeliveryOptionList() as $options) {
+            foreach ($options as $option) {
+                foreach ($option["carrier_list"] as $carrieroption) {
                     $carrierobject = $carrieroption["instance"];
                     $shipping_option = array();
                     $shipping_option["id"] = $carrierobject->id;
@@ -236,7 +236,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                 $shipping_option_update_url .= '&klarna_order_id={checkout.order.id}';
                 
                 $shipping_countries = array();
-                foreach(Country::getCountries($this->context->cookie->id_lang, true, false, false) as $country) {
+                foreach (Country::getCountries($this->context->cookie->id_lang, true, false, false) as $country) {
                     $shipping_countries[] = $country["iso_code"];
                 }
                 $create['shipping_countries'] = $shipping_countries;

@@ -79,7 +79,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         "klarna_orders` WHERE id_order>0 AND id_cart=".
                         (int) $id_cart;
 
-            $result;
+            $result = array();
             $id_order = (int)Db::getInstance()->getValue($sql_cart_select);
             if ($id_order > 0) {
                 $result['id_order'] = $id_order;

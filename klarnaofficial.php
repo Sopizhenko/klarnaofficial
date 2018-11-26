@@ -173,7 +173,7 @@ class KlarnaOfficial extends PaymentModule
         if (parent::uninstall() == false) {
             return false;
         }
-        foreach($this->configuration_params as $param) {
+        foreach ($this->configuration_params as $param) {
             Configuration::deleteByName($param);
         }
         $this->dropTables();
@@ -331,12 +331,12 @@ class KlarnaOfficial extends PaymentModule
             Tools::isSubmit('btnKCOV3Submit') ||
             Tools::isSubmit('btnKCOSubmit')
         ) {
-            foreach($this->configuration_params as $param) {
+            foreach ($this->configuration_params as $param) {
                 if (Tools::getIsset($param)) {
                      Configuration::updateValue($param, Tools::getValue($param));
                      $isSaved = true;
                 }
-            }            
+            }
         }
 
         $invoice_fee_not_found = false;
@@ -1616,8 +1616,8 @@ class KlarnaOfficial extends PaymentModule
                             'id' => 'value',
                             'name' => 'label',
                         ),
-                    ),    
-                    
+                    ),
+
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -2042,7 +2042,7 @@ class KlarnaOfficial extends PaymentModule
     public function getConfigFieldsValues()
     {
         $returnarray = array();
-        foreach($this->configuration_params as $param) {
+        foreach ($this->configuration_params as $param) {
             $returnarray[$param] = Tools::getValue($param, Configuration::get($param));
         }
         return $returnarray;
@@ -3673,11 +3673,11 @@ class KlarnaOfficial extends PaymentModule
             "'', '1234567890', '','', '', 1, 0, $id_country);";
             Db::getInstance()->execute($sql_fix);
             $new_address_id = Db::getInstance()->Insert_ID();
-            Configuration::updateValue($setting_name, $new_address_id); 
+            Configuration::updateValue($setting_name, $new_address_id);
         }
-        
     }
-    public function changeCurrencyonCart($currency, $iso_code_required) 
+    
+    public function changeCurrencyonCart($currency, $iso_code_required)
     {
         if ($currency->iso_code != $iso_code_required) {
             $new_currency = Currency::getIdByIsoCode($iso_code_required);
@@ -3702,13 +3702,48 @@ class KlarnaOfficial extends PaymentModule
             $language_iso_code = 'no';
         }
         
-        $sweden_is_active = (Configuration::get('KCO_SWEDEN') == 0 ? Configuration::get('KCOV3_SWEDEN') : Configuration::get('KCO_SWEDEN'));
-        $norway_is_active = (Configuration::get('KCO_NORWAY') == 0 ? Configuration::get('KCOV3_NORWAY') : Configuration::get('KCO_NORWAY'));
-        $uk_is_active = (Configuration::get('KCO_UK') == 0 ? Configuration::get('KCOV3_UK') : Configuration::get('KCO_UK'));
-        $finland_is_active = (Configuration::get('KCO_FINLAND') == 0 ? Configuration::get('KCOV3_FINLAND') : Configuration::get('KCO_FINLAND'));
-        $germany_is_active = (Configuration::get('KCO_GERMANY') == 0 ? Configuration::get('KCOV3_GERMANY') : Configuration::get('KCO_GERMANY'));
-        $austria_is_active = (Configuration::get('KCO_AUSTRIA') == 0 ? Configuration::get('KCOV3_AUSTRIA') : Configuration::get('KCO_AUSTRIA'));
-        $nl_is_active = (Configuration::get('KCO_NL') == 0 ? Configuration::get('KCOV3_NL') : Configuration::get('KCO_NL'));
+        if (Configuration::get('KCO_SWEDEN') == 0) {
+            $sweden_is_active = Configuration::get('KCOV3_SWEDEN');
+        } else {
+            $sweden_is_active = Configuration::get('KCO_SWEDEN');
+        }
+        
+        if (Configuration::get('KCO_NORWAY') == 0) {
+            $norway_is_active = Configuration::get('KCOV3_NORWAY');
+        } else {
+            $norway_is_active = Configuration::get('KCO_NORWAY');
+        }
+        
+        if (Configuration::get('KCO_UK') == 0) {
+            $uk_is_active = Configuration::get('KCOV3_UK');
+        } else {
+            $uk_is_active = Configuration::get('KCO_UK');
+        }
+        
+        if (Configuration::get('KCO_FINLAND') == 0) {
+            $finland_is_active = Configuration::get('KCOV3_FINLAND');
+        } else {
+            $finland_is_active = Configuration::get('KCO_FINLAND');
+        }
+        
+        if (Configuration::get('KCO_GERMANY') == 0) {
+            $germany_is_active = Configuration::get('KCOV3_GERMANY');
+        } else {
+            $germany_is_active = Configuration::get('KCO_GERMANY');
+        }
+        
+        if (Configuration::get('KCO_AUSTRIA') == 0) {
+            $austria_is_active = Configuration::get('KCOV3_AUSTRIA');
+        } else {
+            $austria_is_active = Configuration::get('KCO_AUSTRIA');
+        }
+
+        if (Configuration::get('KCO_NL') == 0) {
+            $nl_is_active = Configuration::get('KCOV3_NL');
+        } else {
+            $nl_is_active = Configuration::get('KCO_NL');
+        }
+        
         $us_is_active = Configuration::get('KCO_US');
         
         if ($currency_iso_code == 'SEK' &&
