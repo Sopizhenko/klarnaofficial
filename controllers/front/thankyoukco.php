@@ -40,36 +40,6 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
             Tools::redirect('index.php');
         }
         try {
-            /*
-             * Fetch the checkout resource.
-             */
-
-            // $sid = Tools::getValue('sid');
-            // if ($sid == 'gb') {
-                // $sharedSecret = Configuration::get('KCO_UK_SECRET');
-                // $merchantId = Configuration::get('KCO_UK_EID');
-            // } elseif ($sid == 'us') {
-                // $sharedSecret = Configuration::get('KCO_US_SECRET');
-                // $merchantId = Configuration::get('KCO_US_EID');
-            // } elseif ($sid == 'nl') {
-                // $sharedSecret = Configuration::get('KCO_NL_SECRET');
-                // $merchantId = Configuration::get('KCO_NL_EID');
-            // } elseif ($sid == 'se') {
-                // $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
-                // $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
-            // } elseif ($sid == 'no') {
-                // $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
-                // $merchantId = Configuration::get('KCOV3_NORWAY_EID');
-            // } elseif ($sid == 'fi') {
-                // $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
-                // $merchantId = Configuration::get('KCOV3_FINLAND_EID');
-            // } elseif ($sid == 'de') {
-                // $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
-                // $merchantId = Configuration::get('KCOV3_GERMANY_EID');
-            // } elseif ($sid == 'at') {
-                // $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
-                // $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
-            // }
             $merchantId = Configuration::get('KCOV3_MID');
             $sharedSecret = Configuration::get('KCOV3_SECRET');
 
@@ -230,7 +200,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                             $shippingregion = $shipping['region'];
                             $shipping_state_id = State::getIdByIso($shippingregion, $shipping_country_id);
                             if(!$shipping_state_id>0) {
-                                $shipping_state_id = State::getIdByName(Tools::ucfirst(Tools::strtolower($shippingregion)));
+                                $shippingregion = Tools::ucfirst(Tools::strtolower($shippingregion));
+                                $shipping_state_id = State::getIdByName($shippingregion);
                                 $statetmp = new State($shipping_state_id);
                                 if ($statetmp->id_country != $shipping_country_id) {
                                     $shipping_state_id = 0;
@@ -241,7 +212,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                             $billingregion = $billing['region'];
                             $invoice_state_id = State::getIdByIso($billingregion, $invocie_country_id);
                             if(!$invoice_state_id>0) {
-                                $invoice_state_id = State::getIdByName(Tools::ucfirst(Tools::strtolower($billingregion)));
+                                $billingregion = Tools::ucfirst(Tools::strtolower($billingregion));
+                                $invoice_state_id = State::getIdByName($billingregion);
                                 $statetmp = new State($invoice_state_id);
                                 if ($statetmp->id_country != $invocie_country_id) {
                                     $invoice_state_id = 0;

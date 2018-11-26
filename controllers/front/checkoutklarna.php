@@ -452,7 +452,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             if ($this->context->customer->isLogged()) {
                                 /*PREFILL CUSTOMER INFO*/
                                 $okToPrefill = true;
-                                if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT') ) {
+                                if ($country_information['purchase_country'] == "DE" &&
+                                    Configuration::get('KCO_DE_PREFILNOT') 
+                                ) {
                                     $okToPrefill = false;
                                     if(Tools::getIsset("oktoprefill")) {
                                         $okToPrefill = true;
@@ -470,7 +472,11 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                                     $create['shipping_address']['organization_name'] = $address_delivery->company;
                                     $create['shipping_address']['reference'] = $address_delivery->other;
                                     $create['shipping_address']['care_of'] = $address_delivery->address2;
-                                    if ($this->context->cart->id_address_invoice == $this->context->cart->id_address_delivery) {
+                                    
+                                    $prefill_id_address_invoice = $this->context->cart->id_address_invoice;
+                                    $prefill_id_address_delivery = $this->context->cart->id_address_delivery;
+                                    
+                                    if ($prefill_id_address_invoice == $prefill_id_address_delivery) {
                                         $create['billing_address'] = $create['shipping_address'];
                                     } else {
                                         $address_invoice = new Address((int)$this->context->cart->id_address_invoice);

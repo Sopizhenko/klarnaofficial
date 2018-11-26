@@ -27,7 +27,7 @@ class Tools extends ToolsCore
         }
         $old_id_lang = $context->cookie->id_lang;
         $result = parent::switchLanguage($context);
-        $new_id_lang = isset($_GET['id_lang']) ? (int)$_GET['id_lang'] : $old_id_lang;
+        $new_id_lang =  Tools::getIsset('id_lang') ? (int)Tools::getValue('id_lang') : $old_id_lang;
         if ($old_id_lang != $new_id_lang) {
             if (version_compare(phpversion(), '5.4.0', '>=')) {
                 if (session_status() === PHP_SESSION_NONE) {

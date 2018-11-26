@@ -581,8 +581,8 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             }
             
             $klarna_locale = $this->module->getKlarnaLocale();
-            $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/$eid/".
-            $klarna_locale.'/invoice'.$invoicefeestring;
+            $newPclass['terms']['uri'] = "https://cdn.klarna.com/1.0/shared/content/legal/terms/".
+            $eid.'/'.$klarna_locale.'/invoice'.$invoicefeestring;
             
             $newPclass['logo']['uri'] = $logourl;
             $data['payment_methods'][] = $newPclass;

@@ -28,13 +28,6 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
     {
         $klarnadata = Tools::file_get_contents('php://input');
         
-        
-        // $myFile = dirname(__FILE__)."/testFile.txt";
-        // $fh = fopen($myFile, 'a') or die("can't open file");
-        // $stringData = $klarnadata.PHP_EOL.PHP_EOL;
-        // fwrite($fh, $stringData);
-        // fclose($fh);
-        
         $klarna_result = json_decode($klarnadata, true);
         $occurred_at = $klarna_result["occurred_at"];
         $event_type = $klarna_result["event_type"];
@@ -51,7 +44,8 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
                 /*NO CART FOUND, KILL PROCESS*/
                 exit;
             } else {
-                $id_order = Db::getInstance()->getValue('SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_cart` = '.(int)$row["id_cart"]);
+                $sql = 'SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_cart` = '.(int)$row["id_cart"];
+                $id_order = Db::getInstance()->getValue($sql);
             }
         } else {
             $id_order = (int)$row["id_order"];
