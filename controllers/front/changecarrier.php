@@ -29,14 +29,12 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnadata = json_decode($klarnadata);
-        if($klarnadata == false) {
+        if ($klarnadata == false) {
             //something went wrong with the data, redirect.
             $this->redirectKCO();
         }
         $id_cart = (int) Tools::getValue('cartid');
         $id_carrier = (int) $klarnadata->selected_shipping_option->id;
-        
-        PrestaShopLogger::addLog("change carrier: $id_cart $id_carrier", 3, null, '', 0, true);
         
         if ($id_cart > 0 && $id_carrier > 0) {
             $cart = new Cart($id_cart);
@@ -57,7 +55,7 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
                 pSQL($new_delivery_options_serialized).
                 '\' WHERE id_cart='.
                 (int) $cart->id;
-            Db::getInstance()->execute($update_sql);    
+            Db::getInstance()->execute($update_sql);
         }
         
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
@@ -70,8 +68,6 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         $country_on_cart = new Country($carrieraddress->id_country);
         $this->context->country = $country_on_cart;
         
-        PrestaShopLogger::addLog("change carrier country:".print_r($country_on_cart,true), 3, null, '', 0, true);
-        
         $this->context->currency = new Currency((int)$cart->id_currency);
         $order_lines = $KlarnaCheckoutCommonFeatures->BuildCartArray($cart, $shippingReference, $wrappingreference, $this->module->l('Wrapping', 'KlarnaOfficialChangeCarrierModuleFrontController'), $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController'));
         $klarnadata->order_lines = $order_lines;
@@ -81,7 +77,6 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         $klarnadata->order_amount = $totalCartValue * 100;
         $klarnadata->order_tax_amount = $total_tax_value * 100;
         
-        PrestaShopLogger::addLog("change carrier:".print_r($klarnadata,true), 3, null, '', 0, true);
         echo json_encode($klarnadata);
         exit;
     }

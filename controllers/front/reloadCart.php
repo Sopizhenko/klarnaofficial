@@ -41,11 +41,23 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
         // override customization tax rate with real tax (tax rules)
         if ($customizedDatas) {
             foreach ($summary['products'] as &$productUpdate) {
-                $productId = (int)isset($productUpdate['id_product']) ? $productUpdate['id_product'] : $productUpdate['product_id'];
-                $productAttributeId = (int)isset($productUpdate['id_product_attribute']) ? $productUpdate['id_product_attribute'] : $productUpdate['product_attribute_id'];
+                if (isset($productUpdate['id_product'])) {
+                    $productId = (int)$productUpdate['id_product'];
+                } else {
+                    $productId = (int)$productUpdate['product_id'];
+                }
+                
+                if (isset($productUpdate['id_product_attribute'])) {
+                    $productAttributeId = (int)$productUpdate['id_product_attribute'];
+                } else {
+                    $productAttributeId = (int)$productUpdate['product_attribute_id'];
+                }
 
                 if (isset($customizedDatas[$productId][$productAttributeId])) {
-                    $productUpdate['tax_rate'] = Tax::getProductTaxRate($productId, $this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+                    $productUpdate['tax_rate'] = Tax::getProductTaxRate(
+                        $productId,
+                        $this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}
+                    );
                 }
             }
 
@@ -75,7 +87,8 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
                 null,
                 true,
                 true,
-                $cart_product_context);
+                $cart_product_context
+            );
 
             if (Product::getTaxCalculationMethod()) {
                 $product['is_discounted'] = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) != Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);

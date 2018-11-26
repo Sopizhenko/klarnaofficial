@@ -147,7 +147,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     $shipping_option["name"] = $carrierobject->name;
                     $shipping_option["description"] = $carrierobject->delay[(int)$this->context->cart->id_lang];
                     $shipping_option["price"] = $option["total_price_with_tax"] * 100;
-                    $shipping_option["tax_amount"] = (($option["total_price_with_tax"] - $option["total_price_without_tax"]) * 100);
+                    $taxamount = (($option["total_price_with_tax"] - $option["total_price_without_tax"]) * 100);
+                    $shipping_option["tax_amount"] = $taxamount;
                     $shipping_tax_rate = $carrierobject->getTaxesRate($carrieraddress);
                     $shipping_option["tax_rate"] = $shipping_tax_rate*100;
                     $shipping_options[] = $shipping_option;
@@ -186,7 +187,13 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     $wrappingreference = $this->module->wrappingreferences['en'];
                 }
                 
-                $checkoutcart = $KlarnaCheckoutCommonFeatures->BuildCartArray($this->context->cart, $shippingReference, $wrappingreference, $this->module->getL('Inslagning'), $this->module->getL('Discount'));
+                $checkoutcart = $KlarnaCheckoutCommonFeatures->BuildCartArray(
+                    $this->context->cart,
+                    $shippingReference,
+                    $wrappingreference,
+                    $this->module->getL('Inslagning'),
+                    $this->module->getL('Discount')
+                );
                 
                 $callbackPage = $this->context->link->getModuleLink(
                     'klarnaofficial',
@@ -247,13 +254,16 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $this->context->smarty->assign('klarna_error', 'PHP 5.4 Required');
                     } else {
                         require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
-                        $connector = $KlarnaCheckoutCommonFeatures->getConnector($ssid, $eid, $sharedSecret, (int) (Configuration::get('KCO_TESTMODE')));
+                        $connector = $KlarnaCheckoutCommonFeatures->getConnector(
+                            $ssid,
+                            $eid,
+                            $sharedSecret,
+                            (int) (Configuration::get('KCO_TESTMODE'))
+                        );
 
                         $checkout = new \Klarna\Rest\Checkout\Order($connector);
 
-                        // $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH_WITHOUT_SHIPPING);
                         $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-                        // $totalCartValue_tax_excl = $this->context->cart->getOrderTotal(false, Cart::BOTH_WITHOUT_SHIPPING);
                         $totalCartValue_tax_excl = $this->context->cart->getOrderTotal(false, Cart::BOTH);
                         $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
                         $create['purchase_country'] = $country_information['purchase_country'];
@@ -387,9 +397,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                             $create['billing_address']['care_of'] = $address_invoice->address2;
                                             $create['billing_address']['postal_code'] = $address_invoice->postcode;
                                             $create['billing_address']['city'] = $address_invoice->city;
-                                            $create['billing_address']['phone'] = $address_invoice->phone_mobile;   
+                                            $create['billing_address']['phone'] = $address_invoice->phone_mobile;
                                             $billingCountry = new Country((int)$address_invoice->id_country);
-                                            $create['billing_address']['country'] = $billingCountry->iso_code;   
+                                            $create['billing_address']['country'] = $billingCountry->iso_code;
                                             
                                             if ((int)$address_delivery->id_state > 0) {
                                                 $billingState = new State((int)$address_invoice->id_state);

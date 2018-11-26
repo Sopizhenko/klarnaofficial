@@ -95,7 +95,6 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
                 }
             }
         } else {
-            PrestaShopLogger::addLog("changeaddress no change", 3, null, '', 0, true);
             echo json_encode($klarnadata);
             exit;
         }
@@ -172,11 +171,7 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
         $klarnadata->order_amount = $totalCartValue * 100;
         $klarnadata->order_tax_amount = $total_tax_value * 100;
         
-        PrestaShopLogger::addLog("country: ".$country_iso, 3, null, '', 0, true);
-        PrestaShopLogger::addLog("id_cart: ".$id_cart, 3, null, '', 0, true);
-        
         echo json_encode($klarnadata);
-        PrestaShopLogger::addLog("changeaddress:".json_encode($klarnadata), 3, null, '', 0, true);
         exit;
     }
     
