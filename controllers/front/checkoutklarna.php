@@ -453,7 +453,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                                 /*PREFILL CUSTOMER INFO*/
                                 $okToPrefill = true;
                                 if ($country_information['purchase_country'] == "DE" &&
-                                    Configuration::get('KCO_DE_PREFILNOT') 
+                                    Configuration::get('KCO_DE_PREFILNOT')
                                 ) {
                                     $okToPrefill = false;
                                     if (Tools::getIsset("oktoprefill")) {
@@ -677,7 +677,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     }
                     $this->assignSummaryInformations();
                     
-                    if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT') ) {
+                    if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT')) {
                         $show_prefil_link = true;
                     } else {
                         $show_prefil_link = false;

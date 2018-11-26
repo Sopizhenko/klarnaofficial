@@ -77,7 +77,6 @@ foreach ($result as $row) {
         $templateVars = array();
         $history->addWithemail(true, $templateVars);
     }
-    
 }
 
 /*KLARNA KPM PENDING*/

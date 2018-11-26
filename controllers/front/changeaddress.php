@@ -25,17 +25,17 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
     public $ssl = true;
 
     public function init()
-    {        
+    {
         $has_changed = false;
         
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnadata = json_decode($klarnadata);
-        if($klarnadata == false) {
+        if ($klarnadata == false) {
             //something went wrong with the data, redirect.
             $this->redirectKCO();
         }
         $shipping_address = $klarnadata->shipping_address;
-        if(!isset($shipping_address->country)) {
+        if (!isset($shipping_address->country)) {
             //NO COUNTRY SET!
             $this->redirectKCO();
         }
@@ -77,7 +77,6 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
                     } else {
                         PrestaShopLogger::addLog("Klarna Country not active: $country_iso", 3, null, '', 0, true);
                     }
-                    
                 }
             } else {
                 $id_country = (int) Country::getByIso($country_iso, true);
@@ -137,9 +136,9 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
         
         $order_lines = $KlarnaCheckoutCommonFeatures->BuildCartArray($cart, $shippingReference, $wrappingreference, $this->module->l('Wrapping', 'KlarnaOfficialChangeAddressModuleFrontController'), $this->module->l('Discount', 'KlarnaOfficialChangeAddressModuleFrontController'));
         
-        foreach($cart->getDeliveryOptionList(null, true) as $options) {
-            foreach($options as $option) {
-                foreach($option["carrier_list"] as $carrieroption) {
+        foreach ($cart->getDeliveryOptionList(null, true) as $options) {
+            foreach ($options as $option) {
+                foreach ($option["carrier_list"] as $carrieroption) {
                     $carrierobject = $carrieroption["instance"];
                     $shipping_option = array();
                     $shipping_option["id"] = $carrierobject->id;
