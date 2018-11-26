@@ -43,7 +43,7 @@
             </p>
         {/if}
 		<div style="position:relative;width:100%;">
-			<a class="banner__cta" target="_blank" href="{if $showbanner1}https://hello.klarna.com/product-upgrade.html{else}https://eu.portal.klarna.com/signup/prestashop?country={$country}&platformVersion={$platformVersion}&plugin={$plugin}&pluginVersion={$pluginVersion}{/if}">
+			<a class="banner__cta" target="_blank" href="{if $showbanner1}https://hello.klarna.com/product-upgrade.html{else}https://eu.portal.klarna.com/signup/prestashop?country={$country|escape:'htmlall':'UTF-8'}&platformVersion={$platformVersion|escape:'htmlall':'UTF-8'}&plugin={$plugin|escape:'htmlall':'UTF-8'}&pluginVersion={$pluginVersion|escape:'htmlall':'UTF-8'}{/if}">
             {if $showbanner1}
                 {l s='Check it out' mod='klarnaofficial'}
             {else}
@@ -57,7 +57,7 @@
 	<section class="banner banner--docs {if !$showbanner && !$showbanner1}banner--small{/if}">
 		<svg xmlns="http://www.w3.org/2000/svg" style="height:64px;width:64px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
 		<h2 class="banner__title">
-			{l s='Documentation'}
+			{l s='Documentation' mod='klarnaofficial'}
 		</h2>
 		<p>
 			{l s='Link and information to documentation comes here...' mod='klarnaofficial'}
@@ -139,7 +139,7 @@
                     </div>
                     <div id="klarnacheckout-admin" class="col-lg-10">
                         {$kcocommonform}
-                        * {l s='These fields are only applicable in certain markets'}
+                        * {l s='These fields are only applicable in certain markets' mod='klarnaofficial'}
                     </div>
                 </div>
             </div>

@@ -123,8 +123,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $newsletter = 0;
                     $newsletter_setting = (int)Configuration::get('KCO_ADD_NEWSLETTERBOX', null, $cart->id_shop);
                     if ($newsletter_setting == 0 || $newsletter_setting == 1) {
-                        if (
-                            isset($checkout['merchant_requested']) &&
+                        if (isset($checkout['merchant_requested']) &&
                             isset($checkout['merchant_requested']['additional_checkbox']) &&
                             $checkout['merchant_requested']['additional_checkbox'] == true
                         ) {
@@ -182,8 +181,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $invocie_country_id = Country::getByIso($invocie_iso);
                     
                     $is_same = true;
-                    foreach($shipping as $key => $value) {
-                        if($billing[$key] != $value) {
+                    foreach ($shipping as $key => $value) {
+                        if ($billing[$key] != $value) {
                             $is_same = false;
                             continue;
                         }
@@ -195,11 +194,11 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $billing['care_of'] = "";
                     }
                     
-                    if($shipping_iso == "IT" || $shipping_iso == "US") {
+                    if ($shipping_iso == "IT" || $shipping_iso == "US") {
                         if (isset($shipping['region'])) {
                             $shippingregion = $shipping['region'];
                             $shipping_state_id = State::getIdByIso($shippingregion, $shipping_country_id);
-                            if(!$shipping_state_id>0) {
+                            if (!$shipping_state_id>0) {
                                 $shippingregion = Tools::ucfirst(Tools::strtolower($shippingregion));
                                 $shipping_state_id = State::getIdByName($shippingregion);
                                 $statetmp = new State($shipping_state_id);
@@ -211,7 +210,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         if (isset($billing['region'])) {
                             $billingregion = $billing['region'];
                             $invoice_state_id = State::getIdByIso($billingregion, $invocie_country_id);
-                            if(!$invoice_state_id>0) {
+                            if (!$invoice_state_id>0) {
                                 $billingregion = Tools::ucfirst(Tools::strtolower($billingregion));
                                 $invoice_state_id = State::getIdByName($billingregion);
                                 $statetmp = new State($invoice_state_id);
@@ -268,7 +267,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $address->id_country = $invocie_country_id;
                         $address->id_customer = $customer->id;
                         
-                        if(isset($shipping_state_id) && $shipping_state_id > 0) {
+                        if (isset($shipping_state_id) && $shipping_state_id > 0) {
                             $address->id_state = $shipping_state_id;
                         }
                             
@@ -294,7 +293,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                             $address->address1 = $shipping['street_address'];
                         }
 
-                        if($shipping_state_id > 0) {
+                        if ($shipping_state_id > 0) {
                             $address->id_state = $shipping_state_id;
                         }
                             
@@ -435,14 +434,11 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $history->id_order = $this->module->currentOrder;
                         $history->changeIdOrderState((int)$new_pending_status, $this->module->currentOrder, true);
                         $templateVars = array();
-                        $history->addWithemail(true, $templateVars); 
+                        $history->addWithemail(true, $templateVars);
                     }
-                    
                 }
             }
-            
-            
-            
+
             if (isset($result['id_order'])) {
                 unset($_SESSION['klarna_checkout_uk']);
                 //If order is created, we can redirect to normal thankyou page.

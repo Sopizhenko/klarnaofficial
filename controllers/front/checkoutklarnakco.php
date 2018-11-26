@@ -77,7 +77,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         $checkSQL = "SELECT COUNT(id_address_delivery) FROM "._DB_PREFIX_."cart_product WHERE id_cart=".
         (int) $this->context->cart->id. " AND id_address_delivery <> ".(int) $this->context->cart->id_address_delivery;
         $finds = Db::getInstance()->getValue($checkSQL);
-        if($finds > 0) {
+        if ($finds > 0) {
             $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
                 'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
                 ' WHERE id_cart='.(int) $this->context->cart->id;
@@ -156,7 +156,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         }
 
         $layout = 'desktop';
-        //if($this->context->getMobileDevice())
+        //if ($this->context->getMobileDevice())
         //	$layout = 'mobile';
         require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
         $mobile_detect_class = new Mobile_Detect();
