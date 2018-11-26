@@ -20,7 +20,6 @@
 	#module-klarnaofficial-checkoutklarna #order_step,
     #module-klarnaofficial-checkoutklarna .price_discount_delete,
 	#module-klarnaofficial-checkoutklarna .standard-checkout{ display: none; }
-	
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*  $UTILITIES
@@ -137,9 +136,7 @@
 
         .kco-btn {
             border: 0;
-            border-radius: 3px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .075),
-                        inset 0 -2px rgba(0, 0, 0, .1);
+            border-radius: 4px;
             display: inline-block;
             font-size: .9375em;
             font-weight: 700;
@@ -154,16 +151,16 @@
                 box-shadow: inset 0 2px rgba(0, 0, 0, .1);
             }
             .kco-btn--default {
-                background: #fff;
-                border: 1px solid rgba(0,0,0,0.15);
-                color: #555;
+                background: #58CE6F;
+                border: none;
+                color: #fff;
             }
                 .kco-btn--default:hover,
                 .kco-btn--default:focus {
-                    background: #fcfcfc;
+                    background: #46AE5B;
                 }
                 .kco-btn--default:active {
-                    background: #fafafa;
+                    background: #429C54;
                 }
             .kco-btn--blue {
                 background: #0089cf;
@@ -180,14 +177,20 @@
                 width: 100%;
             }
 
+            .message_container .kco-btn {
+                float: right;
+            }
+
+
+            
     /*  $Inputs
     /*-------------------------------------------------------------------------*/
 
         .kco-input {
             background: #fff;
             border: 0;
-            border-radius: 3px;
-            box-shadow: inset 0 0 0 1px #a6a6a6;
+            border-radius: 4px;
+            box-shadow: inset 0 0 0 1px #d1d1d0;
             color: #595959;
             font-size: .9375em;
             font-weight: 600;
@@ -240,8 +243,8 @@
         .kco-select {
             background: #fff;
             border: 0;
-            border-radius: 3px;
-            box-shadow: inset 0 0 0 1px #a6a6a6;
+            border-radius: 4px;
+            box-shadow: inset 0 0 0 1px #d1d1d0;
             color: #595959;
             cursor: pointer;
             font-size: .9375em;
@@ -281,7 +284,6 @@
                 font-size: .9375em;
             }
             .kco-title {
-                border-bottom: 1px solid #ddd;
                 display: block;
                 font-size: 1.125em;
                 padding: 0 0 10px;
@@ -289,7 +291,7 @@
             }
             .kco-title--step {
                 font-size: 1.5em;
-                margin: 0 0 .875em;
+                margin: 0 0 0;
                 padding: 0 0 .875em;
             }
                 .kco-title--step__nbr {
@@ -303,6 +305,12 @@
                     text-align: center;
                     width: 1.5em;
                 }
+        .kco-step-heading {
+            display: block;
+            margin-bottom: 4px;
+            font-size: .750em;
+            text-transform: uppercase;
+        }
 
     /*  $Triggers $Targets
     /*-------------------------------------------------------------------------*/
@@ -310,17 +318,7 @@
         .kco-trigger * {
             cursor: pointer;
         }
-        .kco-trigger:before {
-            color: #0089cf;
-            content: '\f146';
-            display: block;
-            float: right;
-            font-family: Fontawesome;
-            font-size: 16px;
-        }
-            .kco-trigger--inactive:before {
-                content: '\f0fe';
-            }
+
             .kco-trigger--big {
                 background: #f0f4f8;
                 border: 0;
@@ -339,15 +337,17 @@
         list-style: none;
         margin: 0;
         padding: 0;
+        border: 1px solid #d1d1d0;
+        border-radius: 8px;
     }
         .kco-sel-list__item {
-            box-shadow: inset 0 0 0 1px #a6a6a6;
-            border-radius: 3px;
             display: block;
             font-size: .9375em;
-            margin: 0 0 .3333333333333333em;
             position: relative;
         }
+            .kco-sel-list__item:first-child {
+                border-bottom: 1px solid #d1d1d0;
+            }
             .kco-sel-list__item:after,
             .kco-sel-list__item__label:after {
                 clear: both;
@@ -383,7 +383,7 @@
                     min-height: 1.6em;
                 }
                     .kco-sel-list__item__status i {
-                        background: #f0f4f8;
+                        border: 1px solid #d1d1d0;
                         border-radius: 100%;
                         color: transparent;
                         display: block;
@@ -395,26 +395,27 @@
                 .kco-sel-list__item__label:hover {
                     color: #434343;
                 }
-                    .kco-sel-list__item__label:hover .kco-sel-list__item__status i,
-                    .kco-sel-list__item__label:hover .kco-sel-list__item__nbr {
-                        color: #0089cf;
+                    .kco-sel-list__item__label:hover .kco-sel-list__item__status i {
+                        color: #3CC149;
+                        border-color: #3CC149;
                     }
                 .selected .kco-sel-list__item__label {
                     color: #434343;
                 }
                 .selected .kco-sel-list__item__status i {
-                    background: #0089cf;
-                    color: #fff;
+                    border-color: #3CC149;
+                    color: #3CC149;
                 }
                     .selected .kco-sel-list__item__label:hover .kco-sel-list__item__status i {
-                        color: #fff;
+                        color: #3CC149;
+                        border-color: #3CC149;
                     }
                 .selected .kco-sel-list__item__nbr {
-                    color: #0089cf;
+                    color: #8A8A8A;
                 }
             .kco-sel-list__item.selected {
-                box-shadow: 0 0 0 1px #0089cf,
-                            0 0 3px 1px #0089cf;
+   /*              box-shadow: 0 0 0 1px #0089cf,
+                            0 0 3px 1px #0089cf; */
             }
             .kco-sel-list__item__info {
                 clear: both;
@@ -515,14 +516,14 @@
                     color: #e74635;
                 }
 #module-klarnaofficial-checkoutklarna div.shopping_cart span.remove_link{display:none;}
-#module-klarnaofficial-checkoutklarnauk div.shopping_cart span.remove_link{display:none;}
+#module-klarnaofficial-checkoutklarnakco div.shopping_cart span.remove_link{display:none;}
 
-#module-klarnaofficial-checkoutklarnauk #order_step,
-#module-klarnaofficial-checkoutklarnauk .cart_navigation,
-#module-klarnaofficial-checkoutklarnauk #voucher,
-#module-klarnaofficial-checkoutklarnauk .title-offers,
-#module-klarnaofficial-checkoutklarnauk #display_cart_vouchers,
-#module-klarnaofficial-checkoutklarnauk #cart_voucher * {
+#module-klarnaofficial-checkoutklarnakco #order_step,
+#module-klarnaofficial-checkoutklarnakco .cart_navigation,
+#module-klarnaofficial-checkoutklarnakco #voucher,
+#module-klarnaofficial-checkoutklarnakco .title-offers,
+#module-klarnaofficial-checkoutklarnakco #display_cart_vouchers,
+#module-klarnaofficial-checkoutklarnakco #cart_voucher * {
 	display: none;
 }
 
@@ -534,3 +535,68 @@
 #module-klarnaofficial-checkoutklarna #cart_voucher * {
 	display: none;
 }
+
+#checkoutdiv {
+    border: 1px solid #d1d1d0;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+#module-klarnaofficial-checkoutklarnakco .standard-checkout {
+display: none !important;
+}
+
+[id="loaderbox"] {
+    background-color: rgba(255, 255, 255, 0.9);
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999999;
+}
+    .showklarnaloaderbox {
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+            -ms-flex-align: center;
+                align-items: center;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+            -ms-flex-pack: center;
+                justify-content: center;
+    }
+    [id="loaderbox"] .spinner {
+        background-color: #fff;
+        -webkit-border-radius: 100%;
+                border-radius: 100%;
+        -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.05);
+        height: 8em;
+        padding: 1em;
+        width: 8em;
+    }
+    [id="loaderbox"] .spinner:after {
+        -webkit-animation: klarnaSpinner 1s infinite ease-in-out;
+                animation: klarnaSpinner 1s infinite ease-in-out;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #EB6F93;
+        -webkit-border-radius: 100%;
+                border-radius: 100%;
+        content: '';
+        display: block;
+        height: 6em;
+        width: 6em;
+    }
+    @-webkit-keyframes klarnaSpinner {
+        0%   { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
+    }
+    @keyframes klarnaSpinner {
+        0%   { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
+    }

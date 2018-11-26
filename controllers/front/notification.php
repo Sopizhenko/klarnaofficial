@@ -28,8 +28,15 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
     {
         $klarnadata = Tools::file_get_contents('php://input');
         
+        
+        // $myFile = dirname(__FILE__)."/testFile.txt";
+        // $fh = fopen($myFile, 'a') or die("can't open file");
+        // $stringData = $klarnadata.PHP_EOL.PHP_EOL;
+        // fwrite($fh, $stringData);
+        // fclose($fh);
+        
         $klarna_result = json_decode($klarnadata, true);
-        // $occurred_at = $klarna_result["occurred_at"];
+        $occurred_at = $klarna_result["occurred_at"];
         $event_type = $klarna_result["event_type"];
         $order_id = $klarna_result["order_id"];
         
@@ -69,7 +76,7 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
             $history->id_order = $id_order;
             $history->changeIdOrderState((int)$new_pending_status, $id_order, true);
             $templateVars = array();
-            $history->addWithemail(true, $templateVars);
+            $history->addWithemail(true, $templateVars); 
         }
     }
 }

@@ -26,6 +26,17 @@ $(document).ready(function()
 	//$("#kco_cart_summary_div a.cart_quantity_input").typeWatch({ highlight: true, wait: 600, captureLength: 0, callback: function(val) { updateQty(val, true, this.el); } });
 });
 
+// $(document).ready(function()
+// {
+    // window._klarnaCheckout(function(api) {
+      // api.on({
+        // 'change': function(data) {
+        // // Do something
+        // }
+      // });
+    // });
+// });
+
 function showLoaderImg()
 {
     $("#checkoutdiv").html('');
@@ -561,7 +572,7 @@ function updateKCO()
 	$.ajax({
 		type: 'GET',
 		url: kcourl,
-		async: false,
+		async: true,
 		cache: false,
 		data: 'kco_update=1',
 		success: function(jsonData)
@@ -572,4 +583,25 @@ function updateKCO()
 			alert(jsonData);
 		}
 		});
+}
+
+function klarna_shipping_updated()
+{
+    $("#loaderbox").removeClass("hideklarnaloaderbox").addClass("showklarnaloaderbox");
+    $.ajax({
+		type: 'GET',
+		url: klarna_opclink,
+		async: true,
+		cache: false,
+		success: function(data)
+		{
+			$("#kco_cart_summary_div").html(data);
+            $("#loaderbox").removeClass("showklarnaloaderbox").addClass("hideklarnaloaderbox");
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			alert(jsonData);
+            $("#loaderbox").removeClass("showklarnaloaderbox").addClass("hideklarnaloaderbox");
+		}
+		});
+    
 }

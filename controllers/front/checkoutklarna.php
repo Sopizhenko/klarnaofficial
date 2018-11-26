@@ -57,6 +57,21 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $sharedSecret = '';
         parent::initContent();
 
+        $checkSQL = "SELECT COUNT(id_address_delivery) FROM "._DB_PREFIX_."cart_product WHERE id_cart=".
+        (int) $this->context->cart->id. " AND id_address_delivery <> ".(int) $this->context->cart->id_address_delivery;
+        $finds = Db::getInstance()->getValue($checkSQL);
+        if($finds > 0) {
+            $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
+                ' WHERE id_cart='.(int) $this->context->cart->id;
+            Db::getInstance()->execute($update_sql);
+            if (Configuration::get('KCOV3')) {
+                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+            } else {
+                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
+            }
+        }
+                
         if (!$this->context->cart->getDeliveryOption(null, true)) {
             $this->context->cart->setDeliveryOption($this->context->cart->getDeliveryOption());
         }
@@ -84,8 +99,11 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
 
         $country_information = $this->module->getKlarnaCountryInformation($currency->iso_code, $language->iso_code);
 
-        require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
-
+        if (!Configuration::get('KCO_GLOBAL')) {
+            require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
+        } else {
+            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        }
         $layout = 'desktop';
         //if($this->context->getMobileDevice())
         //	$layout = 'mobile';
@@ -434,9 +452,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             if ($this->context->customer->isLogged()) {
                                 /*PREFILL CUSTOMER INFO*/
                                 $okToPrefill = true;
-                                if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT')) {
+                                if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT') ) {
                                     $okToPrefill = false;
-                                    if (Tools::getIsset("oktoprefill")) {
+                                    if(Tools::getIsset("oktoprefill")) {
                                         $okToPrefill = true;
                                     }
                                 }
@@ -653,7 +671,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     }
                     $this->assignSummaryInformations();
                     
-                    if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT')) {
+                    if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT') ) {
                         $show_prefil_link = true;
                     } else {
                         $show_prefil_link = false;
@@ -696,6 +714,12 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         } else {
             $this->context->smarty->assign('klarna_error', 'empty_cart');
         }
+        
+        $button_text_color = Configuration::get('KCO_COLORBUTTONTEXT');
+        $button_color = Configuration::get('KCO_COLORBUTTON');
+        $this->context->smarty->assign('klarna_buttontext_color', $button_text_color);
+        $this->context->smarty->assign('klarna_button_color', $button_color);
+        
         if (Configuration::get('KCO_LAYOUT') == 1) {
             $this->setTemplate('kco_twocolumns.tpl');
         } else {

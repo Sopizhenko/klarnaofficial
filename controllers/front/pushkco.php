@@ -53,40 +53,41 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
         );
 
         try {
-            $sid = Tools::getValue('sid');
-            if ($sid == 'gb') {
-                $sharedSecret = Configuration::get('KCO_UK_SECRET');
-                $merchantId = Configuration::get('KCO_UK_EID');
-            } elseif ($sid == 'us') {
-                $sharedSecret = Configuration::get('KCO_US_SECRET');
-                $merchantId = Configuration::get('KCO_US_EID');
-            } elseif ($sid == 'nl') {
-                $sharedSecret = Configuration::get('KCO_NL_SECRET');
-                $merchantId = Configuration::get('KCO_NL_EID');
-            } elseif ($sid == 'se') {
-                $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
-                $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
-            } elseif ($sid == 'no') {
-                $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
-                $merchantId = Configuration::get('KCOV3_NORWAY_EID');
-            } elseif ($sid == 'fi') {
-                $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
-                $merchantId = Configuration::get('KCOV3_FINLAND_EID');
-            } elseif ($sid == 'de') {
-                $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
-                $merchantId = Configuration::get('KCOV3_GERMANY_EID');
-            } elseif ($sid == 'at') {
-                $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
-                $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
-            }
+            // $sid = Tools::getValue('sid');
+            // if ($sid == 'gb') {
+                // $sharedSecret = Configuration::get('KCO_UK_SECRET');
+                // $merchantId = Configuration::get('KCO_UK_EID');
+            // } elseif ($sid == 'us') {
+                // $sharedSecret = Configuration::get('KCO_US_SECRET');
+                // $merchantId = Configuration::get('KCO_US_EID');
+            // } elseif ($sid == 'nl') {
+                // $sharedSecret = Configuration::get('KCO_NL_SECRET');
+                // $merchantId = Configuration::get('KCO_NL_EID');
+            // } elseif ($sid == 'se') {
+                // $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
+                // $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
+            // } elseif ($sid == 'no') {
+                // $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
+                // $merchantId = Configuration::get('KCOV3_NORWAY_EID');
+            // } elseif ($sid == 'fi') {
+                // $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
+                // $merchantId = Configuration::get('KCOV3_FINLAND_EID');
+            // } elseif ($sid == 'de') {
+                // $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
+                // $merchantId = Configuration::get('KCOV3_GERMANY_EID');
+            // } elseif ($sid == 'at') {
+                // $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
+                // $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
+            // }
+            $merchantId = Configuration::get('KCOV3_MID');
+            $sharedSecret = Configuration::get('KCOV3_SECRET');
+            $orderId = Tools::getValue('klarna_order_id');
             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
                 $connector = \Klarna\Rest\Transport\Connector::create(
                     $merchantId,
                     $sharedSecret,
                     \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
                 );
-
-                $orderId = Tools::getValue('klarna_order_id');
 
                 $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
                 $checkout->fetch();
@@ -96,8 +97,6 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                     $sharedSecret,
                     \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
                 );
-
-                $orderId = Tools::getValue('klarna_order_id');
 
                 $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
                 $checkout->fetch();
@@ -215,8 +214,10 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
 
                     $delivery_address_id = 0;
                     $invoice_address_id = 0;
-                    $shipping_iso = $country_iso_codes[$shipping['country']];
-                    $invocie_iso = $country_iso_codes[$billing['country']];
+                    $shipping_iso = Tools::strtoupper($shipping['country']);
+                    // $shipping_iso = $country_iso_codes[$shipping['country']];
+                    // $invocie_iso = $country_iso_codes[$billing['country']];
+                    $invocie_iso = Tools::strtoupper($billing['country']);
                     $shipping_country_id = Country::getByIso($shipping_iso);
                     $invocie_country_id = Country::getByIso($invocie_iso);
 

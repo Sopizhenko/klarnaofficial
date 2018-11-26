@@ -75,8 +75,9 @@ foreach ($result as $row) {
         $history->id_order = $id_order;
         $history->changeIdOrderState((int)$new_pending_status, $id_order, true);
         $templateVars = array();
-        $history->addWithemail(true, $templateVars);
+        $history->addWithemail(true, $templateVars); 
     }
+    
 }
 
 /*KLARNA KPM PENDING*/

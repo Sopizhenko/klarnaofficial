@@ -16,10 +16,18 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of Prestaworks AB
 *}
+
+
 {if isset($klarna_checkout_cart_changed) && $klarna_checkout_cart_changed}
 <div class="alert alert-warning">
     {l s='Your cart have changed.' mod='klarnaofficial'}<br />
     {l s='Please check all information below and then continue with the checkout.' mod='klarnaofficial'}
+</div>
+{/if}
+{if isset($haserror) && $haserror}
+<div class="alert alert-warning">
+    {l s='Something went wrong.' mod='klarnaofficial'}<br />
+    {l s='Please try again.' mod='klarnaofficial'}
 </div>
 {/if}
 {if isset($KCO_SHOWLINK) && $KCO_SHOWLINK}
@@ -65,7 +73,20 @@
     var kcourl = "{$kcourl|escape:'javascript':'UTF-8'}";
     // ]]>
 </script>
-
+<style type="text/css">
+    .kco-btn--default {
+        background: #343434;
+        color: #fff;
+    }
+    .kco-btn--default:hover {
+        background: #191919;
+        color: #fff;
+    }
+    .kco-btn--default:active, .kco-btn--default:focus {
+        background: #343434;
+        color: #fff;
+    }
+</style>
 <div class="kco-cf kco-main">
     <div id="kco_cart_summary_div">
 		{include file="$tpl_dir/shopping-cart.tpl"}
@@ -79,10 +100,11 @@
         </div>
         {/if}
         <div class="col-xs-12 col-md-4">
-            {if isset($delivery_option_list)}
+            {if isset($delivery_option_list) && $controllername != 'checkoutklarnakco'}
             <div class="kco-box">
+                <span class="kco-step-heading">{l s='Step 1' mod='klarnaofficial'}</span>
                 <h4 class="kco-title kco-title--step">
-                    <span class="kco-title--step__nbr">1</span> {l s='Carrier' mod='klarnaofficial'}
+                    {l s='Carrier' mod='klarnaofficial'}
                 </h4>
                 {if $show_prefil_link}
                 <div class="kco-infobox">
@@ -90,6 +112,7 @@
                 </div>
                 {/if}
                 {if $no_active_countries > 1}
+                <span class="kco-step-heading">{l s='Change country' mod='klarnaofficial'}</span>
                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="kco_change_country">
                     <select name="kco_change_country" class="kco-select kco-select--full kco-select--margin" onchange="$('#kco_change_country').submit();">
                         {if $show_sweden}<option value="sv" {if $kco_selected_country=='SE'}selected="selected"{/if}>{l s='Sweden' mod='klarnaofficial'}</option>{/if}
@@ -178,10 +201,8 @@
             {/if}
             <div class="kco-box">
                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnavoucher">
-                    <h4 class="kco-title kco-trigger {if !sizeof($discounts)}kco-trigger--inactive{/if}">
-                        {l s='Vouchers' mod='klarnaofficial'}
-                    </h4>
-                    <div class="kco-target" {if !sizeof($discounts)}style="display: none;"{/if}>
+                    <span class="kco-step-heading">{l s='Add Voucher' mod='klarnaofficial'}</span>
+                    <div class="kco-target">
                         <div class="kco-input-group">
                             <input type="text" class="kco-input kco-input--text discount_name" id="discount_name" name="discount_name" placeholder="{l s='Enter discount code' mod='klarnaofficial'}" value="{if isset($discount_name) && $discount_name != ''}{$discount_name|escape:'htmlall':'UTF-8'}{/if}" />
                             <button type="submit" id="submitAddDiscount" name="submitAddDiscount" class="kco-btn kco-btn--default">{l s='Save' mod='klarnaofficial'}</button>
@@ -200,12 +221,15 @@
                     </div>
                 </form><!-- /#klarnavoucher -->
             </div><!-- /.kco-box -->
+            {if $controllername == 'checkoutklarnakco'}
+                <div class="kco-box"></div>
+            {/if}
             <div class="message_container kco-box">
                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
-                    <h4 id="message-title" class="kco-title kco-trigger {if !$message.message}kco-trigger--inactive{/if}">
-                        {l s='Message' mod='klarnaofficial'}
-                    </h4>
-                    <p id="message-area" class="kco-target" {if !$message.message}style="display: none;{/if}">
+
+                    <span class="kco-step-heading">{l s='Add Message' mod='klarnaofficial'}</span>
+ 
+                    <p id="message-area" class="kco-target">
                         <textarea class="kco-input kco-input--area kco-input--full" id="message" name="message" rows="4" cols="50" placeholder="{l s='Add additional information to your order (optional)' mod='klarnaofficial'}">{$message.message|escape:'htmlall':'UTF-8'}</textarea>
                         <input type="submit" name="savemessagebutton" class="kco-btn kco-btn--default" id="savemessagebutton" value="{l s='Save' mod='klarnaofficial'}" />
                     </p>
@@ -231,8 +255,9 @@
             {/if}
         </div><!-- /.col-xs-12.col-md-4 -->
         <div class="col-xs-12 col-md-8">
+            <span class="kco-step-heading">{l s='Step 2' mod='klarnaofficial'}</span>
             <h4 class="kco-title kco-title--step">
-                <span class="kco-title--step__nbr">2</span> {l s='Pay for your order' mod='klarnaofficial'}
+                {l s='Pay for your order' mod='klarnaofficial'}
             </h4>
             <div id="checkoutdiv">{$klarna_checkout}</div>
         </div><!-- /#chcekoutdiv.col-xs-12.col-md-8 -->
@@ -240,6 +265,7 @@
 </div><!-- /#height_kco_div -->
 {literal}
 <script type="text/javascript">
+    var klarna_opclink = '{/literal}{$klarna_update_cart_url|escape:'html':'UTF-8'}{literal}';
     $(document).ready(function(){ 
         $('.kco-trigger').each(function(){
             var el = $(this);
@@ -256,7 +282,27 @@
                 el.addClass('selected');
             });
         });
+        
+        
+        
+        window._klarnaCheckout(function(api) {
+          api.on({
+            'shipping_address_change': function(data) {
+                api.suspend();
+                klarna_shipping_updated();
+                api.resume();
+            },
+            'order_total_change': function(data) {
+                api.suspend();
+                klarna_shipping_updated();
+                api.resume();
+            }
+          });
+        });
     });
 </script>
 {/literal}
 {/if}
+<div class="hideklarnaloaderbox" id="loaderbox">
+    <span class="spinner"></span>
+</div>

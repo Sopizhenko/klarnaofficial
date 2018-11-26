@@ -29,12 +29,6 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnaorder = Tools::jsonDecode($klarnadata, true);
         
-        // $myFile = dirname(__FILE__)."/testFile.txt";
-        // $fh = fopen($myFile, 'a') or die("can't open file");
-        // $stringData = $klarnadata.PHP_EOL.PHP_EOL;
-        // fwrite($fh, $stringData);
-        // fclose($fh);
-        
         if (isset($klarnaorder["merchant_reference2"])) {
             //This is a KCO V3 ORDER
             //Convert Data
@@ -110,21 +104,6 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
                             }
                         }
                         
-                        /*$totalDiscounts = $cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
-                        $cartdiscountsfound = true;
-                        if ($totalDiscounts > 0) {
-                            $totalDiscounts = -number_format(($totalDiscounts * 100), 2, '.', '');
-                            $cartdiscountsfound = false;
-                            foreach ($klarnaorder["cart"]["items"] as $key => $cartitem) {
-                                     if ($cartitem["type"] == "discount") {
-                                         if ((int)$cartitem["unit_price"] == (int)$totalDiscounts) {
-                                             unset($klarnaorder["cart"]["items"][$key]);
-                                             $cartdiscountsfound = true;
-                                         }
-                                     }
-                                 }
-                        }*/
-                        
                         //CHECK WRAPPING
                         $cartgiftfound = true;
                         if ($cart->gift == 1) {
@@ -150,9 +129,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
                             //Klarna has products that are not existing in Prestashop
                             $this->redirectKCO();
                     }
-                    /*if ($cartdiscountsfound==false) {
-                        $this->redirectKCO();
-                    }*/
+
                     if ($cartgiftfound==false) {
                         $this->redirectKCO();
                     }
