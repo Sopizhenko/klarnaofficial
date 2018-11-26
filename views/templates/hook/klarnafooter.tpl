@@ -18,16 +18,16 @@
 *}
 {if $klarnav3_footer_layout != 0}
     {if $klarnav3_footer_layout == 1}
-        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale}/checkout/long-blue.png?width=440" />
+        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale|escape:'html':'UTF-8'}/checkout/long-blue.png?width=440" />
     {/if}
     {if $klarnav3_footer_layout == 2}
-        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale}/checkout/long-white.png?width=440" />
+        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale|escape:'html':'UTF-8'}/checkout/long-white.png?width=440" />
     {/if}
     {if $klarnav3_footer_layout == 3}
-        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale}/checkout/short-blue.png?width=312" />
+        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale|escape:'html':'UTF-8'}/checkout/short-blue.png?width=312" />
     {/if}
     {if $klarnav3_footer_layout == 4}
-        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale}/checkout/short-white.png?width=312" />
+        <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale|escape:'html':'UTF-8'}/checkout/short-white.png?width=312" />
     {/if}
 {else}
     {if $klarna_footer_layout == 'blue-black' || $klarna_footer_layout == 'white' || $klarna_footer_layout == 'blue+tuv' || $klarna_footer_layout == 'white+tuv'}

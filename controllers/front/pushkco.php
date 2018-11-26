@@ -35,22 +35,22 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
 
         require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
         //Klarna uses iso 3166-1 alpha 3, prestashop uses different iso so we need to convert this.
-        $country_iso_codes = array(
-        'SWE' => 'SE',
-        'NOR' => 'NO',
-        'FIN' => 'FI',
-        'DNK' => 'DK',
-        'DEU' => 'DE',
-        'NLD' => 'NL',
-        'se' => 'SE',
-        'no' => 'NO',
-        'fi' => 'FI',
-        'dk' => 'DK',
-        'de' => 'DE',
-        'nl' => 'NL',
-        'gb' => 'GB',
-        'us' => 'US',
-        );
+        // $country_iso_codes = array(
+        // 'SWE' => 'SE',
+        // 'NOR' => 'NO',
+        // 'FIN' => 'FI',
+        // 'DNK' => 'DK',
+        // 'DEU' => 'DE',
+        // 'NLD' => 'NL',
+        // 'se' => 'SE',
+        // 'no' => 'NO',
+        // 'fi' => 'FI',
+        // 'dk' => 'DK',
+        // 'de' => 'DE',
+        // 'nl' => 'NL',
+        // 'gb' => 'GB',
+        // 'us' => 'US',
+        // );
 
         try {
             // $sid = Tools::getValue('sid');

@@ -72,7 +72,7 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
                 null,
                 null,
                 null,
-                $null,
+                null,
                 true,
                 true,
                 $cart_product_context);

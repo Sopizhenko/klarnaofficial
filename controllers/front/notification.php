@@ -29,7 +29,7 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
         $klarnadata = Tools::file_get_contents('php://input');
         
         $klarna_result = json_decode($klarnadata, true);
-        $occurred_at = $klarna_result["occurred_at"];
+        // $occurred_at = $klarna_result["occurred_at"];
         $event_type = $klarna_result["event_type"];
         $order_id = $klarna_result["order_id"];
         

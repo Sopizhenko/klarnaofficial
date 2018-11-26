@@ -79,6 +79,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         "klarna_orders` WHERE id_order>0 AND id_cart=".
                         (int) $id_cart;
 
+            $result;
             $id_order = (int)Db::getInstance()->getValue($sql_cart_select);
             if ($id_order > 0) {
                 $result['id_order'] = $id_order;
@@ -112,7 +113,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     Context::getContext()->currency = new Currency((int) $cart->id_currency);
 
                     $reference = Tools::getValue('klarna_order_id');
-                    $klarna_reservation = Tools::getValue('klarna_order_id');
+                    // $klarna_reservation = Tools::getValue('klarna_order_id');
                     $shipping = $checkout['shipping_address'];
                     $billing = $checkout['billing_address'];
 
