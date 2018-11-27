@@ -26,8 +26,7 @@ class CartRule extends CartRuleCore
         $filter = null,
         $package = null,
         $use_cache = false
-    )
-    {
+    ) {
         Cache::clean('getContextualValue_*');
         return parent::getContextualValue($use_tax, $context, $filter, $package, $use_cache);
     }

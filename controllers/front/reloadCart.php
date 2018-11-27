@@ -122,7 +122,9 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
             }
         }
 
-        $show_option_allow_separate_package = (!$this->context->cart->isAllProductsInStock(true) && Configuration::get('PS_SHIP_WHEN_AVAILABLE'));
+        $ps_ship_when_available = Configuration::get('PS_SHIP_WHEN_AVAILABLE');
+        $isAllProductsInStock = $this->context->cart->isAllProductsInStock(true);
+        $show_option_allow_separate_package = (!$isAllProductsInStock && $ps_ship_when_available);
         $advanced_payment_api = (bool)Configuration::get('PS_ADVANCED_PAYMENT_API');
 
         $this->context->smarty->assign($summary);

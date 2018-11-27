@@ -54,17 +54,36 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
                 Tools::strtolower($country_iso) != Tools::strtolower($country_on_cart->iso_code)) {
                     //Not customers address, or country not correct for customer. Create a new address for the customer.
                     $address = new Address();
-                    $address->firstname = $this->module->truncateValue((isset($shipping_address->given_name) ? $shipping_address->given_name : 'Missing'), 32, true);
-                    $address->lastname = $this->module->truncateValue((isset($shipping_address->family_name) ? $shipping_address->family_name : 'Missing'), 32, true);
+                    $firstname = (isset($shipping_address->given_name) ? $shipping_address->given_name : 'Missing');
+                    $address->firstname = $this->module->truncateValue($firstname, 32, true);
+                    $lastname = (isset($shipping_address->family_name) ? $shipping_address->family_name : 'Missing');
+                    $address->lastname = $this->module->truncateValue($lastname, 32, true);
+                    if (isset($shipping_address->street_address)) {
+                        $address1 = $shipping_address->street_address;
+                    } else {
+                        $address1 = 'Missing';
+                    }
+                    
                     if (isset($shipping_address->care_of) && Tools::strlen($shipping_address->care_of) > 0) {
                         $address->address1 = $shipping_address->care_of;
-                        $address->address2 = (isset($shipping_address->street_address) ? $shipping_address->street_address : 'Missing');
+                        $address->address2 = $address1;
                     } else {
-                        $address->address1 = (isset($shipping_address->street_address) ? $shipping_address->street_address : 'Missing');
+                        $address->address1 = $address1;
                     }
                     $id_for_new_country = Country::getByIso($country_iso);
-                    $address->postcode = (isset($shipping_address->postal_code) ? $shipping_address->postal_code : '00000');
-                    $address->phone = (isset($shipping_address->phone) ? $shipping_address->phone : '0000000000');
+                    if (isset($shipping_address->postal_code)) {
+                        $postal_code = $shipping_address->postal_code;
+                    } else {
+                        $postal_code = '00000';
+                    }
+                    $address->postcode = $postal_code;
+                    
+                    if (isset($shipping_address->phone)) {
+                        $phone = $shipping_address->phone;
+                    } else {
+                        $phone = '0000000000';
+                    }
+                    $address->phone = $phone;
                     $address->phone_mobile = $shipping_address->phone;
                     $address->city = (isset($shipping_address->city) ? $shipping_address->city : 'Missing');
                     $address->id_country = $id_for_new_country;
@@ -129,8 +148,17 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
         $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
         $language = new Language((int) $cart->id_lang);
-        $shippingReference = isset($this->module->shippingreferences[$language->iso_code]) ? $this->module->shippingreferences[$language->iso_code] : $this->module->shippingreferences["en"];
-        $wrappingreference = isset($this->module->wrappingreferences[$language->iso_code]) ? $this->module->wrappingreferences[$language->iso_code] : $this->module->wrappingreferences["en"];
+        if (isset($this->module->shippingreferences[$language->iso_code])) {
+            $shippingReference =  $this->module->shippingreferences[$language->iso_code];
+        } else {
+            $shippingReference =  $this->module->shippingreferences["en"];
+        }
+        
+        if (isset($this->module->wrappingreferences[$language->iso_code])) {
+            $wrappingreference = $this->module->wrappingreferences[$language->iso_code];
+        } else {
+            $wrappingreference = $this->module->wrappingreferences["en"];
+        }
         
         $cart->setDeliveryOption($cart->getDeliveryOption());
         
