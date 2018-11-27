@@ -162,7 +162,13 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
         
         $cart->setDeliveryOption($cart->getDeliveryOption());
         
-        $order_lines = $KlarnaCheckoutCommonFeatures->BuildCartArray($cart, $shippingReference, $wrappingreference, $this->module->l('Wrapping', 'KlarnaOfficialChangeAddressModuleFrontController'), $this->module->l('Discount', 'KlarnaOfficialChangeAddressModuleFrontController'));
+        $order_lines = $KlarnaCheckoutCommonFeatures->BuildCartArray(
+            $cart,
+            $shippingReference,
+            $wrappingreference,
+            $this->module->l('Wrapping', 'KlarnaOfficialChangeAddressModuleFrontController'),
+            $this->module->l('Discount', 'KlarnaOfficialChangeAddressModuleFrontController')
+        );
         
         foreach ($cart->getDeliveryOptionList(null, true) as $options) {
             foreach ($options as $option) {
