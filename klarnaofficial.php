@@ -3695,7 +3695,11 @@ class KlarnaOfficial extends PaymentModule
             $language_code = $this->context->language->language_code;
             $id_shop_country = (int)Configuration::get('PS_SHOP_COUNTRY_ID');
             $shop_country = new Country($id_shop_country);
-            return array('locale' => $language_code, 'purchase_currency' => $currency_iso_code, 'purchase_country' => $shop_country->iso_code);
+            return array(
+                'locale' => $language_code,
+                'purchase_currency' => $currency_iso_code,
+                'purchase_country' => $shop_country->iso_code
+            );
         }
         
         if ($language_iso_code == 'nb' || $language_iso_code == 'nn') {
@@ -3782,9 +3786,15 @@ class KlarnaOfficial extends PaymentModule
             $id_shop_country = (int)Configuration::get('PS_SHOP_COUNTRY_ID');
             $shop_country = new Country($id_shop_country);
             
-            if ($shop_country->iso_code == 'FI' && Configuration::get('KCO_FINLAND') == 1 && $language_iso_code == 'sv') {
+            if ($shop_country->iso_code == 'FI' &&
+                Configuration::get('KCO_FINLAND') == 1
+                && $language_iso_code == 'sv'
+            ) {
                 return array('locale' => 'sv-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
-            } elseif ($shop_country->iso_code == 'FI' && Configuration::get('KCO_FINLAND') == 1 && $language_iso_code != 'sv') {
+            } elseif ($shop_country->iso_code == 'FI' &&
+                Configuration::get('KCO_FINLAND') == 1 &&
+                $language_iso_code != 'sv'
+            ) {
                 return array('locale' => 'fi-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
             } elseif ($shop_country->iso_code == 'SE' && Configuration::get('KCO_SWEDEN') == 1) {
                 return array('locale' => 'sv-se', 'purchase_currency' => 'SEK', 'purchase_country' => 'SE');
@@ -3798,9 +3808,15 @@ class KlarnaOfficial extends PaymentModule
                 return array('locale' => 'nl-nl', 'purchase_currency' => 'EUR', 'purchase_country' => 'NL');
             } elseif ($shop_country->iso_code == 'UK' && Configuration::get('KCO_UK') == 1) {
                 return array('locale' => 'en-gb', 'purchase_currency' => 'GBP', 'purchase_country' => 'GB');
-            } elseif ($shop_country->iso_code == 'FI' && Configuration::get('KCOV3_FINLAND') == 1 && $language_iso_code == 'sv') {
+            } elseif ($shop_country->iso_code == 'FI' &&
+                Configuration::get('KCOV3_FINLAND') == 1 &&
+                $language_iso_code == 'sv'
+            ) {
                 return array('locale' => 'sv-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
-            } elseif ($shop_country->iso_code == 'FI' && Configuration::get('KCOV3_FINLAND') == 1 && $language_iso_code != 'sv') {
+            } elseif ($shop_country->iso_code == 'FI' &&
+                Configuration::get('KCOV3_FINLAND') == 1 &&
+                $language_iso_code != 'sv'
+            ) {
                 return array('locale' => 'fi-fi', 'purchase_currency' => 'EUR', 'purchase_country' => 'FI');
             } elseif ($shop_country->iso_code == 'SE' && Configuration::get('KCOV3_SWEDEN') == 1) {
                 return array('locale' => 'sv-se', 'purchase_currency' => 'SEK', 'purchase_country' => 'SE');

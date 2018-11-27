@@ -91,18 +91,19 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
             );
 
             if (Product::getTaxCalculationMethod()) {
-                $pricetmpholder1 = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_);
-                $pricetmpholder2 = Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);
-                $product['is_discounted'] = $pricetmpholder1 != $pricetmpholder2;
+                $tmpholder1 = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $tmpholder2 = Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $product['is_discounted'] = $tmpholder1 != $tmpholder2;
             } else {
-                $pricetmpholder1 = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_);
-                $pricetmpholder2 = Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_);
-                $product['is_discounted'] =  $pricetmpholder1 != $pricetmpholder2;
+                $tmpholder1 = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $tmpholder2 = Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_);
+                $product['is_discounted'] =  $tmpholder1 != $tmpholder2;
             }
         }
 
         // Get available cart rules and unset the cart rules already in the cart
-        $available_cart_rules = CartRule::getCustomerCartRules($this->context->language->id,
+        $available_cart_rules = CartRule::getCustomerCartRules(
+            $this->context->language->id,
             (isset($this->context->customer->id) ? $this->context->customer->id : 0),
             true,
             true,

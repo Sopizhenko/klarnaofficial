@@ -20,7 +20,13 @@
 
 class CartRule extends CartRuleCore
 {
-    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = false)
+    public function getContextualValue(
+        $use_tax,
+        Context $context = null,
+        $filter = null,
+        $package = null,
+        $use_cache = false
+    )
     {
         Cache::clean('getContextualValue_*');
         return parent::getContextualValue($use_tax, $context, $filter, $package, $use_cache);
