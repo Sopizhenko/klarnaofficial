@@ -62,14 +62,29 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
         //$cart->setDeliveryOption($cart->getDeliveryOption());
         $language = new Language((int)$cart->id_lang);
-        $shippingReference = isset($this->module->shippingreferences[$language->iso_code]) ? $this->module->shippingreferences[$language->iso_code] : $this->module->shippingreferences["en"];
-        $wrappingreference = isset($this->module->wrappingreferences[$language->iso_code]) ? $this->module->wrappingreferences[$language->iso_code] : $this->module->wrappingreferences["en"];
+        if (isset($this->module->shippingreferences[$language->iso_code])) {
+            $shippingReference = $this->module->shippingreferences[$language->iso_code];
+        } else {
+            $shippingReference = $this->module->shippingreferences["en"];
+        }
+        if (isset($this->module->wrappingreferences[$language->iso_code])) {
+            $wrappingreference = $this->module->wrappingreferences[$language->iso_code];
+        } else {
+            $wrappingreference = $this->module->wrappingreferences["en"];
+        }
+        
         $carrieraddress = new Address($cart->id_address_delivery);
         $country_on_cart = new Country($carrieraddress->id_country);
         $this->context->country = $country_on_cart;
         
         $this->context->currency = new Currency((int)$cart->id_currency);
-        $order_lines = $KlarnaCheckoutCommonFeatures->BuildCartArray($cart, $shippingReference, $wrappingreference, $this->module->l('Wrapping', 'KlarnaOfficialChangeCarrierModuleFrontController'), $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController'));
+        $order_lines = $KlarnaCheckoutCommonFeatures->BuildCartArray(
+            $cart,
+            $shippingReference,
+            $wrappingreference,
+            $this->module->l('Wrapping', 'KlarnaOfficialChangeCarrierModuleFrontController'),
+            $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController')
+        );
         $klarnadata->order_lines = $order_lines;
         $totalCartValue = $cart->getOrderTotal(true, Cart::BOTH, null, $cart->id_carrier, false);
         $totalCartValue_tax_excl = $cart->getOrderTotal(false, Cart::BOTH, null, $cart->id_carrier, false);

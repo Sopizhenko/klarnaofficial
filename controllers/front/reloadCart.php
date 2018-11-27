@@ -27,13 +27,13 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
     public function initContent()
     {
         parent::initContent();
-        $this->_assignSummaryInformations();
+        $this->kcoassignSummaryInformations();
         $this->setTemplate('updateCart.tpl');
         $this->display();
         $this->ajaxDie();
     }
     
-    protected function _assignSummaryInformations()
+    protected function kcoassignSummaryInformations()
     {
         $summary = $this->context->cart->getSummaryDetails();
         $customizedDatas = Product::getAllCustomizedDatas($this->context->cart->id);
@@ -91,14 +91,26 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
             );
 
             if (Product::getTaxCalculationMethod()) {
-                $product['is_discounted'] = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) != Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $pricetmpholder1 = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $pricetmpholder2 = Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $product['is_discounted'] = $pricetmpholder1 != $pricetmpholder2;
             } else {
-                $product['is_discounted'] = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) != Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_);
+                $pricetmpholder1 = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_);
+                $pricetmpholder2 = Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_);
+                $product['is_discounted'] =  $pricetmpholder1 != $pricetmpholder2;
             }
         }
 
         // Get available cart rules and unset the cart rules already in the cart
-        $available_cart_rules = CartRule::getCustomerCartRules($this->context->language->id, (isset($this->context->customer->id) ? $this->context->customer->id : 0), true, true, true, $this->context->cart, false, true);
+        $available_cart_rules = CartRule::getCustomerCartRules($this->context->language->id,
+            (isset($this->context->customer->id) ? $this->context->customer->id : 0),
+            true,
+            true,
+            true,
+            $this->context->cart,
+            false,
+            true
+        );
         $cart_cart_rules = $this->context->cart->getCartRules();
         foreach ($available_cart_rules as $key => $available_cart_rule) {
             foreach ($cart_cart_rules as $cart_cart_rule) {
