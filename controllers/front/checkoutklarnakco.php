@@ -385,7 +385,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                         $create['shipping_address']['region'] = $delivState->iso_code;
                                     }
                                     
-                                    if ($this->context->cart->id_address_invoice == $this->context->cart->id_address_delivery) {
+                                    $id_address_invoice = $this->context->cart->id_address_invoice;
+                                    $id_address_delivery = $this->context->cart->id_address_delivery;
+                                    if ($id_address_invoice == $id_address_delivery) {
                                         $create['billing_address'] = $create['shipping_address'];
                                     } else {
                                         $address_invoice = new Address((int)$this->context->cart->id_address_invoice);

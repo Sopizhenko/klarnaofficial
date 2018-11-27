@@ -184,7 +184,9 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
                     $shipping_option["name"] = $carrierobject->name;
                     $shipping_option["description"] = $carrierobject->delay[(int)$cart->id_lang];
                     $shipping_option["price"] = $option["total_price_with_tax"] * 100;
-                    $shipping_option["tax_amount"] = (($option["total_price_with_tax"] - $option["total_price_without_tax"]) * 100);
+                    $tax_amount = $option["total_price_with_tax"] - $option["total_price_without_tax"];
+                    $tax_amount = $tax_amount * 100;
+                    $shipping_option["tax_amount"] = $tax_amount;
                     $shipping_tax_rate = $carrierobject->getTaxesRate($carrieraddress);
                     $shipping_option["tax_rate"] = $shipping_tax_rate*100;
                     $shipping_options[] = $shipping_option;
