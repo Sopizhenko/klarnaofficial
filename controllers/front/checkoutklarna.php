@@ -725,6 +725,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $button_color = Configuration::get('KCO_COLORBUTTON');
         $this->context->smarty->assign('klarna_buttontext_color', $button_text_color);
         $this->context->smarty->assign('klarna_button_color', $button_color);
+        $this->context->smarty->assign('klarna_update_cart_url', '');
+        $this->context->smarty->assign('isv3', false);
         
         if (Configuration::get('KCO_LAYOUT') == 1) {
             $this->setTemplate('kco_twocolumns.tpl');

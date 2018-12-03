@@ -306,23 +306,22 @@
                 el.addClass('selected');
             });
         });
+        {/literal}{if $isv3}{literal}
         window._klarnaCheckout(function(api) {
           api.on({
             'shipping_address_change': function(data) {
-            console.log('shipping_address_change');
                 api.suspend();
                 klarna_shipping_updated();
                 api.resume();
             },
             'order_total_change': function(data) {
-            console.log('order_total_change');
                 api.suspend();
                 klarna_shipping_updated();
                 api.resume();
             }
           });
         });
-        
+        {/literal}{/if}{literal}
     });
     
 var klarna_opclink = '{/literal}{$klarna_update_cart_url|escape:'html':'UTF-8'}{literal}';
