@@ -101,9 +101,6 @@ class KlarnaOfficial extends PaymentModule
         'KCO_FINLAND_EID',
         'KCO_NORWAY_B2B',
         'KCO_NORWAY',
-        'KCO_GLOBAL_SECRET',
-        'KCO_GLOBAL_EID',
-        'KCO_GLOBAL',
         'KCO_LAYOUT',
         'KCO_ALLOWED_TYPES',
         'KCO_NIN_MANDATORY',
@@ -154,7 +151,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.26';
+        $this->version = '1.9.27';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;

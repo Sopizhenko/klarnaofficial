@@ -99,7 +99,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
 
         $country_information = $this->module->getKlarnaCountryInformation($currency->iso_code, $language->iso_code);
 
-        if (!Configuration::get('KCO_GLOBAL')) {
+        if (!Configuration::get('KCOV3')) {
             require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
         } else {
             Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
