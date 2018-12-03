@@ -283,8 +283,7 @@
             });
         });
         
-        
-        
+        {/literal}{if $isv3}{literal}
         window._klarnaCheckout(function(api) {
           api.on({
             'shipping_address_change': function(data) {
@@ -299,6 +298,7 @@
             }
           });
         });
+        {/literal}{/if}{literal}
     });
 </script>
 {/literal}
