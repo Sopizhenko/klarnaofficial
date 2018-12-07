@@ -71,6 +71,7 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
             if ($cart_product_context->shop->id != $product['id_shop']) {
                 $cart_product_context->shop = new Shop((int)$product['id_shop']);
             }
+            $null = null;
             $product['price_without_specific_price'] = Product::getPriceStatic(
                 $product['id_product'],
                 !Product::getTaxCalculationMethod(),
@@ -84,7 +85,7 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
                 null,
                 null,
                 null,
-                null,
+                $null,
                 true,
                 true,
                 $cart_product_context
