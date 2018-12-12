@@ -36,7 +36,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = (int) Configuration::get('KCO_SWEDEN_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_SWEDEN_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_SWEDEN_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         if (Configuration::get('KCOV3')) {
@@ -87,7 +87,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = Configuration::get('KCO_FINLAND_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_FINLAND_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_FINLAND_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         if (Configuration::get('KCOV3')) {
@@ -140,7 +140,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = Configuration::get('KCO_NORWAY_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_NORWAY_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_NORWAY_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         if (Configuration::get('KCOV3')) {
@@ -190,7 +190,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = Configuration::get('KCO_GERMANY_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_GERMANY_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_GERMANY_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         if (Configuration::get('KCOV3')) {
@@ -241,7 +241,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = Configuration::get('KCO_AUSTRIA_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_AUSTRIA_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_AUSTRIA_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         if (Configuration::get('KCOV3')) {
@@ -286,7 +286,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = (int) Configuration::get('KCO_NL_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_NL_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_NL_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
@@ -322,7 +322,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = (int) Configuration::get('KCO_UK_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_UK_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_UK_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
@@ -358,7 +358,7 @@ if ($country_information['purchase_country'] == 'SE') {
         $this->context->cart->id_address_invoice = (int) Configuration::get('KCO_US_ADDR');
         $this->context->cart->update();
         $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                    'SET id_address_delivery='.(int) Configuration::get('KCO_US_ADDR');
+                    'SET id_address_delivery='.(int) Configuration::get('KCO_US_ADDR').
                     ' WHERE id_cart='.(int) $this->context->cart->id;
         Db::getInstance()->execute($update_sql);
         Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnaus');

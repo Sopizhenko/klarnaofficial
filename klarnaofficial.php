@@ -151,7 +151,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.28';
+        $this->version = '1.9.30';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3040,12 +3040,23 @@ class KlarnaOfficial extends PaymentModule
             (int) $this->context->cart->id
         );
         if ($delivery_option_serialized and $delivery_option_serialized != '') {
-            $delivery_option_values = unserialize($delivery_option_serialized);
+            if (version_compare(_PS_VERSION_, "1.6.1.21", "<")) {
+                $delivery_option_values = unserialize($delivery_option_serialized);
+            } else {
+                $delivery_option_values = json_decode($delivery_option_serialized);
+            }
+            
             $new_delivery_options = array();
             foreach ($delivery_option_values as $value) {
                 $new_delivery_options[(int) $this->context->cart->id_address_delivery] = $value;
             }
-            $new_delivery_options_serialized = serialize($new_delivery_options);
+            
+            if (version_compare(_PS_VERSION_, "1.6.1.21", "<")) {
+                $new_delivery_options_serialized = serialize($new_delivery_options);
+            } else {
+                $new_delivery_options_serialized = json_encode($new_delivery_options);
+            }
+            
             $update_sql = 'UPDATE '._DB_PREFIX_.'cart SET delivery_option=\''.
             pSQL($new_delivery_options_serialized).
             '\' WHERE id_cart='.(int) $this->context->cart->id;
