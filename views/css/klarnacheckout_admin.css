@@ -1,6 +1,4 @@
-/*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-/*  IMAGES / THEMEVERSIONS
-/*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
+@import 'klarnafontface.css';
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*  BASIC SETUP
@@ -153,3 +151,114 @@
             form.defaultForm .pwd-notice br {
                 display: block;
             }
+
+
+
+
+
+
+.klarna-banners {
+    align-items: stretch;
+    display: flex;
+    justify-content: stretch;
+    margin-right: -5px;
+    margin-left: -5px; }
+    @media (max-width: 991px) {
+    .klarna-banners {
+        flex-direction: column; } }
+
+.banner {
+    align-items: center;
+    border-radius: 5px;
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    font-family: "Klarna Sans", system-ui;
+    font-size: 16px;
+    margin: 0 5px 10px;
+    overflow: hidden;
+    padding: 2.5%;
+    position: relative; }
+    .banner.banner > *:not(:last-child) {
+        margin-bottom: 24px; }
+    .banner p {
+        max-width: 768px;
+        width: 100%; }
+    .banner .banner__title {
+        font-family: "Klarna Headline", system-ui;
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 0;
+        width: 100%; }
+    .banner .banner__cta {
+        background-color: #eb6f93;
+        border-radius: 5px;
+        color: #fff;
+        display: inline-block;
+        padding: 0.75em 1.25em; }
+        .banner .banner__cta:hover {
+            background-color: #e54271;
+            color: #fff;
+            text-decoration: none; }
+    .banner img {
+        display: block;
+        height: auto;
+        max-width: 128px;
+        position: absolute;
+        bottom: 0;
+        right: 0; }
+    .banner svg {
+        display: block;
+        height: 64px;
+        margin-right: auto;
+        margin-left: auto;
+        width: 64px; }
+
+
+.banner--klarna {
+    background-color: #A3B9B7;
+    /*background-image: url("../img/klarna_texture.jpg");*/
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.banner--klarna2 {
+    background-color: #BB95A4;
+    /*background-image: url("../img/klarna_texture.jpg");*/
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.banner--docs {
+    background-color: #f0a1ad;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.banner--small {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 15px 15px 15px 94px;
+    width: 100%;
+}
+    .banner--small p {
+        max-width: none;
+    }
+    .banner.banner--small > *,
+    .banner.banner--small > *:not(:last-child) {
+        margin-bottom: 5px;
+    }
+    @media (min-width: 992px) {
+    .banner--small .banner__cta {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+    } }
+    .banner--small svg {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+    }

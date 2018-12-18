@@ -208,16 +208,8 @@ class KlarnaOfficialPushModuleFrontController extends ModuleFrontController
                         $date_of_birth = "";
                     }
                     
-                    $customer = $this->module->createNewCustomer(
-                        $shipping['given_name'],
-                        $shipping['family_name'],
-                        $shipping['email'],
-                        $newsletter,
-                        $id_gender,
-                        $date_of_birth,
-                        $cart->id_shop,
-                        $cart->id_lang
-                    );
+                    $customer = $this->module->createNewCustomer($shipping['given_name'], $shipping['family_name'], $shipping['email'], $newsletter, $id_gender, $date_of_birth, $cart);
+                    
                 }
                 //Check if address already exists, if not, add
                 $delivery_address_id = 0;

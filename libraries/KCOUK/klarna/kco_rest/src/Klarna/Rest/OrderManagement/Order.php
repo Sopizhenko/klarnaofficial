@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +16,10 @@
  *
  * File containing the Order class.
  */
+
 namespace Klarna\Rest\OrderManagement;
 
-use GuzzleHttp\Exception\RequestException;
+use Klarna\GuzzleHttp\Exception\RequestException;
 use Klarna\Rest\Resource;
 use Klarna\Rest\Transport\Connector;
 use Klarna\Rest\Transport\Exception\ConnectorException;
@@ -41,12 +41,12 @@ use Klarna\Rest\Transport\Exception\ConnectorException;
 class Order extends Resource
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     const ID_FIELD = 'order_id';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static $path = '/ordermanagement/v1/orders';
 
@@ -60,7 +60,7 @@ class Order extends Resource
     {
         parent::__construct($connector);
 
-        $this->setLocation(self::$path."/{$orderId}");
+        $this->setLocation(self::$path . "/{$orderId}");
         $this[static::ID_FIELD] = $orderId;
     }
 
@@ -113,7 +113,7 @@ class Order extends Resource
      */
     public function acknowledge()
     {
-        $this->post($this->getLocation().'/acknowledge')
+        $this->post($this->getLocation() . '/acknowledge')
             ->status('204');
 
         return $this;
@@ -131,7 +131,7 @@ class Order extends Resource
      */
     public function cancel()
     {
-        $this->post($this->getLocation().'/cancel')
+        $this->post($this->getLocation() . '/cancel')
             ->status('204');
 
         return $this;
@@ -151,7 +151,7 @@ class Order extends Resource
      */
     public function updateAuthorization(array $data)
     {
-        $this->patch($this->getLocation().'/authorization', $data)
+        $this->patch($this->getLocation() . '/authorization', $data)
             ->status('204');
 
         return $this;
@@ -169,7 +169,7 @@ class Order extends Resource
      */
     public function extendAuthorizationTime()
     {
-        $this->post($this->getLocation().'/extend-authorization-time')
+        $this->post($this->getLocation() . '/extend-authorization-time')
             ->status('204');
 
         return $this;
@@ -189,7 +189,7 @@ class Order extends Resource
      */
     public function updateMerchantReferences(array $data)
     {
-        $this->patch($this->getLocation().'/merchant-references', $data)
+        $this->patch($this->getLocation() . '/merchant-references', $data)
             ->status('204');
 
         return $this;
@@ -209,7 +209,7 @@ class Order extends Resource
      */
     public function updateCustomerDetails(array $data)
     {
-        $this->patch($this->getLocation().'/customer-details', $data)
+        $this->patch($this->getLocation() . '/customer-details', $data)
             ->status('204');
 
         return $this;
@@ -229,8 +229,8 @@ class Order extends Resource
      */
     public function refund(array $data)
     {
-        $this->post($this->getLocation().'/refunds', $data)
-            ->status('204');
+        $this->post($this->getLocation() . '/refunds', $data)
+            ->status(['201', '204']);
 
         return $this;
     }
@@ -247,7 +247,7 @@ class Order extends Resource
      */
     public function releaseRemainingAuthorization()
     {
-        $this->post($this->getLocation().'/release-remaining-authorization')
+        $this->post($this->getLocation() . '/release-remaining-authorization')
             ->status('204');
 
         return $this;

@@ -48,36 +48,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
             Tools::redirect('index.php');
         }
         try {
-            /*
-             * Fetch the checkout resource.
-             */
-
-            $sid = Tools::getValue('sid');
-            if ($sid == 'gb') {
-                $sharedSecret = Configuration::get('KCO_UK_SECRET');
-                $merchantId = Configuration::get('KCO_UK_EID');
-            } elseif ($sid == 'us') {
-                $sharedSecret = Configuration::get('KCO_US_SECRET');
-                $merchantId = Configuration::get('KCO_US_EID');
-            } elseif ($sid == 'nl') {
-                $sharedSecret = Configuration::get('KCO_NL_SECRET');
-                $merchantId = Configuration::get('KCO_NL_EID');
-            } elseif ($sid == 'se') {
-                $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
-                $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
-            } elseif ($sid == 'no') {
-                $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
-                $merchantId = Configuration::get('KCOV3_NORWAY_EID');
-            } elseif ($sid == 'fi') {
-                $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
-                $merchantId = Configuration::get('KCOV3_FINLAND_EID');
-            } elseif ($sid == 'de') {
-                $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
-                $merchantId = Configuration::get('KCOV3_GERMANY_EID');
-            } elseif ($sid == 'at') {
-                $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
-                $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
-            }
+            $merchantId = Configuration::get('KCOV3_MID');
+            $sharedSecret = Configuration::get('KCOV3_SECRET');
 
             if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
                 $connector = \Klarna\Rest\Transport\Connector::create(
@@ -115,9 +87,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         "klarna_orders` WHERE id_order>0 AND id_cart=".
                         (int) $id_cart;
 
-            $id_order = (int)Db::getInstance()->getValue($sql_cart_select);
             $result = array();
-            
+            $id_order = (int)Db::getInstance()->getValue($sql_cart_select);
             if ($id_order > 0) {
                 $result['id_order'] = $id_order;
             } else {
@@ -139,9 +110,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     'it' => 'IT',
                     'fr' => 'FR',
                     'us' => 'US',
+                    'at' => 'AT',
                     );
-                    
-                    
 
                     $cart = new Cart((int) ($id_cart));
                     
@@ -152,6 +122,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     Context::getContext()->currency = new Currency((int) $cart->id_currency);
 
                     $reference = Tools::getValue('klarna_order_id');
+                    // $klarna_reservation = Tools::getValue('klarna_order_id');
                     $shipping = $checkout['shipping_address'];
                     $billing = $checkout['billing_address'];
 
@@ -187,16 +158,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     } else {
                         $id_gender = 9;
                         $date_of_birth = "";
-                        $customer = $this->module->createNewCustomer(
-                            $shipping['given_name'],
-                            $shipping['family_name'],
-                            $shipping['email'],
-                            $newsletter,
-                            $id_gender,
-                            $date_of_birth,
-                            $cart->id_shop,
-                            $cart->id_lang
-                        );
+                        $customer = $this->module->createNewCustomer($shipping['given_name'], $shipping['family_name'], $shipping['email'], $newsletter, $id_gender, $date_of_birth, $cart);
                     }
 
                     $this->module->changeAddressOnKCOCart($shipping, $billing, $country_iso_codes, $customer, $cart);
@@ -298,8 +260,6 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     'order-confirmation.php?key='.
                     $customer->secure_key.
                     '&kcotpv3=1'.
-                    '&sid='.
-                    $sid.
                     '&id_cart='.
                     (int) ($checkout['merchant_reference2']).
                     '&id_module='.
@@ -319,6 +279,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                 unset($_SESSION['klarna_checkout_uk']);
             }
         } catch (Exception $e) {
+            echo $e->getTraceAsString();
             $this->context->smarty->assign('klarna_error', $e->getMessage());
         }
 
@@ -344,4 +305,5 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
 
         return false;
     }
+    
 }

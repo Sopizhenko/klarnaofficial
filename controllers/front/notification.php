@@ -44,8 +44,7 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
                 /*NO CART FOUND, KILL PROCESS*/
                 exit;
             } else {
-                $sql_query = 'SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_cart` = '.(int)$row["id_cart"];
-                $id_order = Db::getInstance()->getValue($sql_query);
+                $id_order = Db::getInstance()->getValue('SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_cart` = '.(int)$row["id_cart"]);
             }
         } else {
             $id_order = (int)$row["id_order"];

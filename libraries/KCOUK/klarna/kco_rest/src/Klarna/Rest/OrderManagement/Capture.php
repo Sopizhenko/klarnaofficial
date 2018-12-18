@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +16,10 @@
  *
  * File containing the Capture class.
  */
+
 namespace Klarna\Rest\OrderManagement;
 
-use GuzzleHttp\Exception\RequestException;
+use Klarna\GuzzleHttp\Exception\RequestException;
 use Klarna\Rest\Resource;
 use Klarna\Rest\Transport\Connector;
 use Klarna\Rest\Transport\Exception\ConnectorException;
@@ -36,12 +36,12 @@ use Klarna\Rest\Transport\Exception\ConnectorException;
 class Capture extends Resource
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     const ID_FIELD = 'capture_id';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static $path = '/captures';
 
@@ -56,7 +56,7 @@ class Capture extends Resource
     {
         parent::__construct($connector);
 
-        $url = $orderUrl.self::$path;
+        $url = $orderUrl . self::$path;
         if ($captureId !== null) {
             $url = "{$url}/{$captureId}";
             $this[static::ID_FIELD] = $captureId;
@@ -103,7 +103,7 @@ class Capture extends Resource
      */
     public function addShippingInfo(array $data)
     {
-        $this->post($this->getLocation().'/shipping-info', $data)
+        $this->post($this->getLocation() . '/shipping-info', $data)
             ->status('204');
 
         return $this;
@@ -123,7 +123,7 @@ class Capture extends Resource
      */
     public function updateCustomerDetails(array $data)
     {
-        $this->patch($this->getLocation().'/customer-details', $data)
+        $this->patch($this->getLocation() . '/customer-details', $data)
             ->status('204');
 
         return $this;
@@ -141,7 +141,7 @@ class Capture extends Resource
      */
     public function triggerSendout()
     {
-        $this->post($this->getLocation().'/trigger-send-out')
+        $this->post($this->getLocation() . '/trigger-send-out')
             ->status('204');
 
         return $this;

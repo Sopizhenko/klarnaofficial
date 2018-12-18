@@ -63,8 +63,47 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $sharedSecret = '';
         parent::initContent();
 
+        $checkSQL = "SELECT COUNT(id_address_delivery) FROM "._DB_PREFIX_."cart_product WHERE id_cart=".
+        (int) $this->context->cart->id. " AND id_address_delivery <> ".(int) $this->context->cart->id_address_delivery;
+        $finds = Db::getInstance()->getValue($checkSQL);
+        if ($finds > 0) {
+            $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
+                ' WHERE id_cart='.(int) $this->context->cart->id;
+            Db::getInstance()->execute($update_sql);
+            if (Configuration::get('KCOV3')) {
+                $kcov3link = $this->context->link->getModuleLink($this->module->name, 'checkoutklarnakco', array(), true);
+                Tools::redirect($kcov3link);
+            } else {
+                $kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', array(), true);
+                Tools::redirect($kcov3link);
+            }
+        }
+        
         if (!$this->context->cart->getDeliveryOption(null, true)) {
             $this->context->cart->setDeliveryOption($this->context->cart->getDeliveryOption());
+        }
+        
+        $checkValue = Tools::jsonDecode($this->context->cart->delivery_option, true);
+        if($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
+            if(!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
+                $this->context->cart->delivery_option = "";
+                $this->context->cart->update();
+                
+                $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
+                    'SET id_address_delivery='.(int)$this->context->cart->id_address_delivery.
+                    ' WHERE id_cart='.(int) $this->context->cart->id;
+                    
+                Db::getInstance()->execute($update_sql);
+
+                $update_sql = 'UPDATE '._DB_PREFIX_.'customization '.
+                    'SET id_address_delivery='.(int)$this->context->cart->id_address_delivery.
+                    ' WHERE id_cart='.(int) $this->context->cart->id;
+                    
+                Db::getInstance()->execute($update_sql);
+                $kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', array(), true);
+                Tools::redirect($kcolink);
+            }
         }
         
         //Make a check on reload
@@ -76,6 +115,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $create  = array();
         
         if (Tools::getIsset('kco_update') and Tools::getValue('kco_update') == '1') {
+            if (!$this->context->cart->checkQuantities()) {
+                die;
+            }
             if ($this->context->cart->nbProducts() < 1) {
                 die;
             }
@@ -90,6 +132,13 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
 
         $country_information = $this->module->getKlarnaCountryInformation($currency->iso_code, $language->iso_code);
 
+        if (!Configuration::get('KCOV3')) {
+            require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
+        } else {
+            $kcov3link = $this->context->link->getModuleLink($this->module->name, 'checkoutklarnakco', array(), true);
+            Tools::redirect($kcov3link);
+        }
+        
         require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
 
         $layout = 'desktop';
@@ -377,7 +426,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                                 $create['shipping_address']['phone'] = $addressObj->phone_mobile;
                             }
                         }
-                        
+
                         $create['purchase_country'] = $country_information['purchase_country'];
                         $create['purchase_currency'] = $country_information['purchase_currency'];
                         $create['locale'] = $country_information['locale'];
@@ -477,9 +526,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             if ($this->context->customer->isLogged()) {
                                 /*PREFILL CUSTOMER INFO*/
                                 $okToPrefill = true;
-                                if ($country_information['purchase_country'] == "DE" &&
-                                    Configuration::get('KCO_DE_PREFILNOT')
-                                ) {
+                                if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT')) {
                                     $okToPrefill = false;
                                     if (Tools::getIsset("oktoprefill")) {
                                         $okToPrefill = true;
@@ -693,15 +740,16 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         ++$no_active_countries;
                         $show_us = true;
                     }
-                    // Get PS cart
+                    
+                    // Get PS cart  
                     $presenter = new CartPresenter();
                     $presented_cart = $presenter->present($this->context->cart, true);
 
-                    $this->context->smarty->assign(array(
+                    $this->context->smarty->assign([
                         'cart' => $presented_cart,
                         'static_token' => Tools::getToken(false),
-                    ));
-                    // //
+                    ]);
+                    // // 
                     
                     $checkoutSession = $this->getCheckoutSession();
                     $delivery_options = $checkoutSession->getDeliveryOptions();
@@ -724,6 +772,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     }
                     
                     $this->context->smarty->assign(array(
+                        'isv3' => false,
                         'no_active_countries' => $no_active_countries,
                         'show_prefil_link' => $show_prefil_link,
                         'show_austria' => $show_austria,

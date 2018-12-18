@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +16,16 @@
  *
  * File containing the Connector class.
  */
+
 namespace Klarna\Rest\Transport;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Message\RequestInterface;
-use GuzzleHttp\Message\ResponseInterface;
+use Klarna\GuzzleHttp\Client;
+use Klarna\GuzzleHttp\ClientInterface;
+use Klarna\GuzzleHttp\Exception\RequestException;
+use Klarna\GuzzleHttp\Psr7\Request;
 use Klarna\Rest\Transport\Exception\ConnectorException;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Transport connector used to authenticate and make HTTP requests against the
@@ -95,22 +96,20 @@ class Connector implements ConnectorInterface
      *
      * @param string $url     URL
      * @param string $method  HTTP method
-     * @param array  $options Request options
      *
      * @return RequestInterface
      */
-    public function createRequest($url, $method = 'GET', array $options = [])
+    public function createRequest($url, $method = 'GET', array $headers = [], $body = null)
     {
-        $options['auth'] = [$this->merchantId, $this->sharedSecret];
-        $options['headers']['User-Agent'] = strval($this->userAgent);
-
-        return $this->client->createRequest($method, $url, $options);
+        $headers = array_merge($headers, ['User-Agent' => strval($this->userAgent)]);
+        return new Request($method, $url, $headers, $body);
     }
 
     /**
      * Sends the request.
      *
      * @param RequestInterface $request Request to send
+     * @param string[] $options Request options
      *
      * @throws ConnectorException If the API returned an error response
      * @throws RequestException   When an error is encountered
@@ -118,10 +117,12 @@ class Connector implements ConnectorInterface
      *
      * @return ResponseInterface
      */
-    public function send(RequestInterface $request)
+    public function send(RequestInterface $request, array $options = [])
     {
+        $options['auth'] = [$this->merchantId, $this->sharedSecret, 'basic'];
+
         try {
-            return $this->client->send($request);
+            return $this->client->send($request, $options);
         } catch (RequestException $e) {
             if (!$e->hasResponse()) {
                 throw $e;
@@ -129,11 +130,11 @@ class Connector implements ConnectorInterface
 
             $response = $e->getResponse();
 
-            if ($response->getHeader('Content-Type') !== 'application/json') {
+            if (!in_array('application/json', $response->getHeader('Content-Type'))) {
                 throw $e;
             }
 
-            $data = $response->json();
+            $data = \json_decode($response->getBody(), true);
 
             if (!is_array($data) || !array_key_exists('error_code', $data)) {
                 throw $e;
@@ -179,7 +180,7 @@ class Connector implements ConnectorInterface
         $baseUrl = self::EU_BASE_URL,
         UserAgentInterface $userAgent = null
     ) {
-        $client = new Client(['base_url' => $baseUrl]);
+        $client = new Client(['base_uri' => $baseUrl]);
 
         return new static($client, $merchantId, $sharedSecret, $userAgent);
     }

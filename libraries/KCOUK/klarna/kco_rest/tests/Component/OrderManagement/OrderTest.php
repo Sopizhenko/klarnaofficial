@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +16,13 @@
  *
  * File containing tests for the Order class.
  */
+
 namespace Klarna\Rest\Tests\Component\OrderManagement;
 
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
+use GuzzleHttp\Psr7\Response;
 use Klarna\Rest\OrderManagement\Capture;
 use Klarna\Rest\OrderManagement\Order;
 use Klarna\Rest\Tests\Component\ResourceTestCase;
-use Klarna\Rest\Transport\Connector;
 
 /**
  * Component test cases for the order resource.
@@ -34,6 +32,8 @@ class OrderTest extends ResourceTestCase
     /**
      * Make sure that the request sent and retrieved data is correct when fetching
      * the order.
+     *
+     * @return void
      */
     public function testFetch()
     {
@@ -50,11 +50,11 @@ class OrderTest extends ResourceTestCase
 }
 JSON;
 
-        $this->mock->addResponse(
+        $this->mock->append(
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                Stream::factory($json)
+                $json
             )
         );
 
@@ -66,9 +66,9 @@ JSON;
         $this->assertEquals('from json', $order['updated']);
         $this->assertEquals('0002', $order->getId());
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('GET', $request->getMethod());
-        $this->assertEquals('/ordermanagement/v1/orders/0002', $request->getPath());
+        $this->assertEquals('/ordermanagement/v1/orders/0002', $request->getUri()->getPath());
 
         $this->assertAuthorization($request);
 
@@ -81,19 +81,21 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when acknowledging an order.
+     *
+     * @return void
      */
     public function testAcknowledge()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->acknowledge();
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/acknowledge',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
         $this->assertAuthorization($request);
@@ -101,19 +103,21 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when cancelling an order.
+     *
+     * @return void
      */
     public function testCancel()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->cancel();
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/cancel',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
         $this->assertAuthorization($request);
@@ -121,19 +125,21 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when extending authorization time.
+     *
+     * @return void
      */
     public function testExtendAuthorizationTime()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->extendAuthorizationTime();
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/extend-authorization-time',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
         $this->assertAuthorization($request);
@@ -142,19 +148,21 @@ JSON;
     /**
      * Make sure that the request sent is correct when releasing remaining
      * authorization.
+     *
+     * @return void
      */
     public function testReleaseRemainingAuthorization()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->releaseRemainingAuthorization();
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/release-remaining-authorization',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
         $this->assertAuthorization($request);
@@ -162,22 +170,24 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when updating authorization.
+     *
+     * @return void
      */
     public function testUpdateAuthorization()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->updateAuthorization(['data' => 'sent in']);
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('PATCH', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/authorization',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
-        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals(['application/json'], $request->getHeader('Content-Type'));
         $this->assertEquals('{"data":"sent in"}', strval($request->getBody()));
 
         $this->assertAuthorization($request);
@@ -185,22 +195,24 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when updating merchant references.
+     *
+     * @return void
      */
     public function testUpdateMerchantReferences()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->updateMerchantReferences(['data' => 'sent in']);
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('PATCH', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/merchant-references',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
-        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals(['application/json'], $request->getHeader('Content-Type'));
         $this->assertEquals('{"data":"sent in"}', strval($request->getBody()));
 
         $this->assertAuthorization($request);
@@ -208,22 +220,24 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when updating customer details.
+     *
+     * @return void
      */
     public function testUpdateCustomerDetails()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->updateCustomerDetails(['data' => 'sent in']);
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('PATCH', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/customer-details',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
-        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals(['application/json'], $request->getHeader('Content-Type'));
         $this->assertEquals('{"data":"sent in"}', strval($request->getBody()));
 
         $this->assertAuthorization($request);
@@ -231,22 +245,49 @@ JSON;
 
     /**
      * Make sure that the request sent is correct when performing a refund.
+     *
+     * @return void
      */
     public function testRefund()
     {
-        $this->mock->addResponse(new Response(204));
+        $this->mock->append(new Response(204));
 
         $order = new Order($this->connector, '0002');
         $order->refund(['data' => 'sent in']);
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/refunds',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
-        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals(['application/json'], $request->getHeader('Content-Type'));
+        $this->assertEquals('{"data":"sent in"}', strval($request->getBody()));
+
+        $this->assertAuthorization($request);
+    }
+
+    /**
+     * Make sure that the request sent is correct when performing a refund.
+     *
+     * @return void
+     */
+    public function testRefund201()
+    {
+        $this->mock->append(new Response(201));
+
+        $order = new Order($this->connector, '0002');
+        $order->refund(['data' => 'sent in']);
+
+        $request = $this->mock->getLastRequest();
+        $this->assertEquals('POST', $request->getMethod());
+        $this->assertEquals(
+            '/ordermanagement/v1/orders/0002/refunds',
+            $request->getUri()->getPath()
+        );
+
+        $this->assertEquals(['application/json'], $request->getHeader('Content-Type'));
         $this->assertEquals('{"data":"sent in"}', strval($request->getBody()));
 
         $this->assertAuthorization($request);
@@ -255,10 +296,12 @@ JSON;
     /**
      * Make sure that the request sent is correct and that the location is updated
      * when creating an order.
+     *
+     * @return void
      */
     public function testCreateCapture()
     {
-        $this->mock->addResponse(
+        $this->mock->append(
             new Response(201, ['Location' => 'http://somewhere/a-path'])
         );
 
@@ -268,14 +311,14 @@ JSON;
         $this->assertInstanceOf('Klarna\Rest\OrderManagement\Capture', $capture);
         $this->assertEquals('http://somewhere/a-path', $capture->getLocation());
 
-        $request = $this->history->getLastRequest();
+        $request = $this->mock->getLastRequest();
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals(
             '/ordermanagement/v1/orders/0002/captures',
-            $request->getPath()
+            $request->getUri()->getPath()
         );
 
-        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals(['application/json'], $request->getHeader('Content-Type'));
         $this->assertEquals('{"data":"goes here"}', strval($request->getBody()));
 
         $this->assertAuthorization($request);
@@ -284,6 +327,8 @@ JSON;
     /**
      * Make sure that the request sent and retrieved data is correct when fetching
      * a capture.
+     *
+     * @return void
      */
     public function testFetchCapture()
     {
@@ -294,11 +339,11 @@ JSON;
 }
 JSON;
 
-        $this->mock->addResponse(
+        $this->mock->append(
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                Stream::factory($json)
+                $json
             )
         );
 
@@ -319,6 +364,8 @@ JSON;
     /**
      * Make sure that the request sent and retrieved data is correct when fetching
      * a capture that exists in the captures list.
+     *
+     * @return void
      */
     public function testFetchCaptureExisting()
     {
@@ -329,11 +376,11 @@ JSON;
 }
 JSON;
 
-        $this->mock->addResponse(
+        $this->mock->append(
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                Stream::factory($json)
+                $json
             )
         );
 
@@ -360,6 +407,8 @@ JSON;
     /**
      * Make sure that the request sent and retrieved data is correct when fetching
      * a capture that is not already in the captures list.
+     *
+     * @return void
      */
     public function testFetchCaptureNew()
     {
@@ -370,11 +419,11 @@ JSON;
 }
 JSON;
 
-        $this->mock->addResponse(
+        $this->mock->append(
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                Stream::factory($json)
+                $json
             )
         );
 

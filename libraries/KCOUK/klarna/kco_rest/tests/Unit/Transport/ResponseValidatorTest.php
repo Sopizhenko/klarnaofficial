@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +16,11 @@
  *
  * File containing tests for the ResponseValidator class.
  */
+
 namespace Klarna\Rest\Tests\Unit\Transport;
 
 use Klarna\Rest\Transport\ResponseValidator;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Unit test cases for the ResponseValidator class.
@@ -27,7 +28,7 @@ use Klarna\Rest\Transport\ResponseValidator;
 class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var GuzzleHttp\Message\ResponseInterface
+     * @var ResponseInterface
      */
     protected $response;
 
@@ -37,12 +38,11 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
     protected $validator;
 
     /**
-     * Set up the test fixtures.
+     * Set up the test fixtures
      */
     protected function setUp()
     {
-        $interface = 'GuzzleHttp\Message\ResponseInterface';
-        $this->response = $this->getMockBuilder($interface)
+        $this->response = $this->getMockBuilder(ResponseInterface::class)
             ->getMock();
 
         $this->validator = new ResponseValidator($this->response);
@@ -50,6 +50,8 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure the response is retrievable.
+     *
+     * @return void
      */
     public function testGetResponse()
     {
@@ -58,18 +60,22 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure that the JSON data is possible to retrieve.
+     *
+     * @return void
      */
     public function testGetJson()
     {
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue('json response'));
+            ->method('getBody')
+            ->will($this->returnValue(json_encode('json response')));
 
         $this->assertEquals('json response', $this->validator->getJson());
     }
 
     /**
      * Make sure that the location header can be retrieved.
+     *
+     * @return void
      */
     public function testGetLocation()
     {
@@ -80,13 +86,15 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Location')
-            ->will($this->returnValue('a location'));
+            ->will($this->returnValue(['a location']));
 
         $this->assertEquals('a location', $this->validator->getLocation());
     }
 
     /**
      * Make sure that a missing Location header throws an exception.
+     *
+     * @return void
      */
     public function testGetLocationException()
     {
@@ -105,6 +113,8 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure that the content type is asserted properly.
+     *
+     * @return void
      */
     public function testContentType()
     {
@@ -115,7 +125,7 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('text/plain'));
+            ->will($this->returnValue(['text/plain']));
 
         $this->assertSame(
             $this->validator,
@@ -125,6 +135,8 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure that a missing Content-Type header throws an exception.
+     *
+     * @return void
      */
     public function testContentTypeMissingException()
     {
@@ -143,6 +155,8 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure that a different Content-Type header throws an exception.
+     *
+     * @return void
      */
     public function testContentTypeWrongException()
     {
@@ -154,7 +168,7 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('text/plain'));
+            ->will($this->returnValue(['text/plain']));
 
         $this->setExpectedException(
             'RuntimeException',
@@ -166,6 +180,8 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure that the status code is asserted properly.
+     *
+     * @return void
      */
     public function testStatus()
     {
@@ -177,7 +193,26 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Make sure that multiple status codes are asserted properly.
+     *
+     * @return void
+     */
+    public function testStatuses()
+    {
+        $this->response->expects($this->once())
+            ->method('getStatusCode')
+            ->will($this->returnValue('204'));
+
+        $this->assertSame(
+            $this->validator,
+            $this->validator->status(['201', '204'])
+        );
+    }
+
+    /**
      * Make sure that a different status code throws an exception.
+     *
+     * @return void
      */
     public function testStatusException()
     {
@@ -191,5 +226,24 @@ class ResponseValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->validator->status('200');
+    }
+
+    /**
+     * Make sure that a different status code throws an exception.
+     *
+     * @return void
+     */
+    public function testStatusesException()
+    {
+        $this->response->expects($this->once())
+            ->method('getStatusCode')
+            ->will($this->returnValue('200'));
+
+        $this->setExpectedException(
+            'RuntimeException',
+            'Unexpected response status code: 200'
+        );
+
+        $this->validator->status(['201', '204']);
     }
 }

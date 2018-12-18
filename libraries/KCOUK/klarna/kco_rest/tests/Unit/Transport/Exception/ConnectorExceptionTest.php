@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +16,13 @@
  *
  * File containing tests for the ConnectorException class.
  */
+
 namespace Klarna\Rest\Tests\Unit\Transport\Exception;
 
 use GuzzleHttp\Exception\RequestException;
 use Klarna\Rest\Transport\Exception\ConnectorException;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Unit test cases for the ConnectorException.
@@ -29,6 +31,8 @@ class ConnectorExceptionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Make sure the getters work as intended.
+     *
+     * @return void
      */
     public function testGetters()
     {
@@ -36,14 +40,14 @@ class ConnectorExceptionTest extends \PHPUnit_Framework_TestCase
             'error_code' => 'ERROR_CODE_1',
             'error_messages' => [
                 'Oh dear...',
-                'Oh no...',
+                'Oh no...'
             ],
-            'correlation_id' => 'corr_id_1',
+            'correlation_id' => 'corr_id_1'
         ];
 
-        $request = $this->getMockBuilder('GuzzleHttp\Message\RequestInterface')
+        $request = $this->getMockBuilder(RequestInterface::class)
             ->getMock();
-        $response = $this->getMockBuilder('GuzzleHttp\Message\ResponseInterface')
+        $response = $this->getMockBuilder(ResponseInterface::class)
             ->getMock();
 
         $response->expects($this->once())

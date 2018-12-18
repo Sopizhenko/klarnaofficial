@@ -50,10 +50,6 @@
 	
 <script type="text/javascript">
 	// <![CDATA[
-	var currencySign = '{$currencySign|escape:'javascript':'UTF-8'}';
-	var currencyRate = '{$currencyRate|floatval}';
-	var currencyFormat = '{$currencyFormat|intval}';
-	var currencyBlank = '{$currencyBlank|intval}';
 	var txtProduct = "{l s='product' js=1 mod='klarnaofficial'}";
 	var txtProducts = "{l s='products' js=1 mod='klarnaofficial'}";
 	var freeShippingTranslation = "{l s='Free Shipping!' js=1 mod='klarnaofficial'}";
@@ -125,6 +121,7 @@
                     </h1>
                 </div>
                 <div class="row">
+                {if !$isv3}
                     <div class="col-md-6">
                         <div class="xcard">
                                 <div class="card-block">
@@ -180,7 +177,8 @@
                                 </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    {/if}
+                    <div class="col-md-{if $isv3}12{else}6{/if}">
                         <div class="xcard">
                                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
                                     <div class="">

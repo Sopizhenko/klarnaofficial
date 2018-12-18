@@ -16,6 +16,59 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of Prestaworks AB
 *}
+
+
+<div class="klarna-banners">
+{if $showbanner || $showbanner1}
+	<section class="col-xs-12 col-md-6 banner banner--klarna{if $showbanner1}2{/if}">
+		<h2 class="banner__title">
+            {if $showbanner1}
+                {l s='Klarna is entering a new world of smoooth.' mod='klarnaofficial'}
+            {else}
+                {l s='Go live with Klarna' mod='klarnaofficial'}
+            {/if}
+		</h2>
+        {if $showbanner1}
+        <p>
+            {l s='The future proof integration is here! We would love for you to join us on the ride, and to do so you need to upgrade your new Klarna integration. You\'ll then always get the latest features Klarna develops!' mod='klarnaofficial'}
+        </p>
+        {else}
+            <p>
+                <strong>
+                    {l s='You just downloaded our Klarna module. Fantastic!' mod='klarnaofficial'}
+                </strong>
+            </p>
+            <p>
+                {l s='To offer your customers the benefit of paying with Klarna, you must first retrieve your credentials. Sign up for a Klarna account and gain access to the Klarna Merchant Portal where you can generate and download your credentials. You\'ll be up an running in no time!' mod='klarnaofficial'}
+            </p>
+        {/if}
+		<div style="position:relative;width:100%;">
+			<a class="banner__cta" target="_blank" href="{if $showbanner1}https://hello.klarna.com/product-upgrade.html{else}https://eu.portal.klarna.com/signup/prestashop?country={$country|escape:'htmlall':'UTF-8'}&platformVersion={$platformVersion|escape:'htmlall':'UTF-8'}&plugin={$plugin|escape:'htmlall':'UTF-8'}&pluginVersion={$pluginVersion|escape:'htmlall':'UTF-8'}{/if}">
+            {if $showbanner1}
+                {l s='Check it out' mod='klarnaofficial'}
+            {else}
+                {l s='Go live now' mod='klarnaofficial'}
+            {/if}
+            </a>
+			<img class="lockup" src="../modules/klarnaofficial/views/img/klarna_lockup_logo.png">
+		</div>
+	</section>
+{/if}
+	<section class="banner banner--docs {if !$showbanner && !$showbanner1}banner--small{/if}">
+		<svg xmlns="http://www.w3.org/2000/svg" style="height:64px;width:64px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+		<h2 class="banner__title">
+			{l s='Documentation' mod='klarnaofficial'}
+		</h2>
+		<p>
+			{l s='Link and information to documentation comes here...' mod='klarnaofficial'}
+		</p>
+		<a class="banner__cta" href="{$module_dir|escape:'htmlall':'UTF-8'}doc/index.html?cron_token={$cron_token}" target="_blank" id="fancydocs" title="{l s='Read documentation here' mod='klarnaofficial'}">
+			{l s='Read documentation here' mod='klarnaofficial'}
+		</a>
+	</section>
+</div>
+
+
 {if $address_check_done}		
 	<div class="alert alert-success">
 		{l s='Address check done!' mod='klarnaofficial'}
@@ -38,52 +91,6 @@
 {/if}
 <link href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/klarnacheckout_admin.css" rel="stylesheet" type="text/css" media="all" />
 <script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/admin.js"></script>
-
-<div class="row">
-<div class="col-xs-4">
-	<div class="panel">
-		<div class="panel-heading"><i class="icon-cogs"></i> {l s='What does it support?' mod='klarnaofficial'}</div>
-		<div class="row">
-			<p>{l s='Use the tabs below to navigate and activate the different payment methods depending on what you want to use. This integration supports Klarna KPM and Klarna Checkout. There is also a few other settings to laborate with, feel free to use whatever suits you best!' mod='klarnaofficial'}</p>
-		</div>
-	</div>
-</div>
-<div class="col-xs-2">
-	<div class="panel">
-		<div class="panel-heading"><i class="icon-question"></i> {l s='Documentation' mod='klarnaofficial'}</div>
-		<div class="row">
-			<p>{l s='Link and information to documentation comes here...' mod='klarnaofficial'}</p>
-			<p>
-				<a href="{$module_dir|escape:'htmlall':'UTF-8'}doc/index.html?cron_token={$cron_token}" target="_blank" id="fancydocs" class="btn btn-default" title="{l s='Read documentation here' mod='klarnaofficial'}">
-					<i class="icon-file-text"></i> {l s='Read documentation here' mod='klarnaofficial'}
-				</a>
-			</p>
-		</div>
-	</div>
-</div>
-<div class="col-xs-2">
-	<div class="panel">
-		<div class="panel-heading"><i class="icon-info"></i> {l s='Compatibility information' mod='klarnaofficial'}</div>
-		<div class="row">
-			<p>{l s='This core module for Klarna API was developed for and is compatible with:' mod='klarnaofficial'}</p>
-			<p><span class="label label-success">PrestaShop 1.7.1+</span></p>
-		</div>
-	</div>
-</div>
-<div class="col-xs-2">
-	<div class="panel join">
-		<div class="panel-heading"><i class="icon-send"></i> {l s='Join together with Klarna' mod='klarnaofficial'}</div>
-		<div class="row">
-			<p>{l s='Don\'t you have an account with Klarna yet? Hit the button below!' mod='klarnaofficial'}</p>
-			<p>
-                <a href="https://www.klarna.com/international/business/prestashop" target="_blank" class="btn btn-default" title="{l s='Register account here' mod='klarnaofficial'}">
-					<i class="icon-send"></i> {l s='Register Klarna account here' mod='klarnaofficial'}
-				</a>
-			</p>
-		</div>
-	</div>
-</div>
-</div>
 
 <div class="tabbable">
 	<ul class="nav nav-tabs">
@@ -138,14 +145,8 @@
 				<div class="col-lg-12 tab-content">
 					<div class="sidebar col-lg-2">
 						<ul class="nav nav-tabs">
-                            <li class="nav-item"><a href="javascript:;" title="{l s='UK' mod='klarnaofficial'}" data-panel="7" data-fieldset="0"><i class="icon-AdminParentLocalization"></i>{l s='UK' mod='klarnaofficial'}</a></li>
+                            <li class="nav-item"><a href="javascript:;" title="{l s='KCO V3' mod='klarnaofficial'}" data-panel="7" data-fieldset="0"><i class="icon-AdminParentLocalization"></i>{l s='KCO V3' mod='klarnaofficial'}</a></li>
 {* DISABLED FOR NOW			<li class="nav-item"><a href="javascript:;" title="{l s='US' mod='klarnaofficial'}" data-panel="7" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='US' mod='klarnaofficial'}</a></li>*}
-							<li class="nav-item"><a href="javascript:;" title="{l s='Netherlands' mod='klarnaofficial'}" data-panel="7" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="7" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="7" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="7" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="7" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="7" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">

@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +16,7 @@
  *
  * File containing tests for the UserAgent class.
  */
+
 namespace Klarna\Rest\Tests\Unit\Transport;
 
 use Klarna\Rest\Transport\UserAgent;
@@ -32,7 +32,7 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
     protected $agent;
 
     /**
-     * Set up the test fixtures.
+     * Set up the test fixtures
      */
     protected function setUp()
     {
@@ -41,6 +41,8 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure the default user agent components are present.
+     *
+     * @return void
      */
     public function testCreateDefault()
     {
@@ -48,19 +50,19 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
         $text = $agent->__toString();
 
         $this->assertContains(
-            'Language/PHP_'.phpversion(),
+            'Language/PHP_' . phpversion(),
             $text,
             'No PHP language component present'
         );
 
         $this->assertContains(
-            'OS/'.php_uname('s').'_'.php_uname('r'),
+            'OS/' . php_uname('s') . '_' . php_uname('r'),
             $text,
             'No OS component present'
         );
 
         $this->assertContains(
-            'Library/'.UserAgent::NAME.'_'.UserAgent::VERSION,
+            'Library/' . UserAgent::NAME . '_' . UserAgent::VERSION,
             $text,
             'No Library component present',
             false
@@ -69,6 +71,8 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure the key and component are present in the user agent.
+     *
+     * @return void
      */
     public function testSetField()
     {
@@ -79,6 +83,8 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure the key, component and version are present.
+     *
+     * @return void
      */
     public function testSetFieldVersion()
     {
@@ -89,6 +95,8 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure the key, component, version and options are present.
+     *
+     * @return void
      */
     public function testSetFieldOptions()
     {
@@ -102,6 +110,8 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Make sure the key, component, version and multiple options are present.
+     *
+     * @return void
      */
     public function testSetFieldTwoOptions()
     {

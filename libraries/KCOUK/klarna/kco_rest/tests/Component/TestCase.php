@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +16,15 @@
  *
  * File containing the TestCase class.
  */
+
 namespace Klarna\Rest\Tests\Component;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Subscriber\History;
-use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use Klarna\Rest\Transport\Connector;
+use SebastianBergmann\PHPLOC\Log\CSV\History;
 
 /**
  * Base component test case class.
@@ -48,7 +50,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     protected $connector;
 
     /**
-     * @var Mock
+     * @var MockHandler
      */
     protected $mock;
 
@@ -62,13 +64,13 @@ class TestCase extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->client = new Client();
-        $this->mock = new Mock();
-        $this->history = new History();
+        $this->mock = new MockHandler();
+        $this->history = [];
 
-        // Add the mock subscriber to the client.
-        $this->client->getEmitter()->attach($this->mock);
-        $this->client->getEmitter()->attach($this->history);
+        $stack = HandlerStack::create($this->mock);
+        $stack->push(Middleware::history($this->history));
+
+        $this->client = new Client(['handler' => $stack, 'uri' => self::BASE_URL]);
 
         $this->connector = new Connector(
             $this->client,

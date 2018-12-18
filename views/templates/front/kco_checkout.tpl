@@ -50,10 +50,6 @@
 	
 <script type="text/javascript">
 	// <![CDATA[
-	var currencySign = '{$currencySign|escape:'javascript':'UTF-8'}';
-	var currencyRate = '{$currencyRate|floatval}';
-	var currencyFormat = '{$currencyFormat|intval}';
-	var currencyBlank = '{$currencyBlank|intval}';
 	var txtProduct = "{l s='product' js=1 mod='klarnaofficial'}";
 	var txtProducts = "{l s='products' js=1 mod='klarnaofficial'}";
 	var freeShippingTranslation = "{l s='Free Shipping!' js=1 mod='klarnaofficial'}";
@@ -120,6 +116,7 @@
             <div class="card">
                 <div class="row">
                     <div class="col-md-4">
+                        {if !$isv3}
                         <div class="xcard">
                             <div class="card-block">
                                 <span class="kco-step-heading">{l s='Step 1' mod='klarnaofficial'}</span>
@@ -177,7 +174,7 @@
                                     </form>
                             </div>
                         </div>
-                        
+                        {/if}
                         <div class="xcard">
                                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
                                     <div class="">

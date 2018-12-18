@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +16,14 @@
  *
  * File containing tests for the Capture class.
  */
+
 namespace Klarna\Tests\Unit\Rest\OrderManagement;
 
+use GuzzleHttp\Exception\RequestException;
 use Klarna\Rest\OrderManagement\Capture;
 use Klarna\Rest\Tests\Unit\TestCase;
 use Klarna\Rest\Transport\Connector;
+use Klarna\Rest\Transport\Exception\ConnectorException;
 
 /**
  * Unit test cases for the capture resource.
@@ -30,6 +32,8 @@ class CaptureTest extends TestCase
 {
     /**
      * Make sure the location is correct for create method.
+     *
+     * @return void
      */
     public function testConstructorNew()
     {
@@ -39,6 +43,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure the location is correct for fetch method.
+     *
+     * @return void
      */
     public function testConstructorExisting()
     {
@@ -48,6 +54,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure the identifier is retrievable.
+     *
+     * @return void
      */
     public function testGetId()
     {
@@ -60,6 +68,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure fetched data is accessible.
+     *
+     * @return void
      */
     public function testFetch()
     {
@@ -67,8 +77,7 @@ class CaptureTest extends TestCase
             ->method('createRequest')
             ->with(
                 '/orders/1/captures/2',
-                'GET',
-                []
+                'GET'
             )
             ->will($this->returnValue($this->request));
 
@@ -89,16 +98,16 @@ class CaptureTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('application/json'));
+            ->will($this->returnValue(['application/json']));
 
         $data = [
             'data' => 'from response json',
-            'capture_id' => '2',
+            'capture_id' => '2'
         ];
 
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($data));
+            ->method('getBody')
+            ->will($this->returnValue(\GuzzleHttp\json_encode($data)));
 
         $capture = new Capture($this->connector, '/orders/1', '2');
         $capture['data'] = 'is overwritten';
@@ -111,6 +120,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure that an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testFetchInvalidStatusCode()
     {
@@ -118,8 +129,7 @@ class CaptureTest extends TestCase
             ->method('createRequest')
             ->with(
                 '/orders/1/captures/2',
-                'GET',
-                []
+                'GET'
             )
             ->will($this->returnValue($this->request));
 
@@ -145,6 +155,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure a non-JSON response results in an exception.
+     *
+     * @return void
      */
     public function testFetchNotJson()
     {
@@ -152,8 +164,7 @@ class CaptureTest extends TestCase
             ->method('createRequest')
             ->with(
                 '/orders/1/captures/2',
-                'GET',
-                []
+                'GET'
             )
             ->will($this->returnValue($this->request));
 
@@ -174,7 +185,7 @@ class CaptureTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Content-Type')
-            ->will($this->returnValue('text/plain'));
+            ->will($this->returnValue(['text/plain']));
 
         $capture = new Capture($this->connector, '/orders/1', '2');
         $capture['data'] = 'is overwritten';
@@ -189,6 +200,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure the correct data is sent and location is updated.
+     *
+     * @return void
      */
     public function testCreate()
     {
@@ -199,7 +212,8 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -220,7 +234,7 @@ class CaptureTest extends TestCase
         $this->response->expects($this->once())
             ->method('getHeader')
             ->with('Location')
-            ->will($this->returnValue('http://somewhere/a-path'));
+            ->will($this->returnValue(['http://somewhere/a-path']));
 
         $capture = new Capture($this->connector, '/orders/1');
         $location = $capture->create($data)
@@ -231,6 +245,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure that an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testCreateInvalidStatusCode()
     {
@@ -259,6 +275,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure a missing location header in the response results in an exception.
+     *
+     * @return void
      */
     public function testCreateNoLocation()
     {
@@ -292,6 +310,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure the correct data is sent.
+     *
+     * @return void
      */
     public function testAddShippingInfo()
     {
@@ -302,7 +322,8 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures/2/shipping-info',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -321,6 +342,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testAddShippingInfoInvalidStatusCode()
     {
@@ -331,7 +354,8 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures/2/shipping-info',
                 'POST',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -356,6 +380,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure the correct data is sent.
+     *
+     * @return void
      */
     public function testUpdateCustomerDetails()
     {
@@ -366,7 +392,8 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures/2/customer-details',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -385,6 +412,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testUpdateCustomerDetailsInvalidStatusCode()
     {
@@ -395,7 +424,8 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures/2/customer-details',
                 'PATCH',
-                ['json' => $data]
+                ['Content-Type' => 'application/json'],
+                json_encode($data)
             )
             ->will($this->returnValue($this->request));
 
@@ -420,6 +450,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure that the correct request is sent.
+     *
+     * @return void
      */
     public function testTriggerSendout()
     {
@@ -428,7 +460,7 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures/2/trigger-send-out',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 
@@ -447,6 +479,8 @@ class CaptureTest extends TestCase
 
     /**
      * Make sure an unknown status code response results in an exception.
+     *
+     * @return void
      */
     public function testTriggerSendoutInvalidStatusCode()
     {
@@ -455,7 +489,7 @@ class CaptureTest extends TestCase
             ->with(
                 '/orders/1/captures/2/trigger-send-out',
                 'POST',
-                []
+                ['Content-Type' => 'application/json']
             )
             ->will($this->returnValue($this->request));
 

@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2014 Klarna AB.
+ * Copyright 2014 Klarna AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +16,10 @@
  *
  * File containing the Order class.
  */
+
 namespace Klarna\Rest\Checkout;
 
-use GuzzleHttp\Exception\RequestException;
+use Klarna\GuzzleHttp\Exception\RequestException;
 use Klarna\Rest\Resource;
 use Klarna\Rest\Transport\Connector;
 use Klarna\Rest\Transport\Exception\ConnectorException;
@@ -35,12 +35,12 @@ use Klarna\Rest\Transport\Exception\ConnectorException;
 class Order extends Resource
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     const ID_FIELD = 'order_id';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static $path = '/checkout/v3/orders';
 
@@ -55,7 +55,7 @@ class Order extends Resource
         parent::__construct($connector);
 
         if ($orderId !== null) {
-            $this->setLocation(self::$path."/{$orderId}");
+            $this->setLocation(self::$path . "/{$orderId}");
             $this[static::ID_FIELD] = $orderId;
         }
     }
