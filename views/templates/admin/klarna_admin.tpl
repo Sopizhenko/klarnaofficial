@@ -118,7 +118,7 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">
-						{$kcoform}
+						{$kcoform nofilter}
 					</div>
 				</div>
 			</div>
@@ -134,7 +134,7 @@
                         </ul>
                     </div>
                     <div id="klarnacheckout-admin" class="col-lg-10">
-                        {$kcocommonform}
+                        {$kcocommonform nofilter}
                         * {l s='These fields are only applicable in certain markets' mod='klarnaofficial'}
                     </div>
                 </div>
@@ -150,7 +150,7 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">
-						{$kcov3form}
+						{$kcov3form nofilter}
 					</div>
 				</div>
 			</div>
@@ -171,7 +171,7 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-10">
-						{$kpmform}
+						{$kpmform nofilter}
 					</div>
 				</div>
 			</div>
@@ -185,13 +185,13 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-12">
-						{$commonform}
+						{$commonform nofilter}
 					</div>
 				</div>
 			</div>
 		</div>
 		<div id="pane4" class="tab-pane">
-			{$pclasslist}
+			{$pclasslist nofilter}
 		</div>
 		
 		<div id="pane5" class="tab-pane">

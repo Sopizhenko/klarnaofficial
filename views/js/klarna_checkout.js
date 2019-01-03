@@ -16,19 +16,34 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of Prestaworks AB
 */
-var tmpshippingvalue = "";
 $(document).ready(function()
 {
     prestashop.on(
       'updateCart',
       function (event) {
-          showLoaderImg();
-          updateKCO();
+          if (event.reason != "KCOorderChange") {
+            
+            if(isv3) {
+                updateKCOV3();
+            } else {
+                showLoaderImg();
+                updateKCOV2();
+            }
+          }
       }
     );
 });
 
 $(document).ready(function(){ 
+    if(isv3) {
+        window._klarnaCheckout(function(api) {
+          api.on({
+            'order_total_change': function(data) {
+                prestashop.emit('updateCart', {reason: 'KCOorderChange'});
+            }
+          });
+        });
+    }
     $('.kco-trigger').each(function(){
         var el = $(this);
         var elTarget = el.parent().parent().find('.kco-target');
@@ -50,7 +65,31 @@ function showLoaderImg()
 {
     $("#checkoutdiv").html('');
 }
-function updateKCO()
+
+function updateKCOV3()
+{
+    window._klarnaCheckout(function (api) {
+        api.suspend();
+    });
+    $.ajax({
+		type: 'GET',
+		url: kcourl,
+		async: false,
+		cache: false,
+		data: 'kco_update=1',
+		success: function(jsonData)
+		{
+			window._klarnaCheckout(function (api) {
+              api.resume();
+            });
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			alert(jsonData);
+		}
+    });
+}
+
+function updateKCOV2()
 {
 	$.ajax({
 		type: 'GET',

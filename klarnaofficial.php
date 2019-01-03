@@ -2841,6 +2841,15 @@ class KlarnaOfficial extends PaymentModule
                 Tools::redirect('index.php');
             }
         } elseif (Tools::getIsset("kcotpv3")) {
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+            } else {
+                if (session_id() === '') {
+                    session_start();
+                }
+            }
             $sql = "SELECT reservation FROM "._DB_PREFIX_."klarna_orders WHERE id_order=".(int)$params["order"]->id;
             $orderId = Db::getInstance()->getValue($sql);
             

@@ -437,7 +437,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         }
                         // echo "------------".$eid;
                          // echo "<pre>";print_r($create);echo "</pre>";
-                        if (!isset($_SESSION['klarna_checkout_uk____'])) {
+                        if (!isset($_SESSION['klarna_checkout_uk'])) {
                             $checkout->create($create);
                             $checkout->fetch();
                             $_SESSION['klarna_checkout_uk'] = $checkout['order_id'];

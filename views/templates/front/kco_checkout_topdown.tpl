@@ -54,6 +54,7 @@
 	var txtProducts = "{l s='products' js=1 mod='klarnaofficial'}";
 	var freeShippingTranslation = "{l s='Free Shipping!' js=1 mod='klarnaofficial'}";
 	var kcourl = "{$kcourl|escape:'javascript':'UTF-8'}";
+	var isv3 = {$isv3};
 	// ]]>
 </script>
 <style type="text/css">
