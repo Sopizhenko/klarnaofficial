@@ -22,7 +22,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Adapter\ObjectPresenter;
 
-
 class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;

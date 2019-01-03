@@ -83,7 +83,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         $finds = Db::getInstance()->getValue($checkSQL);
         if ($finds > 0) {
             $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
                 ' WHERE id_cart='.(int) $this->context->cart->id;
             Db::getInstance()->execute($update_sql);
             if (Configuration::get('KCOV3')) {
@@ -102,8 +102,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         }
         
         $checkValue = Tools::jsonDecode($this->context->cart->delivery_option, true);
-        if($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
-            if(!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
+        if ($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
+            if (!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
                 $this->context->cart->delivery_option = "";
                 $this->context->cart->update();
                 
@@ -843,7 +843,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                 $url,
                 $klarna_agent
             );
-
         } else {
             if ($ssid=='us') {
                 $url = 'https://api-na.klarna.com/';

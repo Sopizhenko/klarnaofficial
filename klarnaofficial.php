@@ -3267,7 +3267,7 @@ class KlarnaOfficial extends PaymentModule
         $this->context->cart->update(true);
         $this->context->cart->getPackageList(true);
         $this->context->cart->getDeliveryOptionList(null, true);
-        $cache_id = 'objectmodel_cart_'.$cart->id.'*';
+        $cache_id = 'objectmodel_cart_'.$this->context->cart->id.'*';
         Cache::clean($cache_id);
     }
 

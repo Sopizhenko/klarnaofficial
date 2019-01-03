@@ -189,7 +189,15 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         //add customer
                         $id_gender = 9;
                         $date_of_birth = "";
-                        $customer = $this->module->createNewCustomer($shipping['given_name'], $shipping['family_name'], $shipping['email'], $newsletter, $id_gender, $date_of_birth, $cart);
+                        $customer = $this->module->createNewCustomer(
+                            $shipping['given_name'],
+                            $shipping['family_name'],
+                            $shipping['email'],
+                            $newsletter,
+                            $id_gender,
+                            $date_of_birth,
+                            $cart
+                        );
                     }
 
                     $this->module->changeAddressOnKCOCart($shipping, $billing, $country_iso_codes, $customer, $cart);
@@ -270,7 +278,5 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
             Logger::addLog('Klarna Checkout: '.htmlspecialchars($e->getMessage()), 1, null, null, null, true);
         }
-    }
-
-    
+    }   
 }

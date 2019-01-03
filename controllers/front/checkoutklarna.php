@@ -68,14 +68,24 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $finds = Db::getInstance()->getValue($checkSQL);
         if ($finds > 0) {
             $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
                 ' WHERE id_cart='.(int) $this->context->cart->id;
             Db::getInstance()->execute($update_sql);
             if (Configuration::get('KCOV3')) {
-                $kcov3link = $this->context->link->getModuleLink($this->module->name, 'checkoutklarnakco', array(), true);
+                $kcov3link = $this->context->link->getModuleLink(
+                    $this->module->name,
+                    'checkoutklarnakco',
+                    array(),
+                    true
+                );
                 Tools::redirect($kcov3link);
             } else {
-                $kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', array(), true);
+                $kcolink = $this->context->link->getModuleLink(
+                    $this->module->name,
+                    'checkoutklarna',
+                    array(),
+                    true
+                );
                 Tools::redirect($kcov3link);
             }
         }
@@ -85,8 +95,8 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         }
         
         $checkValue = Tools::jsonDecode($this->context->cart->delivery_option, true);
-        if($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
-            if(!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
+        if ($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
+            if (!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
                 $this->context->cart->delivery_option = "";
                 $this->context->cart->update();
                 
@@ -741,15 +751,14 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         $show_us = true;
                     }
                     
-                    // Get PS cart  
+                    // Get PS cart
                     $presenter = new CartPresenter();
                     $presented_cart = $presenter->present($this->context->cart, true);
 
-                    $this->context->smarty->assign([
+                    $this->context->smarty->assign(array(
                         'cart' => $presented_cart,
                         'static_token' => Tools::getToken(false),
-                    ]);
-                    // // 
+                    ));
                     
                     $checkoutSession = $this->getCheckoutSession();
                     $delivery_options = $checkoutSession->getDeliveryOptions();

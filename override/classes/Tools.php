@@ -28,7 +28,7 @@ class Tools extends ToolsCore
         $old_id_lang = $context->cookie->id_lang;
         if (($iso = Tools::getValue('isolang')) && Validate::isLanguageIsoCode($iso) && ($new_id_lang = (int)Language::getIdByIso($iso))) {
             if ($new_id_lang != $old_id_lang) {
-               if (version_compare(phpversion(), '5.4.0', '>=')) {
+                if (version_compare(phpversion(), '5.4.0', '>=')) {
                     if (session_status() === PHP_SESSION_NONE) {
                         session_start();
                     }
