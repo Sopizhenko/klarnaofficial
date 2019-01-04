@@ -2235,7 +2235,8 @@ class KlarnaOfficial extends PaymentModule
         }
         $this->context->controller->addCSS(($this->_path).'views/css/kpm_common.css', 'all');
         $this->context->controller->addJS(($this->_path).'views/js/kco_common.js');
-        Media::addJsDef(array('kco_checkout_url' => $this->context->link->getModuleLink('klarnaofficial', 'checkoutklarna', array(), true)));
+        $kco_checkout_url = $this->context->link->getModuleLink('klarnaofficial', 'checkoutklarna', array(), true);
+        Media::addJsDef(array('kco_checkout_url' => $kco_checkout_url));
     }
 
     /*public function hookTop($params)
@@ -2710,29 +2711,29 @@ class KlarnaOfficial extends PaymentModule
                 if ($country->iso_code=="DE") {
                     $active_in_country = Configuration::get('KCO_GERMANY');
                     if (false == $active_in_country) {
-                        $active_in_country = Configuration::get('KCOV3_GERMANY');    
+                        $active_in_country = Configuration::get('KCOV3_GERMANY');
                     }
                 } elseif ($country->iso_code=="NO") {
                     $active_in_country = Configuration::get('KCO_NORWAY');
                     if (false == $active_in_country) {
-                        $active_in_country = Configuration::get('KCOV3_NORWAY');    
+                        $active_in_country = Configuration::get('KCOV3_NORWAY');
                     }
                 } elseif ($country->iso_code=="FI") {
                     $active_in_country = Configuration::get('KCO_FINLAND');
                     if (false == $active_in_country) {
-                        $active_in_country = Configuration::get('KCOV3_FINLAND');    
+                        $active_in_country = Configuration::get('KCOV3_FINLAND');
                     }
                 } elseif ($country->iso_code=="SE") {
                     $active_in_country = Configuration::get('KCO_SWEDEN');
                     if (false == $active_in_country) {
-                        $active_in_country = Configuration::get('KCOV3_SWEDEN');    
+                        $active_in_country = Configuration::get('KCOV3_SWEDEN');
                     }
                 } elseif ($country->iso_code=="GB") {
                     $active_in_country = Configuration::get('KCO_UK');
                 } elseif ($country->iso_code=="AT") {
                     $active_in_country = Configuration::get('KCO_AUSTRIA');
                     if (false == $active_in_country) {
-                        $active_in_country = Configuration::get('KCOV3_AUSTRIA');    
+                        $active_in_country = Configuration::get('KCOV3_AUSTRIA');
                     }
                 } else {
                     $active_in_country = false;
@@ -3174,7 +3175,7 @@ class KlarnaOfficial extends PaymentModule
         '\' WHERE id_cart='.
         (int) $cart->id;
         
-        Db::getInstance()->execute($update_sql);   
+        Db::getInstance()->execute($update_sql);
         
         $cache_id = 'objectmodel_cart_'.$cart->id.'_*';
         Cache::clean($cache_id);

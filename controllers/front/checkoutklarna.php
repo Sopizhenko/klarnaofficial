@@ -95,7 +95,10 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         }
         
         $checkValue = Tools::jsonDecode($this->context->cart->delivery_option, true);
-        if ($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
+        if ($this->context->cart->delivery_option != "" &&
+            $checkValue !== false &&
+            (int)$this->context->cart->id_address_delivery > 0
+            ) {
             if (!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
                 $this->context->cart->delivery_option = "";
                 $this->context->cart->update();
@@ -536,7 +539,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                             if ($this->context->customer->isLogged()) {
                                 /*PREFILL CUSTOMER INFO*/
                                 $okToPrefill = true;
-                                if ($country_information['purchase_country'] == "DE" && Configuration::get('KCO_DE_PREFILNOT')) {
+                                if ($country_information['purchase_country'] == "DE"
+                                    && Configuration::get('KCO_DE_PREFILNOT')
+                                    ) {
                                     $okToPrefill = false;
                                     if (Tools::getIsset("oktoprefill")) {
                                         $okToPrefill = true;

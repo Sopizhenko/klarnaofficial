@@ -102,7 +102,10 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         }
         
         $checkValue = Tools::jsonDecode($this->context->cart->delivery_option, true);
-        if ($this->context->cart->delivery_option != "" && $checkValue !== false && (int)$this->context->cart->id_address_delivery > 0) {
+        if ($this->context->cart->delivery_option != "" &&
+            $checkValue !== false &&
+            (int)$this->context->cart->id_address_delivery > 0
+        ) {
             if (!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {
                 $this->context->cart->delivery_option = "";
                 $this->context->cart->update();
