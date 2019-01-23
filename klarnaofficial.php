@@ -2151,11 +2151,24 @@ class KlarnaOfficial extends PaymentModule
 
         return $this->display(__FILE__, 'klarnaproductpage.tpl');
     }
-    public function hookFooter($params)
+    public function hookDisplayFooter($params)
     {
         if (Configuration::get('PS_CATALOG_MODE')) {
             return;
         }
+        
+        $klarna_locale = $this->getKlarnaLocale();
+        
+        if ($klarna_locale == 'sv_fi') {
+            $klarna_locale = 'fi_fi';
+        }
+        
+        if (Configuration::get('KCOV3')) {
+            $this->smarty->assign('kco_footer_locale', $klarna_locale);
+            $this->smarty->assign('klarnav3_footer_layout', Configuration::get('KCOV3_FOOTERBANNER'));
+            return $this->display(__FILE__, 'klarnafooter.tpl');
+        }
+        
         if (isset($this->context->language) &&
         isset($this->context->language->id) &&
         (int) $this->context->language->id > 0) {
@@ -2212,12 +2225,9 @@ class KlarnaOfficial extends PaymentModule
         if ($eid == '') {
             return;
         }
-        $klarna_locale = $this->getKlarnaLocale();
         
-        if ($klarna_locale == 'sv_fi') {
-            $klarna_locale = 'fi_fi';
-        }
         $this->smarty->assign('klarna_footer_layout', Configuration::get('KCO_FOOTERLAYOUT'));
+        $this->smarty->assign('klarnav3_footer_layout', 0);
         $this->smarty->assign('kco_footer_active', $kco_active);
         $this->smarty->assign('kco_footer_eid', $eid);
         $this->smarty->assign('kco_footer_locale', $klarna_locale);
@@ -3947,6 +3957,15 @@ class KlarnaOfficial extends PaymentModule
             );
         }
         return $customer;
+    }
+    
+    public function changeCurrencyonCart($currency, $iso_code_required)
+    {
+        if ($currency->iso_code != $iso_code_required) {
+            $new_currency = Currency::getIdByIsoCode($iso_code_required);
+            $this->context->cookie->id_currency = (int)$new_currency;
+            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
+        }
     }
     
     public function getKlarnaCountryInformation($currency_iso_code, $language_iso_code)

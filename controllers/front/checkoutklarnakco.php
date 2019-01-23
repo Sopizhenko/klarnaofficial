@@ -226,7 +226,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                 $notification_url = $this->context->link->getModuleLink(
                     'klarnaofficial',
                     'notification',
-                    array('sid' => $ssid)
+                    array()
                 );
                 $pushPage = $this->context->link->getModuleLink(
                     'klarnaofficial',

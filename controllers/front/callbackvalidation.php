@@ -41,11 +41,13 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
             $id_cart = (int)$klarnaorder["merchant_reference"]["orderid2"];
             if ($id_cart > 0) {
                 $cart = new Cart($id_cart);
-                $this->context->currency = new Currency((int)$cart->id_currency);
-                $language = new Language((int)$cart->id_lang);
-                $this->context->language = $language;
                 //Check cart exist and no order created
                 if (Validate::isLoadedObject($cart) && $cart->OrderExists() == false) {
+                    $this->context->cart = $cart;
+                    $this->context->currency = new Currency((int)$cart->id_currency);
+                    $language = new Language((int)$cart->id_lang);
+                    $this->context->language = $language;
+                    
                     //Check stock
                     if (!$cart->checkQuantities()) {
                          $this->redirectKCO('index.php?controller=order&step=1');
