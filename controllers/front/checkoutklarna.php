@@ -786,7 +786,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     }
                     
                     $this->context->smarty->assign(array(
-                        'isv3' => false,
+                        'isv3' => 0,
                         'no_active_countries' => $no_active_countries,
                         'show_prefil_link' => $show_prefil_link,
                         'show_austria' => $show_austria,
