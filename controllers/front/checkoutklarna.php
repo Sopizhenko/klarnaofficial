@@ -86,7 +86,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     array(),
                     true
                 );
-                Tools::redirect($kcov3link);
+                Tools::redirect($kcolink);
             }
         }
         
@@ -97,6 +97,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $checkValue = Tools::jsonDecode($this->context->cart->delivery_option, true);
         if ($this->context->cart->delivery_option != "" &&
             $checkValue !== false &&
+            $checkValue !== null &&
             (int)$this->context->cart->id_address_delivery > 0
             ) {
             if (!isset($checkValue[(int)$this->context->cart->id_address_delivery])) {

@@ -3625,6 +3625,7 @@ class KlarnaOfficial extends PaymentModule
         if ($abconly) {
             $string = preg_replace("/[^\p{L}\p{N} -]/u", '', $string);
             $string = preg_replace('/[0-9]+/', '', $string);
+            $string = str_replace("-", '', $string);
             $string = trim($string);
         }
         //$string = utf8_encode($string);
