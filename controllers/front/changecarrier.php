@@ -58,6 +58,9 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
             Db::getInstance()->execute($update_sql);
         }
         
+        unset($cart);
+        $cart = new Cart($id_cart);
+        
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
         $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
         //$cart->setDeliveryOption($cart->getDeliveryOption());
