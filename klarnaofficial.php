@@ -2820,32 +2820,7 @@ class KlarnaOfficial extends PaymentModule
         } elseif (Tools::getIsset("kcotpv3")) {
             require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
             $sid = Tools::getValue('sid');
-            if ($sid == 'gb') {
-                $sharedSecret = Configuration::get('KCO_UK_SECRET');
-                $merchantId = Configuration::get('KCO_UK_EID');
-            } elseif ($sid == 'us') {
-                $sharedSecret = Configuration::get('KCO_US_SECRET');
-                $merchantId = Configuration::get('KCO_US_EID');
-            } elseif ($sid == 'nl') {
-                $sharedSecret = Configuration::get('KCO_NL_SECRET');
-                $merchantId = Configuration::get('KCO_NL_EID');
-            } elseif ($sid == 'se') {
-                $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
-                $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
-            } elseif ($sid == 'de') {
-                $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
-                $merchantId = Configuration::get('KCOV3_GERMANY_EID');
-            } elseif ($sid == 'at') {
-                $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
-                $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
-            } elseif ($sid == 'fi') {
-                $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
-                $merchantId = Configuration::get('KCOV3_FINLAND_EID');
-            } elseif ($sid == 'no') {
-                $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
-                $merchantId = Configuration::get('KCOV3_NORWAY_EID');
-            }
-            
+
             if (Configuration::get('KCOV3')) {
                 $merchantId = Configuration::get('KCOV3_MID');
                 $sharedSecret = Configuration::get('KCOV3_SECRET');
@@ -2857,7 +2832,6 @@ class KlarnaOfficial extends PaymentModule
                     $sharedSecret,
                     \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
                 );
-
            
                 $orderId = Tools::getValue('klarna_order_id');
 
