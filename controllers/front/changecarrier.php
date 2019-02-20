@@ -57,6 +57,9 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
                 '\' WHERE id_cart='.
                 (int) $cart->id;
             Db::getInstance()->execute($update_sql);
+            
+            unset($cart);
+            $cart = new Cart($id_cart);
         }
         
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
@@ -96,7 +99,6 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         echo json_encode($klarnadata);
         exit;
     }
-    
     
     public function redirectKCO($url = false)
     {
