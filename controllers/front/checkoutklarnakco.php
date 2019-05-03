@@ -470,7 +470,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $this->context->smarty->assign('klarna_checkout_cart_changed', true);
                         }
                         $this->context->smarty->assign('klarna_checkout', $snippet);
-                        
                     }
                 } catch (Exception $e) {
                     unset($_SESSION['klarna_checkout_uk']);
