@@ -138,6 +138,7 @@ body {
 
     <h3>Configure the module</h3>
     <p>Klarna Official for PrestaShop is a <strong>giant integration</strong> with support for <strong>Klarna Checkout</strong> and <strong>Klarna KPM (invoice and partpayment)</strong>.</p>
+    <p>Download & install the module Klarna checkout module Klarna Official by Prestaworks. In Modules menu > Modules & Services find Klarna module and click on Configure. (Alternatively in: Installed modules) Note: If you use multi-site on Prestashop, please switch to the right store before making the changes</p>
     <p>This integration configuration page contains 5 tabs with different information and settings. These settings totally depend on what you're going to run in your store. We'll explain each tab below:</p>
     
     <table id="tabs_desc" class="table table-bordered table-striped">
@@ -149,8 +150,12 @@ body {
       </thead>
       <tbody>
         <tr>
-          <td class="tabs_topic">KLARNA CHECKOUT (KCO)</td>
-          <td>This tab contains settings for activating Klarna Checkout, enabling Klarna Checkout for different countries, along with various settings such as design (color) management in the Checkout.</td>
+          <td class="tabs_topic">Klarna Checkout V2 (KCO)</td>
+          <td>This tab contains settings for activating Klarna Checkout V2, enabling Klarna Checkout for different countries, along with various settings such as design (color) management in the Checkout.</td>
+        </tr>
+        <tr>
+          <td class="tabs_topic">Klarna Checkout V3 (KCO)</td>
+          <td>This tab contains settings for activating Klarna Checkout V3 in your store.</td>
         </tr>
         <tr>
           <td class="tabs_topic">KLARNA PAYMENT METHOD (KPM)</td>
@@ -175,7 +180,36 @@ body {
       </tbody>
     </table>
     
-    <h3>Configure your store for Klarna Checkout</h3>
+    <h3>Configure your store for Klarna Checkout V2</h3>
+    <p>Let us run through an example of how to configure the store for Klarna Checkout only below.</p>
+    
+    <ol>
+        <li>Start by navigating to the module configuration page, and choose the tab called <strong>KLARNA CHECKOUT (KCO)</strong></li>
+        <li>In the vertical tab inside this tab, make sure to have <strong>General settings</strong> enabled.</li>
+        <li>Set "Active KCO in this shop" to <strong>Yes</strong> (if you're in test-stage, you would probably run better with this option disabled)</li>
+        <li>Then navigate to each country you would like to enable. This guide will assist with how to configure one country.</li>
+        <li>After choosing a country in the vertical list, make sure that <strong>"Active KCO COUNTRYNAME"</strong> is set to <strong>Yes</strong> and that you've filled in your EID and Shared secret for the specific country</li>
+        <li>Hit the button at the very right corner called "Save"</li>
+        <li><strong>You're done, great job!</strong></li>
+    </ol>
+    
+    <h3>Configure your store for Klarna Checkout V3</h3>
+    <p>Let us run through an example of how to configure the store for Klarna Checkout only below.</p>
+    
+    <ol>
+        <li>On the module configuration page, choose the tab called <strong>COMMON SETTINGS</strong>, set the Testdrive to "Yes" if you like to test the integration. This determines if calls are being made to the Klarna playground ("Yes") or production systems ("No").</li>
+        <li>Hit the button at the bottom right corner called "Save"</li>
+        <li>Then navigate to <strong>KLARNA CHECKOUT V3 (KCO)</strong> tab and switch Active KCO V3 "Yes” </li>
+        <li>Enter the Username and Password<br />If you don’t yet have Klarna API credentials, you can request them from: <a href="https://eu.portal.klarna.com/signup/?products=kp&platform=prestashop" target="_blank">https://eu.portal.klarna.com/signup/?products=kp&platform=prestashop</a> (production credentials) or <a href="https://playground.eu.portal.klarna.com/developer-sign-up" target="_blank">https://playground.eu.portal.klarna.com/developer-sign-up</a> (playground)</li>
+        <li>Hit the button at the bottom right corner called "Save"</li>
+        <li>Then navigate to tab called <strong>KLARNA CHECKOUT COMMON</strong></li>
+        <li>In the vertical tab inside this tab, make sure to have selected <strong>General settings</strong></li>
+        <li>Set "Active KCO in this shop" to Yes</li>
+        <li>Hit the button at the bottom right corner called "Save"</li>
+        <li><strong>You're done, great job!</strong></li>
+    </ol>
+
+    <h3>Configure your store for Klarna Checkout V3</h3>
     <p>Let us run through an example of how to configure the store for Klarna Checkout only below.</p>
     
     <ol>
@@ -196,7 +230,7 @@ body {
         <li>Then you will have to navigate to each country you would like to enable. This guide will assist with how to configure one country.</li>
         <li>Make sure to fill your EID and shared secret for the specific country</li>
         <li>Hit the button at the very right corner called "Save"</li>
-        <li><strong>NOTE!</strong> Use the “Testdrive” setting under the main tab “COMMON SETTINGS” to control whether you are running in “TestDrive” or “Live” mode. This will drive if calls are being made to the Klarna test or production systems. This is the only place to control Test or Live for KPM.</li>
+        <li><strong>NOTE!</strong> Use the "Testdrive” setting under the main tab "COMMON SETTINGS” to control whether you are running in "TestDrive” or "Live” mode. This will drive if calls are being made to the Klarna test or production systems. This is the only place to control Test or Live for KPM.</li>
         <li><strong>You're done, great job!</strong></li>
     </ol>
     

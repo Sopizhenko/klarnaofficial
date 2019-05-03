@@ -5,7 +5,12 @@ if ($country_information === false) {
 }
 
 $kcov3link = $this->context->link->getModuleLink($this->module->name, 'checkoutklarnakco', array(), true);
-$kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', array(), true);
+if (Tools::getIsset("kco_update")) {
+    $extra = array("kco_update" => 1);
+} else {
+    $extra = array();
+}
+$kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', $extra, true);
 
 $tmp_address = new Address((int) ($this->context->cart->id_address_delivery));
 $country = new Country($tmp_address->id_country);

@@ -71,6 +71,7 @@ class KlarnaOfficial extends PaymentModule
 
         'KCOV3',
         'KCOV3_PREFILNOT',
+        'KCOV3_SHOWPRODUCTPAGE',
         'KCOV3_MID',
         'KCOV3_SECRET',
         'KCOV3_FOOTERBANNER',
@@ -154,7 +155,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.2';
+        $this->version = '2.1.4';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -186,11 +187,14 @@ class KlarnaOfficial extends PaymentModule
             || $this->registerHook('displayHeader') == false
             || $this->registerHook('displayFooter') == false
             || $this->registerHook('actionOrderStatusUpdate') == false
-            || $this->registerHook('displayProductButtons') == false
+            || $this->registerHook('displayProductAdditionalInfo') == false
             || $this->registerHook('paymentOptions') == false
             || $this->registerHook('displayOrderConfirmation') == false
             || $this->registerHook('displayAdminOrder') == false
             || Configuration::updateValue('KCO_ROUNDOFF', 0) == false
+            || Configuration::updateValue('KCOV3', 1) == false
+            || Configuration::updateValue('KCO_IS_ACTIVE', 1) == false
+            || Configuration::updateValue('KCO_TESTMODE', 1) == false
             || $this->setKCOCountrySettings() == false
             ) {
             return false;
@@ -433,6 +437,32 @@ class KlarnaOfficial extends PaymentModule
         $plugin = $this->name;
         $pluginVersion = $this->version;
         
+        $isPHP7_warning = false;
+        if (version_compare(phpversion(), '7.0.0', '>') && Configuration::get('KPM_SHOW_IN_PAYMENTS')) {
+            $isPHP7_warning = true;
+        }
+        
+        $isMAINTENANCE_warning = false;
+        if (0 === (int)Configuration::get('PS_SHOP_ENABLE')) {
+            $isMAINTENANCE_warning = true;
+        }
+        
+        $isRounding_warning = false;
+        if (1 !== (int)Configuration::get('PS_ROUND_TYPE')) {
+            $isRounding_warning = true;
+        }
+        
+        $isNoSll_warning = false;
+        if (0 === (int)Configuration::get('PS_SSL_ENABLED')) {
+            $isNoSll_warning = true;
+        }
+        
+        $isNoDecimal_warning = false;
+        if (0 === (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION')) {
+            $isNoDecimal_warning = true;
+        }
+        
+        
         $this->context->smarty->assign(array(
             'klarnaisocodedef' => $country->iso_code,
             'errorMSG' => $errorMSG,
@@ -444,6 +474,11 @@ class KlarnaOfficial extends PaymentModule
             'platformVersion' => $platformVersion,
             'pluginVersion' => $pluginVersion,
             'plugin' => $plugin,
+            'isMAINTENANCE_warning' => $isMAINTENANCE_warning,
+            'isPHP7_warning' => $isPHP7_warning,
+            'isRounding_warning' => $isRounding_warning,
+            'isNoDecimal_warning' => $isNoDecimal_warning,
+            'isNoSll_warning' => $isNoSll_warning,
             'cron_token' => $cron_token,
             'invoice_fee_not_found' => $invoice_fee_not_found,
             'commonform' => $this->createCommonForm(),
@@ -1544,6 +1579,23 @@ class KlarnaOfficial extends PaymentModule
                         'name' => 'KCOV3_SECRET',
                         'required' => true,
                     ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Activate product page widget'),
+                        'name' => 'KCOV3_SHOWPRODUCTPAGE',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'showv3pp_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'showv3pp_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate widget on product page.'),
+                    ),
                 array(
                         'type' => 'switch',
                         'label' => $this->l('Active Prefill notification'),
@@ -2018,138 +2070,163 @@ class KlarnaOfficial extends PaymentModule
         return $returnarray;
     }
 
-    public function hookDisplayProductButtons($params)
+    public function hookDisplayProductAdditionalInfo($params)
     {
-        if ((int) Configuration::get('KCO_SHOWPRODUCTPAGE') == 0) {
+        if (0 == (int) Configuration::get('KCO_SHOWPRODUCTPAGE') && 0 == (int) Configuration::get('KCOV3_SHOWPRODUCTPAGE')) {
             return;
         }
+       
         if (Configuration::get('PS_CATALOG_MODE')) {
             return;
         }
-        if (configuration::get('KPM_INVOICEFEE') != '') {
-            $invoicefee = $this->getByReference(Configuration::get('KPM_INVOICEFEE'));
-            if (Validate::isLoadedObject($invoicefee)) {
-                $klarna_invoice_fee = $invoicefee->getPrice();
+        
+        $showLegacyWidget = false;
+        $showV3Widget = false;
+        
+        if (1 === (int) Configuration::get('KCO_SHOWPRODUCTPAGE')) {
+            if (configuration::get('KPM_INVOICEFEE') != '') {
+                $invoicefee = $this->getByReference(Configuration::get('KPM_INVOICEFEE'));
+                if (Validate::isLoadedObject($invoicefee)) {
+                    $klarna_invoice_fee = $invoicefee->getPrice();
+                } else {
+                    $klarna_invoice_fee = 0;
+                }
             } else {
                 $klarna_invoice_fee = 0;
             }
-        } else {
-            $klarna_invoice_fee = 0;
-        }
 
-        $klarna_eid = '';
-        $country_iso = '';
-        if (isset($this->context->cart) &&
-        isset($this->context->cart->id_address_delivery) &&
-        (int) $this->context->cart->id_address_delivery > 0) {
-            $address = new Address($this->context->cart->id_address_delivery);
-            $country_iso = Country::getIsoById($address->id_country);
-        } else {
-            if (isset($this->context->language) &&
-            isset($this->context->language->id) &&
-            (int) $this->context->language->id > 0) {
-                $language_iso = Language::getIsoById((int) $this->context->language->id);
+            $klarna_eid = '';
+            $country_iso = '';
+            if (isset($this->context->cart) &&
+            isset($this->context->cart->id_address_delivery) &&
+            (int) $this->context->cart->id_address_delivery > 0) {
+                $address = new Address($this->context->cart->id_address_delivery);
+                $country_iso = Country::getIsoById($address->id_country);
             } else {
-                $language_iso = Language::getIsoById(Configuration::get('PS_LANG_DEFAULT'));
+                if (isset($this->context->language) &&
+                isset($this->context->language->id) &&
+                (int) $this->context->language->id > 0) {
+                    $language_iso = Language::getIsoById((int) $this->context->language->id);
+                } else {
+                    $language_iso = Language::getIsoById(Configuration::get('PS_LANG_DEFAULT'));
+                }
+                $language_iso = Tools::strtolower($language_iso);
+                if ($language_iso == 'sv') {
+                    $country_iso = 'se';
+                }
+                if ($language_iso == 'no' || $language_iso == 'nn' || $language_iso == 'nb') {
+                    $country_iso = 'no';
+                }
+                if ($language_iso == 'fi') {
+                    $country_iso = 'fi';
+                }
+                if ($language_iso == 'de') {
+                    $country_iso = 'de';
+                }
+                if ($language_iso == 'da') {
+                    $country_iso = 'da';
+                }
+                if ($language_iso == 'at') {
+                    $country_iso = 'at';
+                }
+                if ($language_iso == 'en') {
+                    $country_iso = 'gb';
+                }
             }
-            $language_iso = Tools::strtolower($language_iso);
-            if ($language_iso == 'sv') {
-                $country_iso = 'se';
+
+            if ($country_iso == '') {
+                $country_iso = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
             }
-            if ($language_iso == 'no' || $language_iso == 'nn' || $language_iso == 'nb') {
-                $country_iso = 'no';
+            $country_iso = Tools::strtolower($country_iso);
+
+            if ($country_iso == 'se') {
+                if ((int) Configuration::get('KCO_SWEDEN', null, null, $this->context->shop->id) == 1) {
+                    $klarna_eid = Configuration::get('KCO_SWEDEN_EID', null, null, $this->context->shop->id);
+                } else {
+                    $klarna_eid = Configuration::get('KPM_SV_EID', null, null, $this->context->shop->id);
+                }
             }
-            if ($language_iso == 'fi') {
-                $country_iso = 'fi';
+            if ($country_iso == 'no') {
+                if ((int) Configuration::get('KCO_NORWAY', null, null, $this->context->shop->id) == 1) {
+                    $klarna_eid = Configuration::get('KCO_NORWAY_EID', null, null, $this->context->shop->id);
+                } else {
+                    $klarna_eid = Configuration::get('KPM_NO_EID', null, null, $this->context->shop->id);
+                }
             }
-            if ($language_iso == 'de') {
-                $country_iso = 'de';
+            if ($country_iso == 'de') {
+                if ((int) Configuration::get('KCO_GERMANY', null, null, $this->context->shop->id) == 1) {
+                    $klarna_eid = Configuration::get('KCO_GERMANY_EID', null, null, $this->context->shop->id);
+                } else {
+                    $klarna_eid = Configuration::get('KPM_DE_EID', null, null, $this->context->shop->id);
+                }
             }
-            if ($language_iso == 'da') {
-                $country_iso = 'da';
+            if ($country_iso == 'da') {
+                $klarna_eid = Configuration::get('KPM_DA_EID', null, null, $this->context->shop->id);
             }
-            if ($language_iso == 'at') {
-                $country_iso = 'at';
+            if ($country_iso == 'fi') {
+                if ((int) Configuration::get('KCO_FINLAND', null, null, $this->context->shop->id) == 1) {
+                    $klarna_eid = Configuration::get('KCO_FINLAND_EID', null, null, $this->context->shop->id);
+                } else {
+                    $klarna_eid = Configuration::get('KPM_FI_EID', null, null, $this->context->shop->id);
+                }
             }
-            if ($language_iso == 'en') {
-                $country_iso = 'gb';
+            if ($country_iso == 'nl') {
+                $klarna_eid = Configuration::get('KPM_NL_EID', null, null, $this->context->shop->id);
             }
+            if ($country_iso == 'at') {
+                if ((int) Configuration::get('KCO_AUSTRIA', null, null, $this->context->shop->id) == 1) {
+                    $klarna_eid = Configuration::get('KCO_AUSTRIA_EID', null, null, $this->context->shop->id);
+                } else {
+                    $klarna_eid = Configuration::get('KPM_AT_EID', null, null, $this->context->shop->id);
+                }
+            }
+
+            if ($klarna_eid == '') {
+                $showLegacyWidget = false;
+            }
+
+            $this->context->smarty->assign('kcoeid', $klarna_eid);
+            $productPrice = Product::getPriceStatic(
+                (int) Tools::getValue('id_product'),
+                true,
+                null,
+                6,
+                null,
+                false,
+                true,
+                1,
+                false
+            );
+            $this->context->smarty->assign('kcoproductPrice', $productPrice);
+            $klarna_locale = $this->getKlarnaLocale();
+            $showLegacyWidget = true;
+            $this->context->smarty->assign('klarna_invoice_fee', $klarna_invoice_fee);
+            $this->context->smarty->assign('klarna_locale', $klarna_locale);
+            $this->context->smarty->assign('klarna_widget_layout', Configuration::get('KCO_PRODUCTPAGELAYOUT'));
+        }
+        
+        if (1 === (int) Configuration::get('KCOV3_SHOWPRODUCTPAGE')) {
+            $productPrice = Product::getPriceStatic(
+                (int) Tools::getValue('id_product'),
+                true,
+                null,
+                6,
+                null,
+                false,
+                true,
+                1,
+                false
+            );
+            $productPrice = 200000;
+            $this->context->smarty->assign('kcoproductPrice', $productPrice);
+            $showV3Widget = true;
         }
 
-        if ($country_iso == '') {
-            $country_iso = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+        if ($showV3Widget || $showLegacyWidget) {
+            $this->context->smarty->assign('showV3Widget', $showV3Widget);
+            $this->context->smarty->assign('showLegacyWidget', $showLegacyWidget);
+            return $this->display(__FILE__, 'klarnaproductpage.tpl');
         }
-        $country_iso = Tools::strtolower($country_iso);
-
-        if ($country_iso == 'se') {
-            if ((int) Configuration::get('KCO_SWEDEN', null, null, $this->context->shop->id) == 1) {
-                $klarna_eid = Configuration::get('KCO_SWEDEN_EID', null, null, $this->context->shop->id);
-            } else {
-                $klarna_eid = Configuration::get('KPM_SV_EID', null, null, $this->context->shop->id);
-            }
-        }
-        if ($country_iso == 'no') {
-            if ((int) Configuration::get('KCO_NORWAY', null, null, $this->context->shop->id) == 1) {
-                $klarna_eid = Configuration::get('KCO_NORWAY_EID', null, null, $this->context->shop->id);
-            } else {
-                $klarna_eid = Configuration::get('KPM_NO_EID', null, null, $this->context->shop->id);
-            }
-        }
-        if ($country_iso == 'de') {
-            if ((int) Configuration::get('KCO_GERMANY', null, null, $this->context->shop->id) == 1) {
-                $klarna_eid = Configuration::get('KCO_GERMANY_EID', null, null, $this->context->shop->id);
-            } else {
-                $klarna_eid = Configuration::get('KPM_DE_EID', null, null, $this->context->shop->id);
-            }
-        }
-        if ($country_iso == 'da') {
-            $klarna_eid = Configuration::get('KPM_DA_EID', null, null, $this->context->shop->id);
-        }
-        if ($country_iso == 'fi') {
-            if ((int) Configuration::get('KCO_FINLAND', null, null, $this->context->shop->id) == 1) {
-                $klarna_eid = Configuration::get('KCO_FINLAND_EID', null, null, $this->context->shop->id);
-            } else {
-                $klarna_eid = Configuration::get('KPM_FI_EID', null, null, $this->context->shop->id);
-            }
-        }
-        if ($country_iso == 'nl') {
-            $klarna_eid = Configuration::get('KPM_NL_EID', null, null, $this->context->shop->id);
-        }
-        if ($country_iso == 'at') {
-            if ((int) Configuration::get('KCO_AUSTRIA', null, null, $this->context->shop->id) == 1) {
-                $klarna_eid = Configuration::get('KCO_AUSTRIA_EID', null, null, $this->context->shop->id);
-            } else {
-                $klarna_eid = Configuration::get('KPM_AT_EID', null, null, $this->context->shop->id);
-            }
-        }
-        if ($country_iso == 'gb') {
-            return;
-        }
-
-        if ($klarna_eid == '') {
-            return;
-        }
-
-        $this->context->smarty->assign('kcoeid', $klarna_eid);
-        $productPrice = Product::getPriceStatic(
-            (int) Tools::getValue('id_product'),
-            true,
-            null,
-            6,
-            null,
-            false,
-            true,
-            1,
-            false
-        );
-        $this->context->smarty->assign('kcoproductPrice', $productPrice);
-        $klarna_locale = $this->getKlarnaLocale();
-
-        $this->context->smarty->assign('klarna_invoice_fee', $klarna_invoice_fee);
-        $this->context->smarty->assign('klarna_locale', $klarna_locale);
-        $this->context->smarty->assign('klarna_widget_layout', Configuration::get('KCO_PRODUCTPAGELAYOUT'));
-
-        return $this->display(__FILE__, 'klarnaproductpage.tpl');
     }
     public function hookDisplayFooter($params)
     {

@@ -29,19 +29,19 @@
 {capture name=path}{l s='Checkout' mod='klarnaofficial'}{/capture}
 
 {if isset($klarna_error)}
-{if isset($connectionerror)}
-    {if $connectionerror}
-        <a href="{$link->getPageLink("order", true)|escape:'html':'UTF-8'}" class="button btn btn-default button-medium">{l s='Go to checkout' mod='klarnaofficial'}</a><br /><br />
+    {if isset($connectionerror)}
+        {if $connectionerror}
+            <a href="{$link->getPageLink("order", true)|escape:'html':'UTF-8'}" class="button btn btn-default button-medium">{l s='Go to checkout' mod='klarnaofficial'}</a><br /><br />
+        {/if}
     {/if}
-{/if}
 <div class="alert alert-warning">
 	{if $klarna_error=='empty_cart'}
-	{l s='Your cart is empty' mod='klarnaofficial'}
+        {l s='Your cart is empty' mod='klarnaofficial'}
 	{else}
-	{$klarna_error|escape:'html':'UTF-8'}
+        {$klarna_error|escape:'html':'UTF-8'}
 	{/if}
 </div>
-{else}
+{/if}
 {if isset($vouchererrors) && $vouchererrors!=''}
 <div class="alert alert-warning">
 	{$vouchererrors|escape:'html':'UTF-8'}
@@ -243,12 +243,11 @@
                         </h1>
                     </div>
                     <div class="card-block">
-                    <div id="checkoutdiv">{$klarna_checkout nofilter}</div>
+                    <div id="checkoutdiv">{if isset($klarna_checkout)}{$klarna_checkout nofilter}{/if}</div>
                     </div>
                 </div>
             </div>
         </div>
 <!-- /#checkoutdiv.col-xs-12 -->
 </div><!-- /#height_kco_div -->
-{/if}
 {/block}

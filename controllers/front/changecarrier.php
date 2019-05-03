@@ -26,7 +26,6 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
 
     public function init()
     {
-        
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnadata = json_decode($klarnadata);
         if ($klarnadata == false) {
@@ -87,14 +86,21 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
             $shippingReference,
             $wrappingreference,
             $this->module->l('Wrapping', 'KlarnaOfficialChangeCarrierModuleFrontController'),
-            $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController')
+            $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController'),
+            true
         );
         $klarnadata->order_lines = $order_lines;
         $totalCartValue = $cart->getOrderTotal(true, Cart::BOTH, null, $cart->id_carrier, false);
         $totalCartValue_tax_excl = $cart->getOrderTotal(false, Cart::BOTH, null, $cart->id_carrier, false);
-        $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
+        $total_tax_value = 0;
+        // $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
         $klarnadata->order_amount = $totalCartValue * 100;
-        $klarnadata->order_tax_amount = $total_tax_value * 100;
+        
+        foreach ($order_lines as $item) {
+            $total_tax_value += $item['total_tax_amount'];
+        }
+                        
+        $klarnadata->order_tax_amount = $total_tax_value;
         
         echo json_encode($klarnadata);
         exit;

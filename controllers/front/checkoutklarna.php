@@ -80,10 +80,15 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 );
                 Tools::redirect($kcov3link);
             } else {
+                if (Tools::getIsset("kco_update")) {
+                    $extra = array("kco_update" => 1);
+                } else {
+                    $extra = array();
+                }
                 $kcolink = $this->context->link->getModuleLink(
                     $this->module->name,
                     'checkoutklarna',
-                    array(),
+                    $extra,
                     true
                 );
                 Tools::redirect($kcolink);
@@ -115,7 +120,12 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                     ' WHERE id_cart='.(int) $this->context->cart->id;
                     
                 Db::getInstance()->execute($update_sql);
-                $kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', array(), true);
+                if (Tools::getIsset("kco_update")) {
+                    $extra = array("kco_update" => 1);
+                } else {
+                    $extra = array();
+                }
+                $kcolink = $this->context->link->getModuleLink($this->module->name, 'checkoutklarna', $extra, true);
                 Tools::redirect($kcolink);
             }
         }

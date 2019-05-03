@@ -29,136 +29,85 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnaorder = Tools::jsonDecode($klarnadata, true);
         
+        $isV3 = false;
         if (isset($klarnaorder["merchant_reference2"])) {
             //This is a KCO V3 ORDER
             //Convert Data
+            $isV3 = true;
             $klarnaorder["merchant_reference"]["orderid2"] = $klarnaorder["merchant_reference2"];
             $klarnaorder["cart"]["items"] = $klarnaorder["order_lines"];
         }
-        
         //DO THE CHECKS ON THE CART
         if (isset($klarnaorder["merchant_reference"]["orderid2"])) {
             $id_cart = (int)$klarnaorder["merchant_reference"]["orderid2"];
             if ($id_cart > 0) {
                 $cart = new Cart($id_cart);
-                //Check cart exist and no order created
+                $this->context->cart = $cart;
                 if (Validate::isLoadedObject($cart) && $cart->OrderExists() == false) {
-                    $this->context->cart = $cart;
-                    $this->context->currency = new Currency((int)$cart->id_currency);
-                    $language = new Language((int)$cart->id_lang);
-                    $this->context->language = $language;
-                    
                     //Check stock
                     if (!$cart->checkQuantities()) {
-                         $this->redirectKCO('index.php?controller=order&step=1');
+                        $this->redirectKCO();
                     }
-                    //Check shipping
-                    $shipping_cost_with_tax = $cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
-                    $shipping_cost_with_tax = ($shipping_cost_with_tax * 100);
-                    foreach ($klarnaorder["cart"]["items"] as $key => $cartitem) {
-                        if ($cartitem["type"] == "shipping_fee") {
-                            if ($shipping_cost_with_tax==$cartitem["unit_price"]) {
-                                unset($klarnaorder["cart"]["items"][$key]);
-                            }
-                        }
+                    if ($cart->nbProducts() < 1) {
+                        $this->redirectKCO();
                     }
-                    //Check products
-                    foreach ($cart->getProducts() as $product) {
-                        $product_found = false;
-                        $product_reference = $product['id_product'];
-                        if (isset($product['reference']) &&
-                        $product['reference'] != '') {
-                            $product_reference = $product['reference'];
-                        }
-
-                        $price = Tools::ps_round($product['price_wt'], 2);
-                        $price = "".($price * 100);
-
-                        foreach ($klarnaorder["cart"]["items"] as $key => $cartitem) {
-                            if ($cartitem["reference"] == $product_reference) {
-                                if ((int)$cartitem["quantity"] == (int)$product['cart_quantity']) {
-                                    if ((int)$cartitem["unit_price"] == (int)$price) {
-                                        //All is matching, remove this.
-                                        unset($klarnaorder["cart"]["items"][$key]);
-                                        $product_found = true;
-                                    }
-                                }
-                            }
-                        }
-                        if (!$product_found) {
-                            //Prestashop cart has products kco has not
+                    if(isset($klarnaorder['order_amount'])) {
+                        $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
+                        $order_amount = $klarnaorder['order_amount'];
+                        $order_amount = $order_amount / 100;
+                        if ($order_amount != $totalCartValue) {
                             $this->redirectKCO();
                         }
-                        
-                        //CHECK DISCOUNTS
-                        
-                        foreach ($cart->getCartRules() as $cart_rule) {
-                            $value_real = $cart_rule["value_real"];
-                            $value_real = -(Tools::ps_round($value_real, 2) * 100);
-                            
-                            foreach ($klarnaorder["cart"]["items"] as $key => $cartitem) {
-                                if ($cartitem["type"] == "discount") {
-                                    if ((int)$cartitem["unit_price"] == (int)$value_real) {
-                                            unset($klarnaorder["cart"]["items"][$key]);
-                                            //$cartdiscountsfound = true;
-                                    }
-                                }
-                            }
-                        }
-                        
-                        /*$totalDiscounts = $cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
-                        $cartdiscountsfound = true;
-                        if ($totalDiscounts > 0) {
-                            $totalDiscounts = -number_format(($totalDiscounts * 100), 2, '.', '');
-                            $cartdiscountsfound = false;
-                            foreach ($klarnaorder["cart"]["items"] as $key => $cartitem) {
-                                     if ($cartitem["type"] == "discount") {
-                                         if ((int)$cartitem["unit_price"] == (int)$totalDiscounts) {
-                                             unset($klarnaorder["cart"]["items"][$key]);
-                                             $cartdiscountsfound = true;
-                                         }
-                                     }
-                                 }
-                        }*/
-                        
-                        //CHECK WRAPPING
-                        $cartgiftfound = true;
-                        if ($cart->gift == 1) {
-                            $cart_wrapping = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
-                            if ($cart_wrapping > 0) {
-                                $wrappingreference = $this->module->wrappingreferences[$language->iso_code];
-                                $cartgiftfound = false;
-                                $cart_wrapping = Tools::ps_round($cart_wrapping, 2);
-                                $cart_wrapping = ($cart_wrapping * 100);
-                                foreach ($klarnaorder["cart"]["items"] as $key => $cartitem) {
-                                    if ($cartitem["reference"] == $wrappingreference) {
-                                        if ($cartitem["unit_price"] == $cart_wrapping) {
-                                            $cartgiftfound = true;
-                                            unset($klarnaorder["cart"]["items"][$key]);
-                                        }
-                                    }
-                                }
+                    }
+                    
+                    require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
+                    $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
+                    
+                    $language = new Language($this->context->cart->id_lang);
+                    if (isset($this->module->shippingreferences[$language->iso_code])) {
+                        $shippingReference = $this->module->shippingreferences[$language->iso_code];
+                    } else {
+                        $shippingReference = $this->module->shippingreferences['en'];
+                    }
+                    if (isset($this->module->wrappingreferences[$language->iso_code])) {
+                        $wrappingreference = $this->module->wrappingreferences[$language->iso_code];
+                    } else {
+                        $wrappingreference = $this->module->wrappingreferences['en'];
+                    }
+                    
+                    $checkoutcart = $KlarnaCheckoutCommonFeatures->BuildCartArray(
+                        $this->context->cart,
+                        $shippingReference,
+                        $wrappingreference,
+                        $this->module->getL('Inslagning'),
+                        $this->module->getL('Discount'),
+                        $isV3
+                    );
+                    foreach($klarnaorder["cart"]["items"] as $klarnakey => $itemInKlarna) {
+                        foreach($checkoutcart as $pskey => $itemInPrestashop) {
+                            if ($itemInKlarna["type"] == $itemInPrestashop["type"] &&
+                                $itemInKlarna["name"] == $itemInPrestashop["name"] &&
+                                $itemInKlarna["quantity"] == $itemInPrestashop["quantity"]
+                            ) {
+                                unset($klarnaorder["cart"]["items"][$klarnakey]);
+                                unset($checkoutcart[$pskey]);
                             }
                         }
                     }
                     
-                    if (count($klarnaorder["cart"]["items"]) > 0) {
-                            //Klarna has products that are not existing in Prestashop
-                            $this->redirectKCO();
-                    }
-                    /*if ($cartdiscountsfound==false) {
-                        $this->redirectKCO();
-                    }*/
-                    if ($cartgiftfound==false) {
+                    if(is_array($klarnaorder["cart"]["items"]) && count($klarnaorder["cart"]["items"]) > 0) {
                         $this->redirectKCO();
                     }
-                    
+                    if(is_array($checkoutcart) && count($checkoutcart) > 0) {
+                        $this->redirectKCO();
+                    }
                     //ALL IS OK
                     exit;
                 } else {
-                    PrestaShopLogger::addLog('KCO: cart not loaded', 3, null, '', 0, true);
                     $this->redirectKCO();
                 }
+            } else {
+                $this->redirectKCO();
             }
         } else {
             $this->redirectKCO();

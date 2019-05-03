@@ -57,13 +57,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         $sharedSecret = '';
         parent::initContent();
         
-        $update_cart_url = $this->context->link->getModuleLink(
-            'klarnaofficial',
-            'reloadCart',
-            array('content_only' => 1),
-            true
-        );
-        
         $checkout_url = $this->context->link->getModuleLink(
             'klarnaofficial',
             'checkoutklarnakco',
@@ -214,7 +207,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     $shippingReference,
                     $wrappingreference,
                     $this->module->getL('Inslagning'),
-                    $this->module->getL('Discount')
+                    $this->module->getL('Discount'),
+                    true
                 );
                 
                 $callbackPage = $this->context->link->getModuleLink(
@@ -288,12 +282,14 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
 
                         $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
                         $totalCartValue_tax_excl = $this->context->cart->getOrderTotal(false, Cart::BOTH);
-                        $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
+                        // $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
+                        $total_tax_value = 0;
+                        
                         $create['purchase_country'] = $country_information['purchase_country'];
                         $create['purchase_currency'] = $country_information['purchase_currency'];
                         $create['locale'] = $country_information['locale'];
                         $create['order_amount'] = $totalCartValue * 100;
-                        $create['order_tax_amount'] = $total_tax_value * 100;
+                        // $create['order_tax_amount'] = $total_tax_value * 100;
                        
                         if (0 == (int) Configuration::get('KCO_AUTOFOCUS')) {
                             $create['gui']['options'] = array('disable_autofocus');
@@ -438,9 +434,20 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         }
                         foreach ($checkoutcart as $item) {
                             $create['order_lines'][] = $item;
+                            $total_tax_value += $item['total_tax_amount'];
                         }
+                        
+                        if ($total_tax_value < 0) {
+                            //Total tax can never be negative.
+                            $total_tax_value = 0;
+                        }
+                        $create['order_tax_amount'] = $total_tax_value;
+                        
                         // echo "------------".$eid;
-                         // echo "<pre>";print_r($create);echo "</pre>";
+                        // echo "<pre>";print_r($create);echo "</pre>";
+                         
+                        $this->assignSmartyVars($ssid, $country_information);
+                        
                         if (!isset($_SESSION['klarna_checkout_uk'])) {
                             $checkout->create($create);
                             $checkout->fetch();
@@ -454,197 +461,16 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $checkout->fetch();
                         }
 
-                        $id_country = 0;
-
-                        if ($country_information['purchase_country'] == 'GB') {
-                            $id_country = Country::getByIso('gb');
-                        } elseif ($country_information['purchase_country'] == 'US') {
-                            $id_country = Country::getByIso('us');
-                        }
-
-                        $this->context->cart->getSummaryDetails();
-
                         $snippet = $checkout['html_snippet'];
                         if (Tools::getIsset('kco_update') and Tools::getValue('kco_update') == '1') {
                             die($snippet);
                         }
-
+                        
                         if (Tools::getIsset('changed')) {
                             $this->context->smarty->assign('klarna_checkout_cart_changed', true);
                         }
                         $this->context->smarty->assign('klarna_checkout', $snippet);
-
-                        $wrapping_fees_tax_inc = $this->context->cart->getGiftWrappingPrice(true);
-
-                        $this->context->smarty->assign('discounts', $this->context->cart->getCartRules());
-                        $this->context->smarty->assign('cart_is_empty', false);
-                        $this->context->smarty->assign('gift', $this->context->cart->gift);
-                        $this->context->smarty->assign('gift_message', $this->context->cart->gift_message);
-                        $this->context->smarty->assign('giftAllowed', (int) (Configuration::get('PS_GIFT_WRAPPING')));
-                        $this->context->smarty->assign(
-                            'gift_wrapping_price',
-                            Tools::convertPrice(
-                                $wrapping_fees_tax_inc,
-                                new Currency($this->context->cart->id_currency)
-                            )
-                        );
-                        $this->context->smarty->assign(
-                            'message',
-                            Message::getMessageByCartId((int) ($this->context->cart->id))
-                        );
-
-                        if ($id_country > 0) {
-                            $delivery_option_list = $this->context->cart->getDeliveryOptionList(
-                                new Country($id_country),
-                                true
-                            );
-                        } else {
-                            $delivery_option_list = $this->context->cart->getDeliveryOptionList();
-                        }
-
-                        $free_shipping = false;
-                        foreach ($this->context->cart->getCartRules() as $rule) {
-                            if ($rule['free_shipping']) {
-                                $free_shipping = true;
-                                break;
-                            }
-                        }
-                        $free_fees_price = 0;
-                        $configuration = Configuration::getMultiple(
-                            array(
-                                'PS_SHIPPING_FREE_PRICE',
-                                'PS_SHIPPING_FREE_WEIGHT'
-                            )
-                        );
-                        if (isset($configuration['PS_SHIPPING_FREE_PRICE']) &&
-                        $configuration['PS_SHIPPING_FREE_PRICE'] > 0) {
-                            $free_fees_price = Tools::convertPrice(
-                                (float) $configuration['PS_SHIPPING_FREE_PRICE'],
-                                Currency::getCurrencyInstance((int) $this->context->cart->id_currency)
-                            );
-                            $orderTotalwithDiscounts = $this->context->cart->getOrderTotal(
-                                true,
-                                Cart::BOTH_WITHOUT_SHIPPING,
-                                null,
-                                null,
-                                false
-                            );
-                            $left_to_get_free_shipping = $free_fees_price - $orderTotalwithDiscounts;
-                            $this->context->smarty->assign('left_to_get_free_shipping', $left_to_get_free_shipping);
-                        }
-                        if (isset($configuration['PS_SHIPPING_FREE_WEIGHT']) &&
-                        $configuration['PS_SHIPPING_FREE_WEIGHT'] > 0) {
-                            $free_fees_weight = $configuration['PS_SHIPPING_FREE_WEIGHT'];
-                            $total_weight = $this->context->cart->getTotalWeight();
-                            $left_to_get_free_shipping_weight = $free_fees_weight - $total_weight;
-                            $this->context->smarty->assign(
-                                'left_to_get_free_shipping_weight',
-                                $left_to_get_free_shipping_weight
-                            );
-                        }
-
-                        $delivery_option = $this->context->cart->getDeliveryOption(
-                            new Country($id_country),
-                            false,
-                            false
-                        );
-
-                        $no_active_countries = 0;
-                        // $show_sweden = false;
-                        // $show_norway = false;
-                        // $show_finland = false;
-                        // $show_germany = false;
-                        // $show_austria = false;
-                        // $show_uk = false;
-                        // $show_us = false;
-                        // $show_nl = false;
-                        // if ((int) (Configuration::get('KCO_SWEDEN')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_sweden = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_SWEDEN')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_sweden = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_FINLAND')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_finland = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_FINLAND')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_finland = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_NL')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_nl = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_NORWAY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_norway = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_NORWAY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_norway = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_GERMANY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_germany = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_GERMANY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_germany = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_UK')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_uk = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_US')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_us = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_AUSTRIA')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_austria = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_AUSTRIA')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_austria = true;
-                        // }
-                        $this->assignSummaryInformations();
                         
-                        
-                        if (Configuration::get('KCOV3_PREFILNOT')) {
-                            $show_prefil_link = true;
-                        } else {
-                            $show_prefil_link = false;
-                        }
-                    
-                    
-                        $this->context->smarty->assign(array(
-                            'isv3' => true,
-                            'no_active_countries' => $no_active_countries,
-                            'show_prefil_link' => $show_prefil_link,
-                            // 'show_germany' => $show_germany,
-                            // 'show_norway' => $show_norway,
-                            // 'show_uk' => $show_uk,
-                            // 'show_us' => $show_us,
-                            // 'show_nl' => $show_nl,
-                            // 'show_austria' => $show_austria,
-                            // 'show_finland' => $show_finland,
-                            // 'show_sweden' => $show_sweden,
-                            // 'kco_selected_country' => $country_information['purchase_country'],
-                            'klarna_checkout' => $snippet,
-                            'controllername' => 'checkoutklarnakco',
-                            'free_shipping' => $free_shipping,
-                            'token_cart' => $this->context->cart->secure_key,
-                            'delivery_option_list' => $delivery_option_list,
-                            'delivery_option' => $delivery_option,
-                            'KCO_SHOWLINK' => (int) Configuration::get('KCO_SHOWLINK'),
-                            'layout' => $layout,
-                            'kcourl' => $checkout_url,
-                            'back' => '',
-                            'discount_name' => '',
-                        ));
                     }
                 } catch (Exception $e) {
                     unset($_SESSION['klarna_checkout_uk']);
@@ -654,14 +480,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         } else {
             $this->context->smarty->assign('klarna_error', 'empty_cart');
         }
-        
-        $button_text_color = Configuration::get('KCO_COLORBUTTONTEXT');
-        $button_color = Configuration::get('KCO_COLORBUTTON');
-        $this->context->smarty->assign('klarna_buttontext_color', $button_text_color);
-        $this->context->smarty->assign('klarna_button_color', $button_color);
-        $this->context->smarty->assign('klarna_update_cart_url', $update_cart_url);
-        $this->context->smarty->assign('haserror', Tools::getIsset('haserror'));
-        $this->context->smarty->assign('isv3', true);
         
         if (Configuration::get('KCO_LAYOUT') == 1) {
             $this->setTemplate('module:klarnaofficial/views/templates/front/kco_checkout.tpl');
@@ -709,6 +527,137 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         }
 
         return true;
+    }
+
+    protected function assignSmartyVars($ssid, $country_information) {
+        $this->context->smarty->assign(
+            'message',
+            Message::getMessageByCartId((int) ($this->context->cart->id))
+        );
+
+        $id_country = 0;
+        if ($country_information['purchase_country'] == 'GB') {
+            $id_country = Country::getByIso('gb');
+        } elseif ($country_information['purchase_country'] == 'US') {
+            $id_country = Country::getByIso('us');
+        }
+        
+        if ($id_country > 0) {
+            $delivery_option_list = $this->context->cart->getDeliveryOptionList(
+                new Country($id_country),
+                true
+            );
+        } else {
+            $delivery_option_list = $this->context->cart->getDeliveryOptionList();
+        }
+        
+        $delivery_option = $this->context->cart->getDeliveryOption(
+            new Country($id_country),
+            false,
+            false
+        );
+
+        $free_shipping = false;
+        foreach ($this->context->cart->getCartRules() as $rule) {
+            if ($rule['free_shipping']) {
+                $free_shipping = true;
+                break;
+            }
+        }
+        $free_fees_price = 0;
+        $configuration = Configuration::getMultiple(
+            array(
+                'PS_SHIPPING_FREE_PRICE',
+                'PS_SHIPPING_FREE_WEIGHT'
+            )
+        );
+        
+        if (isset($configuration['PS_SHIPPING_FREE_PRICE']) &&
+        $configuration['PS_SHIPPING_FREE_PRICE'] > 0) {
+            $free_fees_price = Tools::convertPrice(
+                (float) $configuration['PS_SHIPPING_FREE_PRICE'],
+                Currency::getCurrencyInstance((int) $this->context->cart->id_currency)
+            );
+            $orderTotalwithDiscounts = $this->context->cart->getOrderTotal(
+                true,
+                Cart::BOTH_WITHOUT_SHIPPING,
+                null,
+                null,
+                false
+            );
+            $left_to_get_free_shipping = $free_fees_price - $orderTotalwithDiscounts;
+            $this->context->smarty->assign('left_to_get_free_shipping', $left_to_get_free_shipping);
+        }
+        
+        if (isset($configuration['PS_SHIPPING_FREE_WEIGHT']) &&
+        $configuration['PS_SHIPPING_FREE_WEIGHT'] > 0) {
+            $free_fees_weight = $configuration['PS_SHIPPING_FREE_WEIGHT'];
+            $total_weight = $this->context->cart->getTotalWeight();
+            $left_to_get_free_shipping_weight = $free_fees_weight - $total_weight;
+            $this->context->smarty->assign(
+                'left_to_get_free_shipping_weight',
+                $left_to_get_free_shipping_weight
+            );
+        }
+
+        
+        $wrapping_fees_tax_inc = $this->context->cart->getGiftWrappingPrice(true);
+        
+        $this->context->cart->getSummaryDetails();
+        $this->context->smarty->assign('discounts', $this->context->cart->getCartRules());
+        $this->context->smarty->assign('cart_is_empty', false);
+        $this->context->smarty->assign('gift', $this->context->cart->gift);
+        $this->context->smarty->assign('gift_message', $this->context->cart->gift_message);
+        $this->context->smarty->assign('giftAllowed', (int) (Configuration::get('PS_GIFT_WRAPPING')));
+        $this->context->smarty->assign(
+            'gift_wrapping_price',
+            Tools::convertPrice(
+                $wrapping_fees_tax_inc,
+                new Currency($this->context->cart->id_currency)
+            )
+        );
+        
+        $this->assignSummaryInformations();
+        if (Configuration::get('KCOV3_PREFILNOT')) {
+            $show_prefil_link = true;
+        } else {
+            $show_prefil_link = false;
+        }
+        
+        $update_cart_url = $this->context->link->getModuleLink(
+            'klarnaofficial',
+            'reloadCart',
+            array('content_only' => 1),
+            true
+        );
+        $button_text_color = Configuration::get('KCO_COLORBUTTONTEXT');
+        $button_color = Configuration::get('KCO_COLORBUTTON');
+        $this->context->smarty->assign('klarna_buttontext_color', $button_text_color);
+        $this->context->smarty->assign('klarna_button_color', $button_color);
+        $this->context->smarty->assign('klarna_update_cart_url', $update_cart_url);
+        $this->context->smarty->assign('haserror', Tools::getIsset('haserror'));
+    
+        $checkout_url = $this->context->link->getModuleLink(
+            'klarnaofficial',
+            'checkoutklarnakco',
+            array('sid' => $ssid),
+            true
+        );
+        
+        $this->context->smarty->assign(array(
+            'isv3' => true,
+            'no_active_countries' => 0,
+            'show_prefil_link' => $show_prefil_link,
+            'controllername' => 'checkoutklarnakco',
+            'free_shipping' => $free_shipping,
+            'token_cart' => $this->context->cart->secure_key,
+            'delivery_option_list' => $delivery_option_list,
+            'delivery_option' => $delivery_option,
+            'KCO_SHOWLINK' => (int) Configuration::get('KCO_SHOWLINK'),
+            'kcourl' => $checkout_url,
+            'back' => '',
+            'discount_name' => '',
+        ));
     }
 
     protected function assignSummaryInformations()

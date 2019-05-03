@@ -12,6 +12,27 @@ function clearSessions()
     }
 }
 
+if (Configuration::get('KCOV3')) {
+    $ssid = 'gb';
+    $checkout_redirect_url = $this->context->link->getModuleLink(
+        'klarnaofficial',
+        'checkoutklarnakco',
+        array('sid' => $ssid),
+        true
+    );
+} else {
+    if (Tools::getIsset("kco_update")) {
+        $extra = array("kco_update" => 1);
+    } else {
+        $extra = array();
+    }
+    $checkout_redirect_url = $this->context->link->getModuleLink(
+        'klarnaofficial',
+        'checkoutklarna',
+        $extra,
+        true
+    );
+}
 
 if (Tools::isSubmit('kco_change_country')) {
     $id_lang = 0;
@@ -88,26 +109,27 @@ if (Tools::isSubmit('kco_change_country')) {
                 Db::getInstance()->execute($update_sql);
         //KILL THE SESSION TO START A NEW
         clearSessions();
+        Tools::redirect($checkout_redirect_url);
 
-        if (Tools::getValue('kco_change_country') == 'gb') {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } elseif (Tools::getValue('kco_change_country') == 'us') {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnaus');
-        } elseif (Tools::getValue('kco_change_country') == 'nl') {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } elseif (Tools::getValue('kco_change_country') == 'sv' && Configuration::get('KCOV3_SWEDEN')) {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } elseif (Tools::getValue('kco_change_country') == 'no' && Configuration::get('KCOV3_NORWAY')) {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } elseif (Tools::getValue('kco_change_country') == 'fi' && Configuration::get('KCOV3_FINLAND')) {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } elseif (Tools::getValue('kco_change_country') == 'de' && Configuration::get('KCOV3_GERMANY')) {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } elseif (Tools::getValue('kco_change_country') == 'at' && Configuration::get('KCOV3_AUSTRIA')) {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
-        } else {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
-        }
+        // if (Tools::getValue('kco_change_country') == 'gb') {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } elseif (Tools::getValue('kco_change_country') == 'us') {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnaus');
+        // } elseif (Tools::getValue('kco_change_country') == 'nl') {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } elseif (Tools::getValue('kco_change_country') == 'sv' && Configuration::get('KCOV3_SWEDEN')) {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } elseif (Tools::getValue('kco_change_country') == 'no' && Configuration::get('KCOV3_NORWAY')) {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } elseif (Tools::getValue('kco_change_country') == 'fi' && Configuration::get('KCOV3_FINLAND')) {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } elseif (Tools::getValue('kco_change_country') == 'de' && Configuration::get('KCOV3_GERMANY')) {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } elseif (Tools::getValue('kco_change_country') == 'at' && Configuration::get('KCOV3_AUSTRIA')) {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+        // } else {
+            // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
+        // }
     }
 }
 if (Tools::isSubmit('savemessagebutton')) {
@@ -148,8 +170,11 @@ if (CartRule::isFeatureActive()) {
                     $vouchererrors = $error;
                 } else {
                     $this->context->cart->addCartRule($cartRule->id);
-                    $url = 'index.php?fc=module&module=klarnaofficial&controller=checkoutklarna';
-                    Tools::redirect($url);
+                    // $url = 'index.php?fc=module&module=klarnaofficial&controller=checkoutklarna';
+                    // Tools::redirect($url);
+                    echo "REDIRECT";
+                    exit;
+                    Tools::redirect($checkout_redirect_url);
                 }
             } else {
                 $vouchererrors = Tools::displayError('This voucher does not exists');
@@ -164,8 +189,9 @@ if (CartRule::isFeatureActive()) {
     } elseif (($id_cart_rule = (int) Tools::getValue('deleteDiscount')) &&
     Validate::isUnsignedId($id_cart_rule)) {
         $this->context->cart->removeCartRule($id_cart_rule);
-        $url = 'index.php?fc=module&module=klarnaofficial&controller=checkoutklarna';
-        Tools::redirect($url);
+        // $url = 'index.php?fc=module&module=klarnaofficial&controller=checkoutklarna';
+        // Tools::redirect($url);
+        Tools::redirect($checkout_redirect_url);
     }
 }
 

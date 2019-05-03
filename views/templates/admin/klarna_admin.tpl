@@ -68,7 +68,31 @@
 	</section>
 </div>
 
-
+{if $isRounding_warning}
+    <div class="alert alert-danger">
+		 {l s='For the best experience, you should set rounding to "on each article".' mod='klarnaofficial'}
+	</div>
+{/if}
+{if $isNoDecimal_warning}
+    <div class="alert alert-danger">
+		 {l s='You have turned off decimals in your shop. You may experience rounding issues and payment errors.' mod='klarnaofficial'}
+	</div>
+{/if}
+{if $isPHP7_warning}
+    <div class="alert alert-danger">
+		 {l s='You use PHP 7, KPM library requires PHP 5' mod='klarnaofficial'}
+	</div>
+{/if}
+{if $isMAINTENANCE_warning}
+    <div class="alert alert-danger">
+		 {l s='Your shop is in maintenance mode, no callbacks from Klarna will work.' mod='klarnaofficial'}
+	</div>
+{/if}
+{if $isNoSll_warning}
+    <div class="alert alert-danger">
+		 {l s='Klarna Checkout V3 requires SSL' mod='klarnaofficial'}
+	</div>
+{/if}
 {if $address_check_done}		
 	<div class="alert alert-success">
 		{l s='Address check done!' mod='klarnaofficial'}
@@ -94,8 +118,8 @@
 
 <div class="tabbable">
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="#pane1" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V2 (KCO)' mod='klarnaofficial'}</a></li>
-		<li><a href="#pane7" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V3 (KCO)' mod='klarnaofficial'}</a></li>
+        <li class="active"><a href="#pane7" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V3 (KCO)' mod='klarnaofficial'}</a></li>
+		<li><a href="#pane1" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V2 (KCO)' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane8" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout Common' mod='klarnaofficial'}</a></li>
         <li><a href="#pane2" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Payment Method (KPM)' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane3" data-toggle="tab"><i class="icon-cogs"></i> {l s='Common settings' mod='klarnaofficial'}</a></li>
@@ -105,7 +129,7 @@
 	</ul>
 	<div class="panel">
 	<div class="tab-content">
-		<div id="pane1" class="tab-pane active">
+		<div id="pane1" class="tab-pane">
 			<div class="tabbable row klarnacheckout-admin">
 				<div class="col-lg-12 tab-content">
 					<div class="sidebar col-lg-2">
@@ -140,7 +164,7 @@
                 </div>
             </div>
         </div>
-        <div id="pane7" class="tab-pane">
+        <div id="pane7" class="tab-pane active">
 			<div class="tabbable row klarnacheckout-admin">
 				<div class="col-lg-12 tab-content">
 					<div class="sidebar col-lg-2">
