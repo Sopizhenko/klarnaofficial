@@ -129,10 +129,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
 
         $shipping_options = array();
         $carrieraddress = new Address($this->context->cart->id_address_delivery);
-        // echo "Address=".$this->context->cart->id_address_delivery."<br>";
-        // print_r($country_information);
-        // print_r($this->context->cart);
-        // print_r($carrieraddress);
+
         foreach ($this->context->cart->getDeliveryOptionList() as $options) {
             foreach ($options as $option) {
                 foreach ($option["carrier_list"] as $carrieroption) {
@@ -416,9 +413,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         foreach ($checkoutcart as $item) {
                             $create['order_lines'][] = $item;
                         }
-                        // echo "------------".$eid;
-                         // echo "<pre>";print_r($create);echo "</pre>";
-                        if (!isset($_SESSION['klarna_checkout_uk____'])) {
+
+                        if (!isset($_SESSION['klarna_checkout_uk'])) {
                             $checkout->create($create);
                             $checkout->fetch();
                             $_SESSION['klarna_checkout_uk'] = $checkout['order_id'];
