@@ -51,7 +51,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
                     if ($cart->nbProducts() < 1) {
                         $this->redirectKCO();
                     }
-                    if(isset($klarnaorder['order_amount'])) {
+                    if (isset($klarnaorder['order_amount'])) {
                         $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
                         $order_amount = $klarnaorder['order_amount'];
                         $order_amount = $order_amount / 100;
@@ -83,8 +83,8 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
                         $this->module->getL('Discount'),
                         $isV3
                     );
-                    foreach($klarnaorder["cart"]["items"] as $klarnakey => $itemInKlarna) {
-                        foreach($checkoutcart as $pskey => $itemInPrestashop) {
+                    foreach ($klarnaorder["cart"]["items"] as $klarnakey => $itemInKlarna) {
+                        foreach ($checkoutcart as $pskey => $itemInPrestashop) {
                             if ($itemInKlarna["type"] == $itemInPrestashop["type"] &&
                                 $itemInKlarna["name"] == $itemInPrestashop["name"] &&
                                 $itemInKlarna["quantity"] == $itemInPrestashop["quantity"]
@@ -95,10 +95,10 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
                         }
                     }
                     
-                    if(is_array($klarnaorder["cart"]["items"]) && count($klarnaorder["cart"]["items"]) > 0) {
+                    if (is_array($klarnaorder["cart"]["items"]) && count($klarnaorder["cart"]["items"]) > 0) {
                         $this->redirectKCO();
                     }
-                    if(is_array($checkoutcart) && count($checkoutcart) > 0) {
+                    if (is_array($checkoutcart) && count($checkoutcart) > 0) {
                         $this->redirectKCO();
                     }
                     //ALL IS OK

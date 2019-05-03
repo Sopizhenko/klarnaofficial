@@ -529,7 +529,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         return true;
     }
 
-    protected function assignSmartyVars($ssid, $country_information) {
+    protected function assignSmartyVars($ssid, $country_information)
+    {
         $this->context->smarty->assign(
             'message',
             Message::getMessageByCartId((int) ($this->context->cart->id))
