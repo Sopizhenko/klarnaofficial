@@ -62,13 +62,30 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $finds = Db::getInstance()->getValue($checkSQL);
         if ($finds > 0) {
             $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
                 ' WHERE id_cart='.(int) $this->context->cart->id;
             Db::getInstance()->execute($update_sql);
             if (Configuration::get('KCOV3')) {
                 Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
             } else {
                 Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
+            }
+        }
+        
+        $checkSQL = "SELECT COUNT(id_address_delivery) FROM "._DB_PREFIX_."customization WHERE id_cart=".
+        (int) $this->context->cart->id. " AND id_address_delivery <> ".(int) $this->context->cart->id_address_delivery;
+        $finds = Db::getInstance()->getValue($checkSQL);
+        if ($finds > 0) {
+            $update_sql = 'UPDATE '._DB_PREFIX_.'customization '.
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
+                ' WHERE id_cart='.(int) $this->context->cart->id;
+            Db::getInstance()->execute($update_sql);
+            if (Configuration::get('KCOV3')) {
+                Tools::redirect($checkout_url);
+                // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+            } else {
+                Tools::redirect($checkout_url_v2);
+                // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
             }
         }
                 

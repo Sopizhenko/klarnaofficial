@@ -37,8 +37,21 @@ $(document).ready(function()
     // });
 // });
 
+function disableAllCartButtons()
+{
+    $("#kco_cart_summary_div a.cart_quantity_delete").hide();
+	$("#kco_cart_summary_div a.cart_quantity_up").hide();
+	$("#kco_cart_summary_div a.cart_quantity_down").hide();
+}
+function enableAllCartButtons()
+{
+    $("#kco_cart_summary_div a.cart_quantity_delete").show();
+	$("#kco_cart_summary_div a.cart_quantity_up").show();
+	$("#kco_cart_summary_div a.cart_quantity_down").show();
+}
 function showLoaderImg()
 {
+    disableAllCartButtons();
     $("#checkoutdiv").html('');
 }
 function downQuantity(id, qty)
@@ -578,6 +591,7 @@ function updateKCO()
 		success: function(jsonData)
 		{
 			$("#checkoutdiv").html(jsonData);
+            enableAllCartButtons();
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			alert(jsonData);

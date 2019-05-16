@@ -79,7 +79,24 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         $finds = Db::getInstance()->getValue($checkSQL);
         if ($finds > 0) {
             $update_sql = 'UPDATE '._DB_PREFIX_.'cart_product '.
-                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery;
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
+                ' WHERE id_cart='.(int) $this->context->cart->id;
+            Db::getInstance()->execute($update_sql);
+            if (Configuration::get('KCOV3')) {
+                Tools::redirect($checkout_url);
+                // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+            } else {
+                Tools::redirect($checkout_url_v2);
+                // Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
+            }
+        }
+        
+        $checkSQL = "SELECT COUNT(id_address_delivery) FROM "._DB_PREFIX_."customization WHERE id_cart=".
+        (int) $this->context->cart->id. " AND id_address_delivery <> ".(int) $this->context->cart->id_address_delivery;
+        $finds = Db::getInstance()->getValue($checkSQL);
+        if ($finds > 0) {
+            $update_sql = 'UPDATE '._DB_PREFIX_.'customization '.
+                'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
                 ' WHERE id_cart='.(int) $this->context->cart->id;
             Db::getInstance()->execute($update_sql);
             if (Configuration::get('KCOV3')) {
@@ -129,7 +146,10 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
 
         $shipping_options = array();
         $carrieraddress = new Address($this->context->cart->id_address_delivery);
-
+        // echo "Address=".$this->context->cart->id_address_delivery."<br>";
+        // print_r($country_information);
+        // print_r($this->context->cart);
+        // print_r($carrieraddress);
         foreach ($this->context->cart->getDeliveryOptionList() as $options) {
             foreach ($options as $option) {
                 foreach ($option["carrier_list"] as $carrieroption) {
@@ -413,7 +433,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         foreach ($checkoutcart as $item) {
                             $create['order_lines'][] = $item;
                         }
-
+                        // echo "------------".$eid;
+                         // echo "<pre>";print_r($create);echo "</pre>";
                         if (!isset($_SESSION['klarna_checkout_uk'])) {
                             $checkout->create($create);
                             $checkout->fetch();
