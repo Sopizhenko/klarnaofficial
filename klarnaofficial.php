@@ -151,7 +151,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.32';
+        $this->version = '1.9.34';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -188,6 +188,9 @@ class KlarnaOfficial extends PaymentModule
             || $this->registerHook('paymentReturn') == false
             || $this->registerHook('displayAdminOrder') == false
             || Configuration::updateValue('KCO_ROUNDOFF', 0) == false
+            || Configuration::updateValue('KCOV3', 1) == false
+            || Configuration::updateValue('KCO_IS_ACTIVE', 1) == false
+            || Configuration::updateValue('KCO_TESTMODE', 1) == false
             || $this->setKCOCountrySettings() == false
             ) {
             return false;
@@ -334,6 +337,13 @@ class KlarnaOfficial extends PaymentModule
                      $isSaved = true;
                 }
             }
+            if (1 === (int)Tools::getValue("KCOV3")) {
+                Configuration::updateValue("KCO_GERMANY", Tools::getValue("KCO_GERMANY"));
+                Configuration::updateValue("KCO_SWEDEN", Tools::getValue("KCO_SWEDEN"));
+                Configuration::updateValue("KCO_FINLAND", Tools::getValue("KCO_FINLAND"));
+                Configuration::updateValue("KCO_NORWAY", Tools::getValue("KCO_NORWAY"));
+                Configuration::updateValue("KCO_AUSTRIA", Tools::getValue("KCO_AUSTRIA"));
+            }
         }
 
         $invoice_fee_not_found = false;
@@ -464,15 +474,51 @@ class KlarnaOfficial extends PaymentModule
         $platformVersion = _PS_VERSION_;
         $plugin = $this->name;
         $pluginVersion = $this->version;
+        
+        $isPHP7_warning = false;
+        if (version_compare(phpversion(), '7.0.0', '>') && Configuration::get('KPM_SHOW_IN_PAYMENTS')) {
+            $isPHP7_warning = true;
+        }
+        
+        $isMAINTENANCE_warning = false;
+        if (0 === (int)Configuration::get('PS_SHOP_ENABLE')) {
+            $isMAINTENANCE_warning = true;
+        }
+        
+        $isRounding_warning = false;
+        if (1 !== (int)Configuration::get('PS_ROUND_TYPE')) {
+            $isRounding_warning = true;
+        }
+        
+        $isNoSll_warning = false;
+        if (0 === (int)Configuration::get('PS_SSL_ENABLED')) {
+            $isNoSll_warning = true;
+        }
+        
+        $isNoDecimal_warning = false;
+        if (0 === (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION')) {
+            $isNoDecimal_warning = true;
+        }
+        
+        $kcov3_is_active = false;
+        if (1 === (int)Configuration::get('KCOV3')) {
+            $kcov3_is_active = true;
+        }
 
         $this->context->smarty->assign(array(
             'klarnaisocodedef' => $country->iso_code,
             'country' => $country->iso_code,
+            'kcov3_is_active' => $kcov3_is_active,
             'showbanner1' => $showbanner1,
             'showbanner' => $showbanner,
             'platformVersion' => $platformVersion,
             'pluginVersion' => $pluginVersion,
             'plugin' => $plugin,
+            'isMAINTENANCE_warning' => $isMAINTENANCE_warning,
+            'isPHP7_warning' => $isPHP7_warning,
+            'isRounding_warning' => $isRounding_warning,
+            'isNoDecimal_warning' => $isNoDecimal_warning,
+            'isNoSll_warning' => $isNoSll_warning,
             'cron_token' => $cron_token,
             'errorMSG' => $errorMSG,
             'address_check_done' => $address_check_done,
@@ -591,6 +637,11 @@ class KlarnaOfficial extends PaymentModule
     public function createCommonForm()
     {
         $states = OrderState::getOrderStates((int) $this->context->cookie->id_lang);
+        foreach($states as $key => $state) {
+            if ($state['id_order_state'] === Configuration::get('PS_OS_PAYMENT')) {
+                unset($states[$key]);
+            }
+        }
         $states[] = array('id_order_state' => '-1', 'name' => $this->l('Deactivated'));
         
         $fields_form = array();
