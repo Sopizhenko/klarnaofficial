@@ -57,6 +57,20 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         $sharedSecret = '';
         parent::initContent();
 
+        $checkout_url = $this->context->link->getModuleLink(
+            'klarnaofficial',
+            'checkoutklarnakco',
+            array('sid' => $ssid),
+            true
+        );
+        
+        $checkout_url_v2 = $this->context->link->getModuleLink(
+            'klarnaofficial',
+            'checkoutklarna',
+            array(),
+            true
+        );
+        
         $checkSQL = "SELECT COUNT(id_address_delivery) FROM "._DB_PREFIX_."cart_product WHERE id_cart=".
         (int) $this->context->cart->id. " AND id_address_delivery <> ".(int) $this->context->cart->id_address_delivery;
         $finds = Db::getInstance()->getValue($checkSQL);
@@ -66,9 +80,9 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                 ' WHERE id_cart='.(int) $this->context->cart->id;
             Db::getInstance()->execute($update_sql);
             if (Configuration::get('KCOV3')) {
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+                Tools::redirect($checkout_url);
             } else {
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarna');
+                Tools::redirect($checkout_url_v2);
             }
         }
         
@@ -119,7 +133,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         if (!Configuration::get('KCOV3')) {
             require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
         } else {
-            Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+            Tools::redirect($checkout_url);
         }
         $layout = 'desktop';
         //if ($this->context->getMobileDevice())
