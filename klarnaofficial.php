@@ -155,7 +155,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.4';
+        $this->version = '2.1.5';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -306,6 +306,13 @@ class KlarnaOfficial extends PaymentModule
                      Configuration::updateValue($param, Tools::getValue($param));
                      $isSaved = true;
                 }
+            }
+            if (1 === (int)Tools::getValue("KCOV3")) {
+                Configuration::updateValue("KCO_GERMANY", Tools::getValue("KCO_GERMANY"));
+                Configuration::updateValue("KCO_SWEDEN", Tools::getValue("KCO_SWEDEN"));
+                Configuration::updateValue("KCO_FINLAND", Tools::getValue("KCO_FINLAND"));
+                Configuration::updateValue("KCO_NORWAY", Tools::getValue("KCO_NORWAY"));
+                Configuration::updateValue("KCO_AUSTRIA", Tools::getValue("KCO_AUSTRIA"));
             }
         }
         $invoice_fee_not_found = false;
@@ -462,10 +469,15 @@ class KlarnaOfficial extends PaymentModule
             $isNoDecimal_warning = true;
         }
         
+        $kcov3_is_active = false;
+        if (1 === (int)Configuration::get('KCOV3')) {
+            $kcov3_is_active = true;
+        }
         
         $this->context->smarty->assign(array(
             'klarnaisocodedef' => $country->iso_code,
             'errorMSG' => $errorMSG,
+            'kcov3_is_active' => $kcov3_is_active,
             'address_check_done' => $address_check_done,
             'isSaved' => $isSaved,
             'country' => $country->iso_code,
@@ -594,6 +606,11 @@ class KlarnaOfficial extends PaymentModule
     public function createCommonForm()
     {
         $states = OrderState::getOrderStates((int) $this->context->cookie->id_lang);
+        foreach ($states as $key => $state) {
+            if ($state['id_order_state'] === Configuration::get('PS_OS_PAYMENT')) {
+                unset($states[$key]);
+            }
+        }
         $states[] = array('id_order_state' => '-1', 'name' => $this->l('Deactivated'));
         
         $fields_form = array();

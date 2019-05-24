@@ -50,7 +50,7 @@
                 {l s='Go live now' mod='klarnaofficial'}
             {/if}
             </a>
-			<img class="lockup" src="../modules/klarnaofficial/views/img/klarna_lockup_logo.png">
+			<img class="lockup" src="../modules/klarnaofficial/views/img/klarna_lockup_logo.png" />
 		</div>
 	</section>
 {/if}
@@ -130,7 +130,12 @@
 	<div class="panel">
 	<div class="tab-content">
 		<div id="pane1" class="tab-pane">
-			<div class="tabbable row klarnacheckout-admin">
+        {if $kcov3_is_active}
+            <div class="alert alert-danger">
+                {l s='Klarna V2 and V3 should not be used at the same time!' mod='klarnaofficial'}
+            </div>
+        {/if}
+			<div class="tabbable row klarnacheckout-admin{if $kcov3_is_active} hidden{/if}">
 				<div class="col-lg-12 tab-content">
 					<div class="sidebar col-lg-2">
 						<ul class="nav nav-tabs">							
