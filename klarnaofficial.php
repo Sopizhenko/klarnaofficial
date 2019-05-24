@@ -637,7 +637,7 @@ class KlarnaOfficial extends PaymentModule
     public function createCommonForm()
     {
         $states = OrderState::getOrderStates((int) $this->context->cookie->id_lang);
-        foreach($states as $key => $state) {
+        foreach ($states as $key => $state) {
             if ($state['id_order_state'] === Configuration::get('PS_OS_PAYMENT')) {
                 unset($states[$key]);
             }
