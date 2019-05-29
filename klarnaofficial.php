@@ -2963,26 +2963,22 @@ class KlarnaOfficial extends PaymentModule
                 $merchantId = Configuration::get('KCOV3_MID');
                 $sharedSecret = Configuration::get('KCOV3_SECRET');
             }
+            
+            $merchantId = Configuration::get('KCOV3_MID');
+            $sharedSecret = Configuration::get('KCOV3_SECRET');
+            $ssid = Tools::getValue('sid');
+            require_once dirname(__FILE__).'/libraries/commonFeatures.php';
+            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
+            $connector = $KlarnaCheckoutCommonFeatures->getConnector(
+                $ssid,
+                $merchantId,
+                $sharedSecret,
+                (int) (Configuration::get('KCO_TESTMODE')),
+                $this->version
+            );
 
-            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
-                );
-
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
-            } else {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
-                );
-              
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
-            }
+            $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
+            $checkout->fetch();          
 
             $snippet = $checkout['html_snippet'];
             

@@ -209,11 +209,12 @@ class KlarnaCheckoutCommonFeatures
     }
     
     
-    public function getConnector($ssid, $eid, $sharedSecret, $kcoTestMode)
+    public function getConnector($ssid, $eid, $sharedSecret, $kcoTestMode, $version)
     {
         
         $userAgent = \Klarna\Rest\Transport\UserAgent::createDefault();
-        $userAgent->setField('key', 'prestashop', _PS_VERSION_);
+        $userAgent->setField('prestashop', 'version', _PS_VERSION_);
+        $userAgent->setField('klarnaofficial', 'version', $version);
         
         if ($kcoTestMode == 1) {
             if ($ssid=='us') {

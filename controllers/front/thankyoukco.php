@@ -50,31 +50,21 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
         try {
             $merchantId = Configuration::get('KCOV3_MID');
             $sharedSecret = Configuration::get('KCOV3_SECRET');
+            $ssid = Tools::getValue('sid');
+            require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
+            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
+            $connector = $KlarnaCheckoutCommonFeatures->getConnector(
+                $ssid,
+                $merchantId,
+                $sharedSecret,
+                (int) (Configuration::get('KCO_TESTMODE')),
+                $this->module->version
+            );
 
-            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
-                );
-
-           
-                $orderId = Tools::getValue('klarna_order_id');
-
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
-            } else {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
-                );
-              
-                $orderId = Tools::getValue('klarna_order_id');
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
-            }
-
+            $orderId = Tools::getValue('klarna_order_id');
+            $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
+            $checkout->fetch();
+                
             $snippet = $checkout['html_snippet'];
 
             if ($checkout['status'] == 'checkout_incomplete') {
@@ -264,6 +254,11 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
             }
             
             if (isset($result['id_order'])) {
+                $payment_type_allows_increase = '';
+                if (isset($checkout['payment_type_allows_increase']) && 1 === (int)$checkout['payment_type_allows_increase']) {
+                    $payment_type_allows_increase = '&ptai=1';
+                }
+                
                 //If order is created, we can redirect to normal thankyou page.
                 $order = new Order((int) $result['id_order']);
                 $id_customer = $order->id_customer;
@@ -272,6 +267,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     'order-confirmation.php?key='.
                     $customer->secure_key.
                     '&kcotpv3=1'.
+                    $payment_type_allows_increase.
                     '&id_cart='.
                     (int) ($checkout['merchant_reference2']).
                     '&id_module='.
