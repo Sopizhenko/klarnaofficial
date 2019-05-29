@@ -155,7 +155,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.5';
+        $this->version = '2.1.6';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3286,7 +3286,9 @@ class KlarnaOfficial extends PaymentModule
         Cache::clean('getContextualValue*');
         Cache::clean('getPackageShippingCost_'.$cart->id.'_*');
         $cart = new Cart($cart->id);
-        $cart->resetStaticCache();
+        if (version_compare(_PS_VERSION_, '1.7.2.5', '>')) {
+            $cart->resetStaticCache();
+        }
         $cart->getDeliveryOptionList(null, true);
     }
     

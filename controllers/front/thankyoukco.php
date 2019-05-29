@@ -202,12 +202,16 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     Cache::clean('getContextualValue*');
                     Cache::clean('getPackageShippingCost_'.$cart->id.'_*');
                     $cart = new Cart($cart->id);
-                    $cart->resetStaticCache();
+                    if (version_compare(_PS_VERSION_, '1.7.2.5', '>')) {
+                        $cart->resetStaticCache();
+                    }
                     $cart->getDeliveryOptionList(null, true);
                     $cart->getDeliveryOption(null, false, true);
                     $this->context->cart->getDeliveryOption(null, false, false);
                     $this->context->cart->getDeliveryOptionList(null, true);
-                    $this->context->cart->resetStaticCache();
+                    if (version_compare(_PS_VERSION_, '1.7.2.5', '>')) {
+                        $this->context->cart->resetStaticCache();
+                    }
 
                     $this->module->validateOrder(
                         $cart->id,

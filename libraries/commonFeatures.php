@@ -211,6 +211,10 @@ class KlarnaCheckoutCommonFeatures
     
     public function getConnector($ssid, $eid, $sharedSecret, $kcoTestMode)
     {
+        
+        $userAgent = \Klarna\Rest\Transport\UserAgent::createDefault();
+        $userAgent->setField('key', 'prestashop', _PS_VERSION_);
+        
         if ($kcoTestMode == 1) {
             if ($ssid=='us') {
                 $url = 'https://api-na.playground.klarna.com/';
@@ -221,7 +225,8 @@ class KlarnaCheckoutCommonFeatures
             $connector = \Klarna\Rest\Transport\Connector::create(
                 $eid,
                 $sharedSecret,
-                $url
+                $url,
+                $userAgent
             );
         } else {
             if ($ssid=='us') {
@@ -232,7 +237,8 @@ class KlarnaCheckoutCommonFeatures
             $connector = \Klarna\Rest\Transport\Connector::create(
                 $eid,
                 $sharedSecret,
-                $url
+                $url,
+                $userAgent
             );
         }
         return $connector;
