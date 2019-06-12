@@ -25,7 +25,7 @@
 */
 
 $sql = array();
-
+ 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'klarna_orders` (
 		  `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
 		  `id_cart` INTEGER UNSIGNED NOT NULL,

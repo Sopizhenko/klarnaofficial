@@ -31,3 +31,4 @@ function upgrade_module_1_9_3($module)
     }
     return $result;
 }
+ 
