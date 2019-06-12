@@ -275,7 +275,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $ssid,
                             $eid,
                             $sharedSecret,
-                            (int) (Configuration::get('KCO_TESTMODE'))
+                            (int) (Configuration::get('KCO_TESTMODE')),
+                            $this->module->version
                         );
 
                         $checkout = new \Klarna\Rest\Checkout\Order($connector);

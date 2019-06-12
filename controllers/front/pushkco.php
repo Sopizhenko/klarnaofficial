@@ -34,74 +34,25 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
         //Logger::addLog($url, 1, null, null, null, true);
 
         require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
-        //Klarna uses iso 3166-1 alpha 3, prestashop uses different iso so we need to convert this.
-        // $country_iso_codes = array(
-        // 'SWE' => 'SE',
-        // 'NOR' => 'NO',
-        // 'FIN' => 'FI',
-        // 'DNK' => 'DK',
-        // 'DEU' => 'DE',
-        // 'NLD' => 'NL',
-        // 'se' => 'SE',
-        // 'no' => 'NO',
-        // 'fi' => 'FI',
-        // 'dk' => 'DK',
-        // 'de' => 'DE',
-        // 'nl' => 'NL',
-        // 'gb' => 'GB',
-        // 'us' => 'US',
-        // );
-
+     
         try {
-            // $sid = Tools::getValue('sid');
-            // if ($sid == 'gb') {
-                // $sharedSecret = Configuration::get('KCO_UK_SECRET');
-                // $merchantId = Configuration::get('KCO_UK_EID');
-            // } elseif ($sid == 'us') {
-                // $sharedSecret = Configuration::get('KCO_US_SECRET');
-                // $merchantId = Configuration::get('KCO_US_EID');
-            // } elseif ($sid == 'nl') {
-                // $sharedSecret = Configuration::get('KCO_NL_SECRET');
-                // $merchantId = Configuration::get('KCO_NL_EID');
-            // } elseif ($sid == 'se') {
-                // $sharedSecret = Configuration::get('KCOV3_SWEDEN_SECRET');
-                // $merchantId = Configuration::get('KCOV3_SWEDEN_EID');
-            // } elseif ($sid == 'no') {
-                // $sharedSecret = Configuration::get('KCOV3_NORWAY_SECRET');
-                // $merchantId = Configuration::get('KCOV3_NORWAY_EID');
-            // } elseif ($sid == 'fi') {
-                // $sharedSecret = Configuration::get('KCOV3_FINLAND_SECRET');
-                // $merchantId = Configuration::get('KCOV3_FINLAND_EID');
-            // } elseif ($sid == 'de') {
-                // $sharedSecret = Configuration::get('KCOV3_GERMANY_SECRET');
-                // $merchantId = Configuration::get('KCOV3_GERMANY_EID');
-            // } elseif ($sid == 'at') {
-                // $sharedSecret = Configuration::get('KCOV3_AUSTRIA_SECRET');
-                // $merchantId = Configuration::get('KCOV3_AUSTRIA_EID');
-            // }
             $merchantId = Configuration::get('KCOV3_MID');
             $sharedSecret = Configuration::get('KCOV3_SECRET');
+            
+            require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
+            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
+            $connector = $KlarnaCheckoutCommonFeatures->getConnector(
+                $sid,
+                $merchantId,
+                $sharedSecret,
+                (int) (Configuration::get('KCO_TESTMODE')),
+                $this->module->version
+            );
+            
             $orderId = Tools::getValue('klarna_order_id');
-            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
-                );
-
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
-            } else {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
-                );
-
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
-            }
-            //var_dump($checkout);
+            $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
+            $checkout->fetch();
+            
             if ($checkout['status'] == 'checkout_complete') {
                 $id_cart = $checkout['merchant_reference2'];
                 $cart = new Cart((int) ($id_cart));
