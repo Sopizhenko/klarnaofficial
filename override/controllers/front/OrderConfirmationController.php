@@ -22,7 +22,7 @@ class OrderConfirmationController extends OrderConfirmationControllerCore
 {
     /**
     * Initialize order confirmation controller
-    * @see FrontController::init() 
+    * @see FrontController::init()
     */
     public function init()
     {
