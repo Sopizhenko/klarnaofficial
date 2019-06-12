@@ -27,4 +27,3 @@ function upgrade_module_1_9_20($module)
   
     return true;
 }
- 

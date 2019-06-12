@@ -25,4 +25,3 @@ function upgrade_module_1_8_11($module)
     $update_sql .= ' COLUMN `id_cart` INT(10) UNSIGNED NOT NULL AFTER `id`;';
     return Db::getInstance()->execute($update_sql);
 }
- 

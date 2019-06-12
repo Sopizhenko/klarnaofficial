@@ -30,5 +30,5 @@ function upgrade_module_1_9_21($module)
             }
         }
     }
-    return $result; 
+    return $result;
 }

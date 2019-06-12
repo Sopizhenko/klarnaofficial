@@ -25,4 +25,3 @@ function upgrade_module_1_8_15($module)
     $update_sql .= ' `expire` VARCHAR(20) NOT NULL;';
     return Db::getInstance()->execute($update_sql);
 }
- 
