@@ -315,7 +315,12 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $new_delivery_options = array();
                     $new_delivery_options[(int) ($delivery_address_id)] = $cart->id_carrier.',';
                     // $new_delivery_options[(int) ($delivery_address_id)] = $id_carrier_selected.',';
-                    $new_delivery_options_serialized = serialize($new_delivery_options);
+                    // $new_delivery_options_serialized = serialize($new_delivery_options);
+                    if (version_compare(_PS_VERSION_, "1.6.1.21", "<")) {
+                        $new_delivery_options_serialized = serialize($new_delivery_options);
+                    } else {
+                        $new_delivery_options_serialized = json_encode($new_delivery_options);
+                    }
 
                     $update_sql = 'UPDATE '._DB_PREFIX_.'cart '.
                         'SET delivery_option=\''.
@@ -441,6 +446,11 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
             }
 
             if (isset($result['id_order'])) {
+                $payment_type_allows_increase = '';
+                if (isset($checkout['payment_type_allows_increase']) && 1 === (int)$checkout['payment_type_allows_increase']) {
+                    $payment_type_allows_increase = '&ptai=1';
+                }
+                
                 unset($_SESSION['klarna_checkout_uk']);
                 //If order is created, we can redirect to normal thankyou page.
                 $order = new Order((int) $result['id_order']);
@@ -450,6 +460,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     'order-confirmation.php?key='.
                     $customer->secure_key.
                     '&kcotpv3=1'.
+                    $payment_type_allows_increase.
                     '&klarna_order_id='.
                     $orderId.
                     '&id_cart='.
