@@ -34,7 +34,7 @@ class KlarnaOfficialReloadCartModuleFrontController extends ModuleFrontControlle
     }
     
     protected function kcoassignSummaryInformations()
-    { 
+    {
         $summary = $this->context->cart->getSummaryDetails();
         $customizedDatas = Product::getAllCustomizedDatas($this->context->cart->id);
 
