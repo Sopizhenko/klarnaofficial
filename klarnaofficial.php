@@ -2978,7 +2978,7 @@ class KlarnaOfficial extends PaymentModule
             );
 
             $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-            $checkout->fetch();          
+            $checkout->fetch();
 
             $snippet = $checkout['html_snippet'];
             
