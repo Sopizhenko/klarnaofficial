@@ -30,9 +30,9 @@ class KlarnaCheckoutCommonFeatures
                 ),
                 'quantity' => (int) ($product['cart_quantity']),
                 'quantity_unit' => 'pcs',
-                'unit_price' => $price,
+                'unit_price' => (string) $price,
                 'tax_rate' => $tax_rate,
-                'total_amount' => (int) ($rowvalue * 100),
+                'total_amount' => (string) ($rowvalue * 100),
                 'total_tax_amount' => (int) ($tax_value * 100),
             );
         }
@@ -62,9 +62,9 @@ class KlarnaCheckoutCommonFeatures
                 'reference' => $shippingReference,
                 'name' => strip_tags($carrier->name),
                 'quantity' => 1,
-                'unit_price' => ($shipping_cost_with_tax * 100),
+                'unit_price' => (string) ($shipping_cost_with_tax * 100),
                 'tax_rate' => (int) ($shipping_tax_rate * 100),
-                'total_amount' => ($shipping_cost_with_tax * 100),
+                'total_amount' => (string) ($shipping_cost_with_tax * 100),
                 'total_tax_amount' => (int) ($shipping_tax_value * 100),
             );
         }
@@ -83,9 +83,9 @@ class KlarnaCheckoutCommonFeatures
                     'reference' => $wrappingreference,
                     'name' => $wrappingname,
                     'quantity' => 1,
-                    'unit_price' => ($cart_wrapping * 100),
+                    'unit_price' => (string) ($cart_wrapping * 100),
                     'tax_rate' => (int) ($wrapping_vat * 100),
-                    'total_amount' => ($cart_wrapping * 100),
+                    'total_amount' => (string) ($cart_wrapping * 100),
                     'total_tax_amount' => (int) ($wrapping_tax_value * 100),
                 );
             }
@@ -105,9 +105,9 @@ class KlarnaCheckoutCommonFeatures
                     'reference' => '',
                     'name' => $discountname,
                     'quantity' => 1,
-                    'unit_price' => -($totalCartValue * 100),
+                    'unit_price' => (string)-($totalCartValue * 100),
                     'tax_rate' => (int) ($common_tax_rate * 100),
-                    'total_amount' => -($totalCartValue * 100),
+                    'total_amount' => (string)-($totalCartValue * 100),
                     'total_tax_amount' => -(int) ($common_tax_value * 100),
                 );
             } else {
@@ -121,9 +121,9 @@ class KlarnaCheckoutCommonFeatures
                     'reference' => '',
                     'name' => $discountname,
                     'quantity' => 1,
-                    'unit_price' => -number_format(($totalDiscounts * 100), 2, '.', ''),
+                    'unit_price' => (string)-number_format(($totalDiscounts * 100), 2, '.', ''),
                     'tax_rate' => (int) ($common_tax_rate * 100),
-                    'total_amount' => -number_format(($totalDiscounts * 100), 2, '.', ''),
+                    'total_amount' => (string)-number_format(($totalDiscounts * 100), 2, '.', ''),
                     'total_tax_amount' => -(int) ($common_tax_value * 100),
                 );
             }
@@ -142,10 +142,10 @@ class KlarnaCheckoutCommonFeatures
                 'reference' => '',
                 'name' => 'Avrundning',
                 'quantity' => 1,
-                'unit_price' => round(($round_diff * 100), 0),
+                'unit_price' => (string) round(($round_diff * 100), 0),
                 'discount_rate' => 0,
                 'tax_rate' => 0,
-                'total_amount' => round(($round_diff * 100), 0),
+                'total_amount' => (string) round(($round_diff * 100), 0),
                 'total_tax_amount' => 0,
             );
         }
