@@ -48,7 +48,8 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
         $language = new Language($this->context->cookie->id_lang);
         $currencyIso = $currency->iso_code;
         $languageIso = $language->iso_code;
-            
+        $eid = "";
+        
         if ($deliveryCountry->iso_code == 'se' || $deliveryCountry->iso_code == 'SE') {
             $eid = Configuration::get('KPM_SV_EID', null, null, $this->context->shop->id);
             $sharedSecret = Configuration::get('KPM_SV_SECRET', null, null, $this->context->shop->id);
@@ -92,6 +93,12 @@ class KlarnaOfficialKpmPartPaymentModuleFrontController extends ModuleFrontContr
             $sharedSecret = Configuration::get('KPM_AT_SECRET', null, null, $this->context->shop->id);
             $countryIso = $deliveryCountry->iso_code;
             $languageIso = 'de';
+        }
+        
+        if ("" == $eid) {
+            //NO EID FOR SELECTED MARKET.
+            $this->setTemplate('module:klarnaofficial/views/templates/front/kpm_notavailable.tpl');
+            return;
         }
 
         $k = $this->module->initKlarnaAPI(

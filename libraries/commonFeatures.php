@@ -31,6 +31,7 @@ class KlarnaCheckoutCommonFeatures
                 } else {
                     $tax_value = $price - ($price / (1+($rate/100)));
                     $tax_value = ($tax_value * (int) ($product['cart_quantity']));
+                    $tax_value = Tools::ps_round($tax_value,2);
                 }
             }
             
@@ -210,6 +211,7 @@ class KlarnaCheckoutCommonFeatures
                 // 'total_tax_amount' => 0,
             // );
         // }
+        
         return $checkoutcart;
     }
     

@@ -155,7 +155,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.7';
+        $this->version = '2.1.8';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -194,6 +194,7 @@ class KlarnaOfficial extends PaymentModule
             || Configuration::updateValue('KCO_ROUNDOFF', 0) == false
             || Configuration::updateValue('KCOV3', 1) == false
             || Configuration::updateValue('KCO_IS_ACTIVE', 1) == false
+            || Configuration::updateValue('KPM_LOGO', 'blue-black') == false
             || Configuration::updateValue('KCO_TESTMODE', 1) == false
             || $this->setKCOCountrySettings() == false
             ) {
