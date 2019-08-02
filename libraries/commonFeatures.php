@@ -6,6 +6,10 @@ class KlarnaCheckoutCommonFeatures
         $totalCartValue = 0;
         
         foreach ($cart->getProducts() as $product) {
+            
+            $product_url = Context::getContext()->link->getProductLink($product['id_product'], $product['link_rewrite'], $product['category'], null, null, $product['id_shop'], $product['id_product_attribute'], false, false, true);
+            $image_url = Context::getContext()->link->getImageLink($product['link_rewrite'], $product['id_image'], 'large_default');
+            
             $price = Tools::ps_round($product['price_wt'], 2);
             $tax_value = (Tools::ps_round($product['price_wt'], 2) - Tools::ps_round($product['price'], 2));
             $tax_value = Tools::ps_round($tax_value, 2);
@@ -31,6 +35,8 @@ class KlarnaCheckoutCommonFeatures
                 'quantity' => (int) ($product['cart_quantity']),
                 'quantity_unit' => 'pcs',
                 'unit_price' => (string) $price,
+                'product_url' => $product_url,
+                'image_url' => $image_url,
                 'tax_rate' => $tax_rate,
                 'total_amount' => (string) ($rowvalue * 100),
                 'total_tax_amount' => (int) ($tax_value * 100),
