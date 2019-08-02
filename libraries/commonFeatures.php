@@ -7,6 +7,9 @@ class KlarnaCheckoutCommonFeatures
         $highest_tax_rate = 0;
         
         foreach ($cart->getProducts() as $product) {
+            $product_url = Context::getContext()->link->getProductLink($product['id_product'], $product['link_rewrite'], $product['category'], null, null, $product['id_shop'], $product['id_product_attribute'], false, false, true);
+            $image_url = Context::getContext()->link->getImageLink($product['link_rewrite'], $product['id_image'], 'large_default');
+            
             $price = Tools::ps_round($product['price_wt'], 2);
             $tax_value = (Tools::ps_round($product['price_wt'], 2) - Tools::ps_round($product['price'], 2));
             $tax_value = Tools::ps_round($tax_value, 2);
@@ -49,9 +52,11 @@ class KlarnaCheckoutCommonFeatures
                 'quantity' => (int) ($product['cart_quantity']),
                 'quantity_unit' => 'pcs',
                 'unit_price' => $price,
+                'product_url' => $product_url,
+                'image_url' => $image_url,
                 'tax_rate' => $tax_rate,
-                'total_amount' => (int) ($rowvalue * 100),
-                'total_tax_amount' => (int) ($tax_value * 100),
+                'total_amount' => (string) ($rowvalue * 100),
+                'total_tax_amount' => (string) ($tax_value * 100),
             );
         }
         $shipping_cost_with_tax = $cart->getOrderTotal(true, Cart::ONLY_SHIPPING, null, $cart->id_carrier, false);
@@ -87,8 +92,8 @@ class KlarnaCheckoutCommonFeatures
                 'quantity' => 1,
                 'unit_price' => ($shipping_cost_with_tax * 100),
                 'tax_rate' => $shipping_tax_rate,
-                'total_amount' => ($shipping_cost_with_tax * 100),
-                'total_tax_amount' => (int) ($shipping_tax_value * 100),
+                'total_amount' => (string) ($shipping_cost_with_tax * 100),
+                'total_tax_amount' => (string) ($shipping_tax_value * 100),
             );
         }
         if ($cart->gift == 1) {
@@ -113,8 +118,8 @@ class KlarnaCheckoutCommonFeatures
                     'quantity' => 1,
                     'unit_price' => ($cart_wrapping * 100),
                     'tax_rate' => $wrapping_vat,
-                    'total_amount' => ($cart_wrapping * 100),
-                    'total_tax_amount' => (int) ($wrapping_tax_value * 100),
+                    'total_amount' => (string) ($cart_wrapping * 100),
+                    'total_tax_amount' => (string) ($wrapping_tax_value * 100),
                 );
             }
         }
@@ -140,10 +145,10 @@ class KlarnaCheckoutCommonFeatures
                     'reference' => '',
                     'name' => $discountname,
                     'quantity' => 1,
-                    'unit_price' => -($value_real * 100),
+                    'unit_price' => (string) (-($value_real * 100)),
                     'tax_rate' => (int) ($common_tax_rate * 100),
-                    'total_amount' => -($value_real * 100),
-                    'total_tax_amount' => -(int) ($tax_value * 100),
+                    'total_amount' => (string) (-($value_real * 100)),
+                    'total_tax_amount' => (string) (-($tax_value * 100)),
                 );                    
             }
         } else {
@@ -176,10 +181,10 @@ class KlarnaCheckoutCommonFeatures
                         'reference' => '',
                         'name' => $discountname,
                         'quantity' => 1,
-                        'unit_price' => -number_format(($totalDiscounts * 100), 2, '.', ''),
+                        'unit_price' => (string) (-number_format(($totalDiscounts * 100), 2, '.', '')),
                         'tax_rate' => (int) ($common_tax_rate * 100),
-                        'total_amount' => -number_format(($totalDiscounts * 100), 2, '.', ''),
-                        'total_tax_amount' => -(int) ($common_tax_value * 100),
+                        'total_amount' => (string)(-number_format(($totalDiscounts * 100), 2, '.', '')),
+                        'total_tax_amount' => (string)(-(int) ($common_tax_value * 100)),
                     );
                 }
             }
