@@ -155,7 +155,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.8';
+        $this->version = '2.1.9';
         $this->author = 'Prestaworks AB';
         $this->module_key = '0969b3c2f7f0d687c526fbcb0906e204';
         $this->need_instance = 1;
@@ -3970,7 +3970,7 @@ class KlarnaOfficial extends PaymentModule
             "alias='$alias', company='', lastname='$country',firstname='Person', ".
             "address1='Standardgatan 1', address2='', postcode='12345',city='$city', ".
             "other='', phone='1234567890', phone_mobile='',vat_number='', ".
-            "dni='', active='', deleted='',date_upd=NOW(), ".
+            "dni='', active=1, deleted=0,date_upd=NOW(), ".
             "id_country=$id_country WHERE id_address=$addressidtoupd";
             Db::getInstance()->execute($sql_fix);
         } else {
