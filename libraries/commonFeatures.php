@@ -78,6 +78,7 @@ class KlarnaCheckoutCommonFeatures
             }
             //$shipping_tax_value = ($shipping_cost_with_tax - $shipping_cost_without_tax);
             $shipping_tax_value = $shipping_cost_with_tax - ($shipping_cost_with_tax / (1+($shipping_tax_rate/100)));
+            $shipping_tax_value = Tools::ps_round($shipping_tax_value, 2);
             $totalCartValue += $shipping_cost_with_tax;
             
             $shipping_tax_rate = (int) ($shipping_tax_rate * 100);
