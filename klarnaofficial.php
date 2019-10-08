@@ -2321,6 +2321,10 @@ class KlarnaOfficial extends PaymentModule
             return;
         }
         
+        if (1 === (int) Configuration::get('KCO_SHOWPRODUCTPAGE')) {
+            $this->smarty->assign('kco_legacy_productpage', true);
+        }
+        
         $this->smarty->assign('klarna_footer_layout', Configuration::get('KCO_FOOTERLAYOUT'));
         $this->smarty->assign('klarnav3_footer_layout', 0);
         $this->smarty->assign('kco_footer_active', $kco_active);
