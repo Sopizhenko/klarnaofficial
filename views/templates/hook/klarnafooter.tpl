@@ -29,7 +29,7 @@
     {if $klarnav3_footer_layout == 4}
         <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale|escape:'html':'UTF-8'}/checkout/short-white.png?width=312" />
     {/if}
-{else}
+{elseif isset($klarna_footer_layout)}
     {if $klarna_footer_layout == 'blue-black' || $klarna_footer_layout == 'white' || $klarna_footer_layout == 'blue+tuv' || $klarna_footer_layout == 'white+tuv'}
         <div class="klarna-widget klarna-logo-tooltip"
             data-eid="{$kco_footer_eid|escape:'html':'UTF-8'}"
