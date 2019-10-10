@@ -63,6 +63,15 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'kpmpclasses` (
                 KEY `id` (`id`)
             )
             ENGINE = '._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+            
+$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'klarna_checkbox` (
+		  `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+		  `id_cart` INTEGER UNSIGNED NOT NULL,
+		  `text_at_time_of_purchase` VARCHAR(256) NOT NULL,
+		  `checked` tinyint(1) NOT NULL,
+		  PRIMARY KEY (`id`)
+		)
+		ENGINE = '._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {

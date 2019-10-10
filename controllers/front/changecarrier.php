@@ -32,6 +32,7 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
             //something went wrong with the data, redirect.
             $this->redirectKCO();
         }
+        Hook::exec('actionKlarnaChangeCarrier', array('klarnadata' => $klarnadata));
         $id_cart = (int) Tools::getValue('cartid');
         $id_carrier = (int) $klarnadata->selected_shipping_option->id;
         
