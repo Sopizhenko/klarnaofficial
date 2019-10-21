@@ -278,6 +278,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                 $payment_type_allows_increase = '';
                 if (isset($checkout['payment_type_allows_increase']) && 1 === (int)$checkout['payment_type_allows_increase']) {
                     $payment_type_allows_increase = '&ptai=1';
+                    $payment_type_allows_increase .= '&klarna_order_id='.Tools::getValue('klarna_order_id');
                 }
                 
                 Hook::exec('actionKlarnaOrderDone', array('klarnadata' => $checkout));
