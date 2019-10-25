@@ -74,6 +74,10 @@ class KlarnaOfficial extends PaymentModule
         'KCOV3_MID',
         'KCOV3_SECRET',
         'KCOV3_FOOTERBANNER',
+        'KCOV3_CUSTOM_CHECKBOX',
+        'KCOV3_CUSTOM_CHECKBOX_REQUIRED',
+        'KCOV3_CUSTOM_CHECKBOX_PRECHECKED',
+        'KCOV3_CUSTOM_CHECKBOX_TEXT',
        
         'KCO_DOBMAN',
         'KCO_CALLBACK_CHECK',
@@ -151,7 +155,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.39';
+        $this->version = '1.9.40';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -332,6 +336,19 @@ class KlarnaOfficial extends PaymentModule
             Tools::isSubmit('btnKCOSubmit')
         ) {
             foreach ($this->configuration_params as $param) {
+                if ("KCOV3_CUSTOM_CHECKBOX_TEXT" == $param) {
+                    $texts = array();
+                    $has_custom_text = false;
+                    foreach (Language::getLanguages(false, false, true) as $id_lang) {
+                        if (Tools::getIsset($param.'_'.$id_lang)) {
+                            $has_custom_text = true;
+                            $texts[$id_lang] = Tools::getValue($param.'_'.$id_lang);
+                        }
+                    }
+                    if ($has_custom_text) {
+                        $_POST[$param] = Tools::jsonEncode($texts);
+                    }
+                }
                 if (Tools::getIsset($param)) {
                      Configuration::updateValue($param, Tools::getValue($param));
                      $isSaved = true;
@@ -1665,6 +1682,68 @@ class KlarnaOfficial extends PaymentModule
                             'name' => 'label',
                         ),
                     ),
+                    
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Activate custom checkbox'),
+                        'name' => 'KCOV3_CUSTOM_CHECKBOX',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'cc_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'cc_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate custom checkbox.'),
+                    ),
+                    
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Custom checkbox prechecked'),
+                    'name' => 'KCOV3_CUSTOM_CHECKBOX_PRECHECKED',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'ccpc_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'ccpc_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('the checkbox is prechecked.'),
+                ),
+                
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Custom checkbox required'),
+                    'name' => 'KCOV3_CUSTOM_CHECKBOX_REQUIRED',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'ccr_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'ccr_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('the checkbox is required to be checked.'),
+                ),
+                    
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('Custom Checkbox text'),
+                        'name' => 'KCOV3_CUSTOM_CHECKBOX_TEXT',
+                        'required' => false,
+                        'lang' => true,
+                    ),
 
                 ),
                 'submit' => array(
@@ -2091,7 +2170,13 @@ class KlarnaOfficial extends PaymentModule
     {
         $returnarray = array();
         foreach ($this->configuration_params as $param) {
-            $returnarray[$param] = Tools::getValue($param, Configuration::get($param));
+            if ("KCOV3_CUSTOM_CHECKBOX_TEXT" == $param) {
+                $jsonstring = Configuration::get($param);
+                $dataarray = Tools::jsonDecode($jsonstring, true);
+                $returnarray[$param] = $dataarray;
+            } else {
+                $returnarray[$param] = Tools::getValue($param, Configuration::get($param));
+            }
         }
         return $returnarray;
     }
@@ -2456,11 +2541,14 @@ class KlarnaOfficial extends PaymentModule
             return;
         }
 
+        $sql = 'SELECT * FROM  `'._DB_PREFIX_.'klarna_checkbox` WHERE id_cart='.(int) $order->id_cart;
+        $klarna_checkbox_info = Db::getInstance()->getRow($sql);
         $sql = 'SELECT * FROM  `'._DB_PREFIX_.'klarna_orders` WHERE id_order='.(int) Tools::getValue('id_order');
         $klarna_orderinfo = Db::getInstance()->getRow($sql);
         $sql = 'SELECT error_message FROM `'._DB_PREFIX_.
         'klarna_errors` WHERE id_order='.(int) Tools::getValue('id_order');
         $klarna_errors = Db::getInstance()->executeS($sql);
+        $this->context->smarty->assign('klarna_checkbox_info', $klarna_checkbox_info);
         $this->context->smarty->assign('klarnacheckout_ssn', $klarna_orderinfo['ssn']);
         $this->context->smarty->assign('klarnacheckout_invoicenumber', $klarna_orderinfo['invoicenumber']);
         $this->context->smarty->assign('klarnacheckout_reservation', $klarna_orderinfo['reservation']);

@@ -442,6 +442,26 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $payment_type_allows_increase = '&ptai=1';
                 }
                 
+                $additional_checkboxes = array();
+                if (isset($checkout['options']) && isset($checkout['options']['additional_checkboxes'])) {
+                    foreach($checkout['options']['additional_checkboxes'] as $additional_checkbox) {
+                        $additional_checkboxes[$additional_checkbox['id']] = $additional_checkbox['text'];
+                    }
+                }
+                if (isset($checkout['merchant_requested']) && isset($checkout['merchant_requested']['additional_checkboxes'])) {
+                    foreach($checkout['merchant_requested']['additional_checkboxes'] as $additional_checkbox) {
+                        if (isset($additional_checkboxes[$additional_checkbox['id']])) {
+                            $text_at_time_of_purchase = pSQL($additional_checkboxes[$additional_checkbox['id']]);
+                        } else {
+                            $text_at_time_of_purchase = pSQL($additional_checkbox['id']);
+                        }
+                        $id_cart = (int) $cart->id;
+                        $checked = (int) $additional_checkbox['checked'];
+                        $sql = "INSERT INTO `"._DB_PREFIX_."klarna_checkbox` (id_cart, text_at_time_of_purchase, checked) VALUES($id_cart, '$text_at_time_of_purchase', $checked);";
+                        Db::getInstance()->execute($sql);
+                    }
+                }
+                
                 unset($_SESSION['klarna_checkout_uk']);
                 //If order is created, we can redirect to normal thankyou page.
                 $order = new Order((int) $result['id_order']);

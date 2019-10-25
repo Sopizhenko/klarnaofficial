@@ -339,6 +339,20 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $create['options']['additional_checkbox']['checked'] = true;
                             $create['options']['additional_checkbox']['required'] = false;
                         }
+                        
+                        if (1 == (int)Configuration::get('KCOV3_CUSTOM_CHECKBOX')) {
+                            $json_encoded_string = Configuration::get('KCOV3_CUSTOM_CHECKBOX_TEXT');
+                            $text_array = Tools::jsonDecode($json_encoded_string,true);
+                            $custom_textbox_text = $text_array[(int) $this->context->language->id];
+                            $additional_checkbox = array (
+                                'id' => 'customcheckbox',
+                                'checked' => (bool) Configuration::get('KCOV3_CUSTOM_CHECKBOX_PRECHECKED'),
+                                'required' => (bool) Configuration::get('KCOV3_CUSTOM_CHECKBOX_REQUIRED'),
+                                'text' => $custom_textbox_text
+                            );
+                            $create['options']['additional_checkboxes'][] = $additional_checkbox;
+                        }
+                        
                         if (Configuration::get('KCO_COLORBUTTON') != '') {
                             $create['options']['color_button'] = ''.Configuration::get('KCO_COLORBUTTON');
                         }
