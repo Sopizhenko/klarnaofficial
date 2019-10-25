@@ -264,7 +264,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                 if (isset($checkout['merchant_requested']) && isset($checkout['merchant_requested']['additional_checkboxes'])) {
                     foreach($checkout['merchant_requested']['additional_checkboxes'] as $additional_checkbox) {
                         if (isset($additional_checkboxes[$additional_checkbox['id']])) {
-                            $text_at_time_of_purchase = pSQL($additional_checkbox['id'].': '.$additional_checkboxes[$additional_checkbox['id']]);
+                            $text_at_time_of_purchase = pSQL($additional_checkboxes[$additional_checkbox['id']]);
                         } else {
                             $text_at_time_of_purchase = pSQL($additional_checkbox['id']);
                         }
