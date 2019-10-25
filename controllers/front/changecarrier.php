@@ -92,7 +92,7 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         );
         $klarnadata->order_lines = $order_lines;
         $totalCartValue = $cart->getOrderTotal(true, Cart::BOTH, null, $cart->id_carrier, false);
-        $totalCartValue_tax_excl = $cart->getOrderTotal(false, Cart::BOTH, null, $cart->id_carrier, false);
+        // $totalCartValue_tax_excl = $cart->getOrderTotal(false, Cart::BOTH, null, $cart->id_carrier, false);
         $total_tax_value = 0;
         // $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
         $klarnadata->order_amount = $totalCartValue * 100;

@@ -2168,14 +2168,14 @@ class KlarnaOfficial extends PaymentModule
             } else {
                 $returnarray[$param] = Tools::getValue($param, Configuration::get($param));
             }
-            
         }
         return $returnarray;
     }
 
     public function hookDisplayProductAdditionalInfo($params)
     {
-        if (0 == (int) Configuration::get('KCO_SHOWPRODUCTPAGE') && 0 == (int) Configuration::get('KCOV3_SHOWPRODUCTPAGE')) {
+        if (0 == (int) Configuration::get('KCO_SHOWPRODUCTPAGE') &&
+        0 == (int) Configuration::get('KCOV3_SHOWPRODUCTPAGE')) {
             return;
         }
        
@@ -4100,8 +4100,15 @@ class KlarnaOfficial extends PaymentModule
         }
     }
     
-    public function createNewCustomer($given_name, $family_name, $email, $newsletter, $id_gender = 9, $date_of_birth = "", $cart = null)
-    {
+    public function createNewCustomer(
+        $given_name,
+        $family_name,
+        $email,
+        $newsletter,
+        $id_gender = 9,
+        $date_of_birth = "",
+        $cart = null
+    ) {
         $password = Tools::passwdGen(8);
         $customer = new Customer();
         $customer->firstname = $this->truncateValue($given_name, 32, true);
