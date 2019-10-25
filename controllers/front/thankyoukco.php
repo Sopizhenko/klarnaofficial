@@ -270,14 +270,16 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         }
                         $id_cart = (int) $cart->id;
                         $checked = (int) $additional_checkbox['checked'];
-                        $sql = "INSERT INTO `"._DB_PREFIX_."klarna_checkbox` (id_cart, text_at_time_of_purchase, checked)".
+                        $sql = "INSERT INTO `"._DB_PREFIX_.
+                        "klarna_checkbox` (id_cart, text_at_time_of_purchase, checked)".
                         " VALUES($id_cart, '$text_at_time_of_purchase', $checked);";
                         Db::getInstance()->execute($sql);
                     }
                 }
                 
                 $payment_type_allows_increase = '';
-                if (isset($checkout['payment_type_allows_increase']) && 1 === (int)$checkout['payment_type_allows_increase']) {
+                if (isset($checkout['payment_type_allows_increase']) &&
+                1 === (int)$checkout['payment_type_allows_increase']) {
                     $payment_type_allows_increase = '&ptai=1';
                     $payment_type_allows_increase .= '&klarna_order_id='.Tools::getValue('klarna_order_id');
                 }
