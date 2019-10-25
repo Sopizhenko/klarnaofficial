@@ -385,7 +385,8 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                             }
                             $id_cart = (int) $cart->id;
                             $checked = (int) $additional_checkbox['checked'];
-                            $sql = "INSERT INTO `"._DB_PREFIX_."klarna_checkbox` (id_cart, text_at_time_of_purchase, checked)".
+                            $sql = "INSERT INTO `"._DB_PREFIX_."klarna_checkbox`".
+                            " (id_cart, text_at_time_of_purchase, checked)".
                             " VALUES($id_cart, '$text_at_time_of_purchase', $checked);";
                             Db::getInstance()->execute($sql);
                         }

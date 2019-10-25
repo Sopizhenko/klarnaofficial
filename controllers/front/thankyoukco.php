@@ -449,7 +449,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $additional_checkboxes[$additional_checkbox['id']] = $additional_checkbox['text'];
                     }
                 }
-                if (isset($checkout['merchant_requested']) && isset($checkout['merchant_requested']['additional_checkboxes'])) {
+                if (isset($checkout['merchant_requested']) &&
+                isset($checkout['merchant_requested']['additional_checkboxes'])) {
                     foreach ($checkout['merchant_requested']['additional_checkboxes'] as $additional_checkbox) {
                         if (isset($additional_checkboxes[$additional_checkbox['id']])) {
                             $text_at_time_of_purchase = pSQL($additional_checkboxes[$additional_checkbox['id']]);
@@ -458,7 +459,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         }
                         $id_cart = (int) $cart->id;
                         $checked = (int) $additional_checkbox['checked'];
-                        $sql = "INSERT INTO `"._DB_PREFIX_."klarna_checkbox` (id_cart, text_at_time_of_purchase, checked)".
+                        $sql = "INSERT INTO `"._DB_PREFIX_."klarna_checkbox`".
+                        " (id_cart, text_at_time_of_purchase, checked)".
                         " VALUES($id_cart, '$text_at_time_of_purchase', $checked);";
                         Db::getInstance()->execute($sql);
                     }
