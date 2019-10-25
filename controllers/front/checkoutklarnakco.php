@@ -342,7 +342,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         
                         if (1 == (int)Configuration::get('KCOV3_CUSTOM_CHECKBOX')) {
                             $json_encoded_string = Configuration::get('KCOV3_CUSTOM_CHECKBOX_TEXT');
-                            $text_array = Tools::jsonDecode($json_encoded_string,true);
+                            $text_array = Tools::jsonDecode($json_encoded_string, true);
                             $custom_textbox_text = $text_array[(int) $this->context->language->id];
                             $additional_checkbox = array (
                                 'id' => 'customcheckbox',
