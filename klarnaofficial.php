@@ -159,7 +159,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.13';
+        $this->version = '2.1.14';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -4161,9 +4161,14 @@ class KlarnaOfficial extends PaymentModule
         
         if (Configuration::get('KCOV3')) {
             $language_code = $this->context->language->language_code;
-            $id_shop_country = (int)Configuration::get('PS_SHOP_COUNTRY_ID');
+            $id_shop_country = (int)Configuration::get('PS_COUNTRY_DEFAULT');
             if ($id_shop_country == 0) {
-                $id_shop_country = (int)Configuration::get('PS_COUNTRY_DEFAULT');
+                $id_shop_country = (int)Configuration::get('PS_SHOP_COUNTRY_ID');
+            }
+            
+             if ($this->context->cart->id_address_delivery > 0) {
+                $temporary_address_object = new Address((int) $this->context->cart->id_address_delivery);
+                $id_shop_country = $temporary_address_object->id_country;
             }
             
             $shop_country = new Country($id_shop_country);
