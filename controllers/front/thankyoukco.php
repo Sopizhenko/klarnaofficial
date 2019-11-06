@@ -187,6 +187,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         (int) $cart->id.", $id_shop, '', '', '','$reference');";
                     Db::getInstance()->execute($sql);
                     
+                    Hook::exec('actionKlarnaOrderDone', array('klarnadata' => $checkout));
+                    
                     $cache_id = 'objectmodel_cart_'.$cart->id.'_*';
                     Cache::clean($cache_id);
                     Cache::clean('getContextualValue*');
@@ -283,8 +285,6 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $payment_type_allows_increase = '&ptai=1';
                     $payment_type_allows_increase .= '&klarna_order_id='.Tools::getValue('klarna_order_id');
                 }
-                
-                Hook::exec('actionKlarnaOrderDone', array('klarnadata' => $checkout));
                 
                 //If order is created, we can redirect to normal thankyou page.
                 $order = new Order((int) $result['id_order']);

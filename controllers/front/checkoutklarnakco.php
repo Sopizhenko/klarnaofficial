@@ -465,6 +465,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                          
                         $this->assignSmartyVars($ssid, $country_information);
                         
+                        Hook::exec('actionKlarnaBeforeSendData', array('create' => &$create));
+                        
                         if (!isset($_SESSION['klarna_checkout_uk'])) {
                             $checkout->create($create);
                             $checkout->fetch();
