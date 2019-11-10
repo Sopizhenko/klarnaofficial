@@ -341,7 +341,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $external_payment_methods[] = $external_payment_method;
                             $create['external_payment_methods'] = $external_payment_methods;
                         }
-                        dump($create);
                         
                         $create['gui']['layout'] = $layout;
                         $create['merchant_urls']['terms'] = $termsPage;
