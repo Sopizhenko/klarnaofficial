@@ -325,7 +325,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION_JSON = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION');
                             $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION = Tools::jsonDecode($KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION_JSON);
                             $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION = $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION[(int) $this->context->language->id];
-                            $original_checkout_url = '';
+                            $original_checkout_url = $this->context->link->getPageLink('order');
                             $external_payment_method = array(
                                 'name' => Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION'),
                                 'redirect_url' => $original_checkout_url,
@@ -335,13 +335,13 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 'label' => $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL,
                             );
                             
-                            if ("" != Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION')) {
-                                $external_payment_method["countries"] = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION');
+                            if ("" != Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES')) {
+                                $external_payment_method["countries"] = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES');
                             }
                             $external_payment_methods[] = $external_payment_method;
                             $create['external_payment_methods'] = $external_payment_methods;
                         }
-                        
+
                         $create['gui']['layout'] = $layout;
                         $create['merchant_urls']['terms'] = $termsPage;
                         $create['merchant_urls']['cancellation_terms'] = $link_cancelation;
