@@ -78,6 +78,14 @@ class KlarnaOfficial extends PaymentModule
         'KCOV3_CUSTOM_CHECKBOX_REQUIRED',
         'KCOV3_CUSTOM_CHECKBOX_PRECHECKED',
         'KCOV3_CUSTOM_CHECKBOX_TEXT',
+        
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE',
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_FEE',
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_IMGURL',
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES',
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL',
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_DESC',
+        'KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION',
        
         'KCO_DOBMAN',
         'KCO_CALLBACK_CHECK',
@@ -155,7 +163,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.40';
+        $this->version = '1.9.41';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -349,6 +357,21 @@ class KlarnaOfficial extends PaymentModule
                         $_POST[$param] = Tools::jsonEncode($texts);
                     }
                 }
+                
+                if ("KCOV3_EXTERNAL_PAYMENT_METHOD_DESC" == $param) {
+                    $texts = array();
+                    $has_custom_text = false;
+                    foreach (Language::getLanguages(false, false, true) as $id_lang) {
+                        if (Tools::getIsset($param.'_'.$id_lang)) {
+                            $has_custom_text = true;
+                            $texts[$id_lang] = Tools::getValue($param.'_'.$id_lang);
+                        }
+                    }
+                    if ($has_custom_text) {
+                        $_POST[$param] = Tools::jsonEncode($texts);
+                    }
+                }
+                
                 if (Tools::getIsset($param)) {
                      Configuration::updateValue($param, Tools::getValue($param));
                      $isSaved = true;
@@ -1744,6 +1767,91 @@ class KlarnaOfficial extends PaymentModule
                         'required' => false,
                         'lang' => true,
                     ),
+                    
+                array(
+                        'type' => 'switch',
+                        'label' => $this->l('Activate EPM'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'epm_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'epm_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('Activate EPM'),
+                    ),
+                array(
+                        'type' => 'select',
+                        'label' => $this->l('EPM label'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION',
+                        'desc' => $this->l('Choose the label text'),
+                        'options' => array(
+                            'query' => array(
+                            array(
+                                'value' => 0,
+                                'label' => $this->l('Nothing selected'), ),
+                            array(
+                                'value' => 'paypal',
+                                'label' => $this->l('Paypal'), ),
+                            array(
+                                'value' => 'swish',
+                                'label' => $this->l('Swish'), ),
+                        ),
+                            'id' => 'value',
+                            'name' => 'label',
+                        ),
+                    ),
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('EPM image url'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_IMGURL',
+                        'required' => false,
+                        'desc' => $this->l('Requires https'),
+                    ),
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('EPM Fee'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_FEE',
+                        'required' => false,
+                        'desc' => $this->l('Enter in minor units'),
+                    ),
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('EPM limit countries'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES',
+                        'required' => false,
+                        'desc' => $this->l('Enter ISO codes if you want to limit the option.'),
+                    ),
+                array(
+                        'type' => 'text',
+                        'label' => $this->l('EPM Description'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_DESC',
+                        'required' => false,
+                        'lang' => true,
+                    ),
+                array(
+                        'type' => 'select',
+                        'label' => $this->l('EPM label'),
+                        'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL',
+                        'desc' => $this->l('Choose the label text'),
+                        'options' => array(
+                            'query' => array(
+                            array(
+                                'value' => 0,
+                                'label' => $this->l('Continue'), ),
+                            array(
+                                'value' => 1,
+                                'label' => $this->l('Complete'), ),
+                        ),
+                            'id' => 'value',
+                            'name' => 'label',
+                        ),
+                    ),
 
                 ),
                 'submit' => array(
@@ -2171,6 +2279,10 @@ class KlarnaOfficial extends PaymentModule
         $returnarray = array();
         foreach ($this->configuration_params as $param) {
             if ("KCOV3_CUSTOM_CHECKBOX_TEXT" == $param) {
+                $jsonstring = Configuration::get($param);
+                $dataarray = Tools::jsonDecode($jsonstring, true);
+                $returnarray[$param] = $dataarray;
+            } elseif ("KCOV3_EXTERNAL_PAYMENT_METHOD_DESC" == $param) {
                 $jsonstring = Configuration::get($param);
                 $dataarray = Tools::jsonDecode($jsonstring, true);
                 $returnarray[$param] = $dataarray;
