@@ -136,6 +136,7 @@ class KlarnaCheckoutCommonFeatures
                 $value_real = Tools::ps_round($rule["value_real"], 2);
 
                 $tax_value = $value_real - ($value_real / (1+($common_tax_rate/100)));
+                $tax_value = Tools::ps_round($tax_value, 2);
                 
                 if ($highest_tax_rate == 0) {
                     $tax_value = 0;
