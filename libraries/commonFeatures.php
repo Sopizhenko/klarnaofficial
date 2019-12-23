@@ -135,24 +135,29 @@ class KlarnaCheckoutCommonFeatures
                 $discountname = $rule["name"];
                 $value_real = Tools::ps_round($rule["value_real"], 2);
 
-                $tax_value = $value_real - ($value_real / (1+($common_tax_rate/100)));
-                $tax_value = Tools::ps_round($tax_value, 2);
+                if ($value_real > 0) {
+                    $tax_value = $value_real - ($value_real / (1+($common_tax_rate/100)));
+                    $tax_value = Tools::ps_round($tax_value, 2);
+                } else {
+                    $tax_value = 0;
+                }
                 
                 if ($highest_tax_rate == 0) {
                     $tax_value = 0;
                     $common_tax_rate = 0;
                 }
-                
-                $checkoutcart[] = array(
-                    'type' => 'discount',
-                    'reference' => '',
-                    'name' => $discountname,
-                    'quantity' => 1,
-                    'unit_price' => (string) (-($value_real * 100)),
-                    'tax_rate' => (int) ($common_tax_rate * 100),
-                    'total_amount' => (string) (-($value_real * 100)),
-                    'total_tax_amount' => (string) (-($tax_value * 100)),
-                );                    
+                if ($value_real > 0) {
+                    $checkoutcart[] = array(
+                        'type' => 'discount',
+                        'reference' => '',
+                        'name' => $discountname,
+                        'quantity' => 1,
+                        'unit_price' => (string) (-($value_real * 100)),
+                        'tax_rate' => (int) ($common_tax_rate * 100),
+                        'total_amount' => (string) (-($value_real * 100)),
+                        'total_tax_amount' => (string) (-($tax_value * 100)),
+                    );                    
+                }
             }
         } else {
             $totalDiscounts = $cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);

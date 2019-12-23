@@ -60,6 +60,9 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
             
             unset($cart);
             $cart = new Cart($id_cart);
+            //Make a check on reload
+            CartRule::autoRemoveFromCart($this->context);
+            CartRule::autoAddToCart($this->context);
         }
         
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
