@@ -310,41 +310,43 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         }
                         
                         if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE')) {
-                            
                             if (1 == (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL')) {
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL = 'continue';
                             } else {
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL = 'complete';
                             }
+                            $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC_JSON = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_DESC');
+                            $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC = Tools::jsonDecode($KCOV3_EXTERNAL_PAYMENT_METHOD_DESC_JSON, true);
+                            $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC = $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC[(int) $this->context->language->id];
                             
-                            if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE') > 0) {
-                                $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE = (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE');
-                            }
-                            
-                            $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION_JSON = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION');
-                            $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION = Tools::jsonDecode($KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION_JSON);
-                            $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION = $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION[(int) $this->context->language->id];
-                            
-                            $order_process = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
-                            
-                            if ("order" == $order_process) {
-                                $step = "step=3";
+                            if ("" != Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_EXTERNALURL')) {
+                                $original_checkout_url = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_EXTERNALURL');
                             } else {
-                                $step = null;
-                            }
-                            $original_checkout_url = $this->context->link->getPageLink($order_process, true, null, $step);
+                                $order_process = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
                             
+                                if ("order" == $order_process) {
+                                    $step = "step=3";
+                                } else {
+                                    $step = null;
+                                }
+                                $original_checkout_url = $this->context->link->getPageLink($order_process, true, null, $step);
+                            }
+
                             $external_payment_method = array(
                                 'name' => Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION'),
                                 'redirect_url' => $original_checkout_url,
                                 'image_url' => Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_IMGURL'),
-                                'fee' => $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE,
-                                'description' => $KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION,
+                                'description' => $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC,
                                 'label' => $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL,
                             );
                             
                             if ("" != Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES')) {
-                                $external_payment_method["countries"] = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES');
+                                $KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES = explode(',', Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES'));
+                                $external_payment_method["countries"] = $KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES;
+                            }
+                            if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE') > 0) {
+                                $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE = (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE');
+                                $external_payment_method["fee"] = $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE;
                             }
                             $external_payment_methods[] = $external_payment_method;
                             $create['external_payment_methods'] = $external_payment_methods;
@@ -698,7 +700,13 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     }
                 } catch (Exception $e) {
                     unset($_SESSION['klarna_checkout_uk']);
-                    $this->context->smarty->assign('klarna_error', $e->getMessage());
+                    $klarna_error = $e->getMessage();
+                    if (strpos($klarna_error, 'purchase_currency') !== false) {
+                        $klarna_error = 'purchase_currency';
+                        $this->context->smarty->assign('klarnaCurrency', $country_information['purchase_currency']);
+                        $this->context->smarty->assign('klarnaCountry', $country_information['purchase_country']);
+                    }
+                    $this->context->smarty->assign('klarna_error', $klarna_error);
                 }
             }
         } else {
