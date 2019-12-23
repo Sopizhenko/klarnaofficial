@@ -348,6 +348,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE = (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE');
                                 $external_payment_method["fee"] = $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE;
                             }
+                            $external_payment_methods = array();
                             $external_payment_methods[] = $external_payment_method;
                             $create['external_payment_methods'] = $external_payment_methods;
                         }
