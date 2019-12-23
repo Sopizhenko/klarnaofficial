@@ -4364,7 +4364,10 @@ class KlarnaOfficial extends PaymentModule
             
             if ($this->context->cart->id_address_delivery > 0) {
                 $temporary_address_object = new Address((int) $this->context->cart->id_address_delivery);
-                if ($temporary_address_object->id_customer > 0 && $this->context->customer->id > 0 && $this->context->customer->id == $temporary_address_object->id_customer) {
+                if ($temporary_address_object->id_customer > 0 &&
+                $this->context->customer->id > 0 &&
+                $this->context->customer->id == $temporary_address_object->id_customer
+                ) {
                     $id_shop_country = $temporary_address_object->id_country;
                 }
             }

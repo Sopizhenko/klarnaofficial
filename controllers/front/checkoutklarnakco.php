@@ -311,7 +311,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $create['options']['phone_mandatory'] = true;
                         }
                         if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE')) {
-                            
                             if (1 == (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL')) {
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL = 'continue';
                             } else {
@@ -344,7 +343,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE = (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE');
                                 $external_payment_method["fee"] = $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE;
                             }
-                            
+                            $external_payment_methods = array();
                             $external_payment_methods[] = $external_payment_method;
                             $create['external_payment_methods'] = $external_payment_methods;
                         }
