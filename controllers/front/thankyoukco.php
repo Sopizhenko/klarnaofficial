@@ -167,8 +167,10 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
 
                     $delivery_address_id = 0;
                     $invoice_address_id = 0;
-                    $shipping_iso = $country_iso_codes[$shipping['country']];
-                    $invocie_iso = $country_iso_codes[$billing['country']];
+                    $shipping_iso = Tools::strtoupper($shipping['country']);
+                    $invocie_iso = Tools::strtoupper($billing['country']);
+                    // $shipping_iso = $country_iso_codes[$shipping['country']];
+                    // $invocie_iso = $country_iso_codes[$billing['country']];
                     $shipping_country_id = Country::getByIso($shipping_iso);
                     $invocie_country_id = Country::getByIso($invocie_iso);
                     
