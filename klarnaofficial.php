@@ -168,7 +168,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.21';
+        $this->version = '2.1.22';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -3396,6 +3396,18 @@ class KlarnaOfficial extends PaymentModule
         if (!isset($billing['care_of'])) {
             $billing['care_of'] = "";
         }
+        if (!isset($shipping['organization_name'])) {
+            $shipping['organization_name'] = "";
+        }
+        if (!isset($billing['organization_name'])) {
+            $billing['organization_name'] = "";
+        }
+        if (!isset($shipping['attention'])) {
+            $shipping['attention'] = "";
+        }
+        if (!isset($billing['attention'])) {
+            $billing['attention'] = "";
+        }
         
         $shipping_state_id = 0;
         $invoice_state_id = 0;
@@ -3433,6 +3445,8 @@ class KlarnaOfficial extends PaymentModule
             and $address['address1'] == $shipping['street_address']
             and $address['postcode'] == $shipping['postal_code']
             and $address['phone_mobile'] == $shipping['phone']
+            and $address['other'] == $shipping['attention']
+            and $address['company'] == $shipping['organization_name']
             and $address['id_country'] == $shipping_country_id) {
                 //LOAD SHIPPING ADDRESS
                 $cart->id_address_delivery = $address['id_address'];
@@ -3445,8 +3459,10 @@ class KlarnaOfficial extends PaymentModule
             and $address['address1'] == $billing['street_address']
             and $address['postcode'] == $billing['postal_code']
             and $address['phone_mobile'] == $billing['phone']
+            and $address['other'] == $billing['attention']
+                        and $address['company'] == $billing['organization_name']
             and $address['id_country'] == $invocie_country_id) {
-                //LOAD SHIPPING ADDRESS
+                //LOAD BILLING ADDRESS
                 $cart->id_address_invoice = $address['id_address'];
                 $invoice_address_id = $address['id_address'];
             }
@@ -3469,6 +3485,8 @@ class KlarnaOfficial extends PaymentModule
             $address->phone_mobile = $billing['phone'];
             $address->city = $billing['city'];
             $address->id_country = $invocie_country_id;
+            $address->other = $billing['attention'];
+            $address->company = $billing['organization_name'];
             $address->id_customer = $customer->id;
             
             if ($shipping_state_id > 0) {
@@ -3506,6 +3524,8 @@ class KlarnaOfficial extends PaymentModule
             $address->phone = $shipping['phone'];
             $address->phone_mobile = $shipping['phone'];
             $address->id_country = $shipping_country_id;
+            $address->other = $shipping['attention'];
+            $address->company = $shipping['organization_name'];
             $address->id_customer = $customer->id;
             $address->alias = 'Klarna Address';
             $address->add();
