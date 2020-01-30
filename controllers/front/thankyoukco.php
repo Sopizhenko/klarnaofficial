@@ -187,6 +187,18 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     if (!isset($billing['care_of'])) {
                         $billing['care_of'] = "";
                     }
+                    if (!isset($billing['organization_name'])) {
+                        $billing['organization_name'] = "";
+                    }
+                    if (!isset($shipping['organization_name'])) {
+                        $shipping['organization_name'] = "";
+                    }
+                    if (!isset($billing['attention'])) {
+                        $billing['attention'] = "";
+                    }
+                    if (!isset($shipping['attention'])) {
+                        $shipping['attention'] = "";
+                    }
                     
                     if ($shipping_iso == "IT" || $shipping_iso == "US") {
                         if (isset($shipping['region'])) {
@@ -222,6 +234,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         and $address['address2'] == $shipping['care_of']
                         and $address['address1'] == $shipping['street_address']
                         and $address['postcode'] == $shipping['postal_code']
+                        and $address['other'] == $shipping['attention']
+                        and $address['company'] == $shipping['organization_name']
                         and $address['phone_mobile'] == $shipping['phone']
                         and $address['id_country'] == $shipping_country_id) {
                             //LOAD SHIPPING ADDRESS
@@ -232,11 +246,13 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         and $address['lastname'] == $billing['family_name']
                         and $address['city'] == $billing['city']
                         and $address['address2'] == $billing['care_of']
+                        and $address['other'] == $billing['attention']
+                        and $address['company'] == $billing['organization_name']
                         and $address['address1'] == $billing['street_address']
                         and $address['postcode'] == $billing['postal_code']
                         and $address['phone_mobile'] == $billing['phone']
                         and $address['id_country'] == $invocie_country_id) {
-                            //LOAD SHIPPING ADDRESS
+                            //LOAD BILLING ADDRESS
                             $cart->id_address_invoice = $address['id_address'];
                             $invoice_address_id = $address['id_address'];
                         }
@@ -256,6 +272,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
 
                         $address->postcode = $billing['postal_code'];
                         $address->phone = $billing['phone'];
+                        $address->other = $billing['attention'];
+                        $address->company = $billing['organization_name'];
                         $address->phone_mobile = $billing['phone'];
                         $address->city = $billing['city'];
                         $address->id_country = $invocie_country_id;
@@ -295,6 +313,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $address->postcode = $shipping['postal_code'];
                         $address->phone = $shipping['phone'];
                         $address->phone_mobile = $shipping['phone'];
+                        $address->other = $shipping['attention'];
+                        $address->company = $shipping['organization_name'];
                         $address->id_country = $shipping_country_id;
                         $address->id_customer = $customer->id;
                         $address->alias = 'Klarna Address';

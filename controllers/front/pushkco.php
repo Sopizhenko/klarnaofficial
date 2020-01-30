@@ -178,6 +178,46 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                     if (!isset($billing['care_of'])) {
                         $billing['care_of'] = "";
                     }
+                    if (!isset($billing['organization_name'])) {
+                        $billing['organization_name'] = "";
+                    }
+                    if (!isset($shipping['organization_name'])) {
+                        $shipping['organization_name'] = "";
+                    }
+                    if (!isset($billing['attention'])) {
+                        $billing['attention'] = "";
+                    }
+                    if (!isset($shipping['attention'])) {
+                        $shipping['attention'] = "";
+                    }
+                    
+                    if ($shipping_iso == "IT" || $shipping_iso == "US") {
+                        if (isset($shipping['region'])) {
+                            $shippingregion = $shipping['region'];
+                            $shipping_state_id = State::getIdByIso($shippingregion, $shipping_country_id);
+                            if (!$shipping_state_id>0) {
+                                $shippingregion = Tools::ucfirst(Tools::strtolower($shippingregion));
+                                $shipping_state_id = State::getIdByName($shippingregion);
+                                $statetmp = new State($shipping_state_id);
+                                if ($statetmp->id_country != $shipping_country_id) {
+                                    $shipping_state_id = 0;
+                                }
+                            }
+                        }
+                        if (isset($billing['region'])) {
+                            $billingregion = $billing['region'];
+                            $invoice_state_id = State::getIdByIso($billingregion, $invocie_country_id);
+                            if (!$invoice_state_id>0) {
+                                $billingregion = Tools::ucfirst(Tools::strtolower($billingregion));
+                                $invoice_state_id = State::getIdByName($billingregion);
+                                $statetmp = new State($invoice_state_id);
+                                if ($statetmp->id_country != $invocie_country_id) {
+                                    $invoice_state_id = 0;
+                                }
+                            }
+                        }
+                    }
+                    
                     
                     foreach ($customer->getAddresses($cart->id_lang) as $address) {
                         if ($address['firstname'] == $shipping['given_name']
@@ -187,6 +227,8 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         and $address['address1'] == $shipping['street_address']
                         and $address['postcode'] == $shipping['postal_code']
                         and $address['phone_mobile'] == $shipping['phone']
+                        and $address['other'] == $shipping['attention']
+                        and $address['company'] == $shipping['organization_name']
                         and $address['id_country'] == $shipping_country_id) {
                             //LOAD SHIPPING ADDRESS
                             $cart->id_address_delivery = $address['id_address'];
@@ -199,6 +241,8 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         and $address['address1'] == $billing['street_address']
                         and $address['postcode'] == $billing['postal_code']
                         and $address['phone_mobile'] == $billing['phone']
+                        and $address['other'] == $billing['attention']
+                        and $address['company'] == $billing['organization_name']
                         and $address['id_country'] == $invocie_country_id) {
                             //LOAD SHIPPING ADDRESS
                             $cart->id_address_invoice = $address['id_address'];
@@ -219,6 +263,8 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         }
 
                         $address->postcode = $billing['postal_code'];
+                        $address->other = $billing['attention'];
+                        $address->company = $billing['organization_name'];
                         $address->phone = $billing['phone'];
                         $address->phone_mobile = $billing['phone'];
                         $address->city = $billing['city'];
@@ -246,6 +292,8 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         $address->postcode = $shipping['postal_code'];
                         $address->phone = $shipping['phone'];
                         $address->phone_mobile = $shipping['phone'];
+                        $address->other = $shipping['attention'];
+                        $address->company = $shipping['organization_name'];
                         $address->id_country = $shipping_country_id;
                         $address->id_customer = $customer->id;
                         $address->alias = 'Klarna Address';
