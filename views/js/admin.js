@@ -59,6 +59,14 @@ $(document).ready(function(){
 			return false;
 		}
 	});
+    $('#pane9 .sidebar .nav-tabs a').each(function(){
+		var fieldset_arr = $(this).attr('data-fieldset').split(',');
+		if($.inArray(pwd_refer, fieldset_arr) > -1)
+		{
+			$(this).trigger('click');
+			return false;
+		}
+	});
     $('#pane7 .sidebar .nav-tabs a').each(function(){
 		var fieldset_arr = $(this).attr('data-fieldset').split(',');
 		if($.inArray(pwd_refer, fieldset_arr) > -1)
@@ -75,4 +83,87 @@ $(document).ready(function(){
 			return false;
 		}
 	});
+});
+
+
+
+
+$(document).on('ready', function() {
+/*  Toggle the next field/fields from a switch, count is the number of next fields to toggle
+    /*  --------------------------------------------------------------  */
+    $.fn.toggleNextFields = function(count) {
+        var selector = $(this.selector + '_on'), // Making a jquery object of the ON ID 
+            selectorOff = $(this.selector + '_off'); // Making a jquery object of the OFF ID 
+
+        /*if ON selector is checked by default*/
+        if(!selector.is(":checked")) {
+            /*Hide number of fields specified by count*/
+            selector.parent().parent().parent().nextAll().slice(0,count).hide(); 
+        }
+        
+        /*if ON is changed*/
+        selector.change(function() {
+
+            /*if ON is checked*/
+            if(selector.is(":checked")) {
+                /*Hide number of fields specified by count*/
+               selector.parent().parent().parent().nextAll().slice(0,count).slideDown();
+            }
+
+        });
+
+        /*if OFF is changed*/
+        selectorOff.change(function() {
+
+            /*if OFF is checked*/
+            if(selectorOff.is(":checked")) {
+                /*Hide number of fields specified by count*/
+                selector.parent().parent().parent().nextAll().slice(0,count).slideUp();
+            }
+        });
+    };
+    
+    
+    $.fn.toggleNextFieldsInactive = function(count) {
+        var selector = $(this.selector + '_off'), // Making a jquery object of the ON ID 
+            selectorOff = $(this.selector + '_on'); // Making a jquery object of the OFF ID 
+
+        /*if ON selector is checked by default*/
+        if(!selector.is(":checked")) {
+            /*Hide number of fields specified by count*/
+            selector.parent().parent().parent().nextAll().slice(0,count).hide(); 
+        }
+
+        /*if ON is changed*/
+        selector.change(function() {
+
+            /*if ON is checked*/
+            if(selector.is(":checked")) {
+                /*Hide number of fields specified by count*/
+               selector.parent().parent().parent().nextAll().slice(0,count).slideDown();
+            }
+
+        });
+
+        /*if OFF is changed*/
+        selectorOff.change(function() {
+
+            /*if OFF is checked*/
+            if(selectorOff.is(":checked")) {
+                /*Hide number of fields specified by count*/
+                selector.parent().parent().parent().nextAll().slice(0,count).slideUp();
+            }
+        });
+    };
+
+    // Init
+    for (var key in toggle_js_inputs) {
+        $('#'+key).toggleNextFields(toggle_js_inputs[key]);
+    }
+
+    $('#toggle-presets').on('click', function() {
+        var panel = $(this).closest('.panel');
+        var presets = panel.find('.row');
+        presets.slideToggle(300);
+    });
 });
