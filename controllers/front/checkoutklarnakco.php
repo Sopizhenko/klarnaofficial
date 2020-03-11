@@ -318,9 +318,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL = 'complete';
                             }
                             
-                            $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC_JSON = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_DESC');
-                            $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC = Tools::jsonDecode($KCOV3_EXTERNAL_PAYMENT_METHOD_DESC_JSON, true);
-                            $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC = $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC[(int) $this->context->language->id];
+                            $KCOV3_EPM_DESC_JSON = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_DESC');
+                            $KCOV3_EPM_DESC = Tools::jsonDecode($KCOV3_EPM_DESC_JSON, true);
+                            $KCOV3_EPM_DESC = $KCOV3_EPM_DESC[(int) $this->context->language->id];
                             
                             if ("" != Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_EXTERNALURL')) {
                                 $original_checkout_url = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_EXTERNALURL');
@@ -332,17 +332,18 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 'name' => Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION'),
                                 'redirect_url' => $original_checkout_url,
                                 'image_url' => Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_IMGURL'),
-                                'description' => $KCOV3_EXTERNAL_PAYMENT_METHOD_DESC,
+                                'description' => $KCOV3_EPM_DESC,
                                 'label' => $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL,
                             );
                             
                             if ("" != Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES')) {
-                                $KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES = explode(',', Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES'));
-                                $external_payment_method["countries"] = $KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES;
+                                $KCOV3_EPM_COUNTRIES = Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES');
+                                $KCOV3_EPM_COUNTRIES = explode(',', $KCOV3_EPM_COUNTRIES);
+                                $external_payment_method["countries"] = $KCOV3_EPM_COUNTRIES;
                             }
                             if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE') > 0) {
-                                $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE = (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE');
-                                $external_payment_method["fee"] = $KCOV3_EXTERNAL_PAYMENT_METHOD_FEE;
+                                $KCOV3_EPM_FEE = (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_FEE');
+                                $external_payment_method["fee"] = $KCOV3_EPM_FEE;
                             }
                             $external_payment_methods = array();
                             $external_payment_methods[] = $external_payment_method;
