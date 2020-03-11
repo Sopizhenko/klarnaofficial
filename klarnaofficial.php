@@ -720,7 +720,7 @@ class KlarnaOfficial extends PaymentModule
 
     public function createOSMForm()
     {
-        
+        $placements = array();
         $placements[] = array('value' => '0', 'label' => $this->l('Select type'));
         foreach (self::OSM_PLACEMENTS as $placementID) {
             $placements[] = array('value' => $placementID, 'label' => $placementID);
@@ -883,7 +883,7 @@ class KlarnaOfficial extends PaymentModule
                     'id' => 'value',
                     'name' => 'label',
                 ),
-            );            
+            );
         }
         
         $helper = new HelperForm();
@@ -2859,7 +2859,7 @@ class KlarnaOfficial extends PaymentModule
         ) {
             return;
         }
-        
+        $klarna_placement = array();
         // Check if country is active
         if ((bool) $OSMconfig[$this->context->country->iso_code][$use_osm_key]) {
             $languageIsoCode = $this->context->language->iso_code;
@@ -4835,8 +4835,6 @@ class KlarnaOfficial extends PaymentModule
     
     public static function getOnSiteMessagingUrl()
     {
-        $use_us_path = Configuration::get('KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY');
-        
         $eu_test_path = 'https://eu-library.playground.klarnaservices.com/lib.js';
         $eu_path = 'https://eu-library.klarnaservices.com/lib.js';
         
