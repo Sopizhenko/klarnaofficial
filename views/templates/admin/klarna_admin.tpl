@@ -131,6 +131,7 @@
 		<li><a href="#pane4" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Pclasses' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane5" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Terms and Conditions' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane6" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Setup' mod='klarnaofficial'}</a></li>
+        <li><a href="#pane9" data-toggle="tab"><i class="icon-list-alt"></i> {l s='On Site Messaging' mod='klarnaofficial'}</a></li>
 	</ul>
 	<div class="panel">
 	<div class="tab-content">
@@ -267,7 +268,23 @@
 				</form>
 			</div>
 		</div>
-		
+		<div id="pane9" class="tab-pane">
+			<div class="tabbable row klarnacheckout-admin">
+				<div class="col-lg-12 tab-content">
+					<div class="sidebar col-lg-2" style="display: none;">
+						<ul class="nav nav-tabs">
+							<li class="nav-item"><a href="javascript:;" title="{l s='On Site Messaging' mod='klarnaofficial'}" data-panel="9" data-fieldset="0"><i class="icon-AdminAdmin"></i>{l s='On Site Messaging' mod='klarnaofficial'}</a></li>
+						</ul>
+					</div>
+					<div id="klarnacheckout-admin" class="col-lg-12">
+						{$osmform nofilter}
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	</div>
 </div>
+<script>
+var toggle_js_inputs = {$toggle_js_inputs nofilter};
+</script>

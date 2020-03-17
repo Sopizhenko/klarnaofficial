@@ -289,7 +289,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $create['locale'] = $country_information['locale'];
                         // $create['order_amount'] = $totalCartValue * 100;
                         $create['order_amount'] = bcmul($totalCartValue, 100, 0);
-                        $create['order_tax_amount'] = $total_tax_value * 100;
+                        // $create['order_tax_amount'] = $total_tax_value * 100;
                        
                         if (0 == (int) Configuration::get('KCO_AUTOFOCUS')) {
                             $create['gui']['options'] = array('disable_autofocus');
@@ -491,9 +491,18 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 }
                             }
                         }
+                        
+                        $total_tax_value = 0;
                         foreach ($checkoutcart as $item) {
                             $create['order_lines'][] = $item;
+                            $total_tax_value += $item['total_tax_amount'];
                         }
+                        
+                        if ($total_tax_value < 0) {
+                            $total_tax_value = 0;
+                        }
+                        $create['order_tax_amount'] = $total_tax_value;
+                        
                         // echo "------------".$eid;
                          // echo "<pre>";print_r($create);echo "</pre>";
                         if (!isset($_SESSION['klarna_checkout_uk'])) {

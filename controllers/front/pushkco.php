@@ -123,6 +123,12 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         $newsletter = 1;
                     }
 
+                    $KCOV3_USEGUESTACCOUNTS = Configuration::get(
+                        'KCOV3_USEGUESTACCOUNTS',
+                        null,
+                        $cart->id_shop
+                    );
+
                     $id_customer = (int) (Customer::customerExists($shipping['email'], true, true));
                     if ($id_customer > 0) {
                         $customer = new Customer($id_customer);
@@ -140,26 +146,38 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                         $customer->email = $shipping['email'];
                         $customer->passwd = Tools::encrypt($password);
                         $customer->is_guest = 0;
-                        $customer->id_default_group = (int) (Configuration::get(
-                            'PS_CUSTOMER_GROUP',
-                            null,
-                            $cart->id_shop
-                        ));
+                        if (0 == (int) $KCOV3_USEGUESTACCOUNTS) {
+                            $customer->id_default_group = (int) (Configuration::get(
+                                'PS_CUSTOMER_GROUP',
+                                null,
+                                $cart->id_shop
+                            ));
+                            $customer->is_guest = 0;
+                        } else {
+                            $customer->id_default_group = (int) (Configuration::get(
+                                'PS_GUEST_GROUP',
+                                null,
+                                $cart->id_shop
+                            ));
+                            $customer->is_guest = 1;
+                        }
                         
                         $customer->newsletter = $newsletter;
                         $customer->optin = 0;
                         $customer->active = 1;
                         $customer->id_gender = 9;
                         $customer->add();
-                        if (!$this->sendConfirmationMail($customer, $cart->id_lang, $password)) {
-                            Logger::addLog(
-                                'KCO: Failed sending welcome mail to: '.$shipping['email'],
-                                1,
-                                null,
-                                null,
-                                null,
-                                true
-                            );
+                        if (0 == $customer->is_guest) {
+                            if (!$this->sendConfirmationMail($customer, $cart->id_lang, $password)) {
+                                Logger::addLog(
+                                    'KCO: Failed sending welcome mail to: '.$shipping['email'],
+                                    1,
+                                    null,
+                                    null,
+                                    null,
+                                    true
+                                );
+                            }
                         }
                     }
 
