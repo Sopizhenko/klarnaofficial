@@ -277,7 +277,7 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-12">
-						{$osmform nofilter}
+						{$osmform}
 					</div>
 				</div>
 			</div>
@@ -286,5 +286,5 @@
 	</div>
 </div>
 <script>
-var toggle_js_inputs = {$toggle_js_inputs nofilter};
+var toggle_js_inputs = {$toggle_js_inputs};
 </script>
