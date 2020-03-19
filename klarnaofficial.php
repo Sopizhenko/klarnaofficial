@@ -2070,7 +2070,7 @@ class KlarnaOfficial extends PaymentModule
                                 'value' => 0,
                                 'label' => $this->l('No'), ),
                         ),
-                        'desc' => $this->l('Active External Payment Method (EPM)'),
+                        'desc' => $this->l('Active External Payment Method (EPM). Approval required, check documentation'),
                     ),
                 array(
                         'type' => 'select',
