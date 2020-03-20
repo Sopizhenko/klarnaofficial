@@ -525,6 +525,7 @@ class KlarnaOfficial extends PaymentModule
 
         $PS_COUNTRY_DEFAULT = (int)Configuration::get('PS_COUNTRY_DEFAULT');
         $country = new Country($PS_COUNTRY_DEFAULT);
+        $country_iso_code = $country->iso_code;
         
         $cron_token = Tools::hash(Tools::hash(Tools::hash($this->name)));
         
@@ -587,8 +588,10 @@ class KlarnaOfficial extends PaymentModule
             $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code']] = $numInputs;
         }
 
+        $cron_domain = $this->context->link->getBaseLink(null, true, false);
+        
         $this->context->smarty->assign(array(
-            'klarnaisocodedef' => $country->iso_code,
+            'klarnaisocodedef' => $country_iso_code,
             'errorMSG' => $errorMSG,
             'kcov3_is_active' => $kcov3_is_active,
             'address_check_done' => $address_check_done,
@@ -606,6 +609,7 @@ class KlarnaOfficial extends PaymentModule
             'isNoDecimal_warning' => $isNoDecimal_warning,
             'isNoSll_warning' => $isNoSll_warning,
             'cron_token' => $cron_token,
+            'cron_domain' => $cron_domain,
             'invoice_fee_not_found' => $invoice_fee_not_found,
             'osmform' => $this->createOSMForm(),
             'commonform' => $this->createCommonForm(),

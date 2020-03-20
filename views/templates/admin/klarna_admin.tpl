@@ -62,7 +62,7 @@
 		<p>
 			{l s='Link and information to documentation comes here...' mod='klarnaofficial'}
 		</p>
-		<a class="banner__cta" href="{$module_dir|escape:'htmlall':'UTF-8'}doc/index.html?cron_token={$cron_token}" target="_blank" id="fancydocs" title="{l s='Read documentation here' mod='klarnaofficial'}">
+		<a class="banner__cta" href="https://klarnadocs.prestaworks.se?cron_token={$cron_token}&cron_domain={$cron_domain|escape:'url'}" target="_blank" id="__fancydocs" title="{l s='Read documentation here' mod='klarnaofficial'}">
 			{l s='Read documentation here' mod='klarnaofficial'}
 		</a>
 	</section>
