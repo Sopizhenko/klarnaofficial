@@ -618,6 +618,8 @@ class KlarnaOfficial extends PaymentModule
         foreach (Country::getCountries(Configuration::get('PS_LANG_DEFAULT'), true) as $country) {
             $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code']] = $numInputs;
         }
+        
+        $cron_domain = $this->context->link->getBaseLink(null, true, false);
 
         $this->context->smarty->assign(array(
             'klarnaisocodedef' => $country_iso_code,
@@ -634,6 +636,7 @@ class KlarnaOfficial extends PaymentModule
             'isNoDecimal_warning' => $isNoDecimal_warning,
             'isNoSll_warning' => $isNoSll_warning,
             'cron_token' => $cron_token,
+            'cron_domain' => $cron_domain,
             'errorMSG' => $errorMSG,
             'address_check_done' => $address_check_done,
             'isSaved' => $isSaved,
