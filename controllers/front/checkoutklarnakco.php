@@ -288,7 +288,8 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $create['purchase_currency'] = $country_information['purchase_currency'];
                         $create['locale'] = $country_information['locale'];
                         // $create['order_amount'] = $totalCartValue * 100;
-                        $create['order_amount'] = bcmul($totalCartValue, 100, 0);
+                        // $create['order_amount'] = bcmul($totalCartValue, 100, 0);
+                        $create['order_amount'] = $this->module->fixPrestashopRoundingIssues($totalCartValue, 100, 0);
                         // $create['order_tax_amount'] = $total_tax_value * 100;
                        
                         if (0 == (int) Configuration::get('KCO_AUTOFOCUS')) {
