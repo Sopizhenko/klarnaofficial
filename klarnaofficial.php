@@ -4865,7 +4865,7 @@ class KlarnaOfficial extends PaymentModule
     
     public function fixPrestashopRoundingIssues($value, $multiplier, $scale=0)
     {
-        if (function_exists(bcmul)) {
+        if (function_exists('bcmul')) {
             return bcmul($value, $multiplier, $scale);
         } else {
             return round($value * $multiplier, $scale);
