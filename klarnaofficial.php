@@ -204,7 +204,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.24';
+        $this->version = '2.1.25';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -4843,7 +4843,7 @@ class KlarnaOfficial extends PaymentModule
         $eu_path = 'https://eu-library.klarnaservices.com/lib.js';
         
         $us_test_path = 'https://us-library.playground.klarnaservices.com/lib.js';
-        $us_path = 'https://us-library.playground.klarnaservices.com/lib.js';
+        $us_path = 'https://us-library.klarnaservices.com/lib.js';
         
         $url = $eu_path;
         if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
@@ -4863,6 +4863,14 @@ class KlarnaOfficial extends PaymentModule
         return $url;
     }
     
+    public function fixPrestashopRoundingIssues($value, $multiplier, $scale=0)
+    {
+        if (function_exists(bcmul)) {
+            $create['order_amount'] = bcmul($value, $multiplier, $scale);
+        } else {
+            $create['order_amount'] = round($value * $multiplier, $scale);
+        }
+    }
     public function getKlarnaCountryInformation($currency_iso_code, $language_iso_code)
     {
         if (!Configuration::get('KCO_IS_ACTIVE')) {
