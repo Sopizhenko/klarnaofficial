@@ -4863,7 +4863,7 @@ class KlarnaOfficial extends PaymentModule
         return $url;
     }
     
-    public function fixPrestashopRoundingIssues($value, $multiplier, $scale=0)
+    public function fixPrestashopRoundingIssues($value, $multiplier, $scale = 0)
     {
         if (function_exists('bcmul')) {
             return bcmul($value, $multiplier, $scale);
