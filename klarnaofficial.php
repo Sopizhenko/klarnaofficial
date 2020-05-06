@@ -3381,7 +3381,7 @@ class KlarnaOfficial extends PaymentModule
                                 'order_lines' => $kcoorder['order_lines'],
                             );
                             
-                            if("" != $order->shipping_number) {
+                            if ("" != $order->shipping_number) {
                                 $carrier = new Carrier((int)($order->id_carrier), (int)($order->id_lang));
                                 if ("" != $carrier->url) {
                                     $tracking_uri = urlencode(str_replace('@', $order->shipping_number, $carrier->url));
