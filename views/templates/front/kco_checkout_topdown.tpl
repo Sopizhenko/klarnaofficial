@@ -119,12 +119,14 @@
 
 		<div class="cart-grid-body kco-box col-xs-12">
             <div class="card">
+                {if !$isv3}
                 <div class="card-block">
                     <span class="kco-step-heading">{l s='Step 1' mod='klarnaofficial'}</span>
                     <h1 class="h1">
                         {l s='Shipping' mod='klarnaofficial'}
                     </h1>
                 </div>
+                {/if}
                 <div class="row">
                 {if !$isv3}
                     <div class="col-md-6">
@@ -183,6 +185,7 @@
                         </div>
                     </div>
                     {/if}
+                    {if 1 == $KCO_ALLOWMESSAGE}
                     <div class="col-md-{if $isv3}12{else}6{/if}">
                         <div class="xcard">
                                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
@@ -202,6 +205,7 @@
                                 </form><!-- /#klarnamessage -->
                         </div>
                     </div>
+                    {/if}
                 </div>
                 <div class="xcard">
                     {if $giftAllowed==1}
@@ -231,7 +235,7 @@
                 </div>
                 <div class="xcard">
                     <div class="card-block">
-                        <span class="kco-step-heading">{l s='Step 2' mod='klarnaofficial'}</span>
+                        {if !$isv3}<span class="kco-step-heading">{l s='Step 2' mod='klarnaofficial'}</span>{/if}
                         <h1 class="h1">
                             {l s='Pay for your order' mod='klarnaofficial'}
                             <span>

@@ -125,6 +125,7 @@ class KlarnaOfficial extends PaymentModule
         'KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION',
         'KCOV3_EXTERNAL_PAYMENT_METHOD_EXTERNALURL',
        
+        'KCO_ALLOWMESSAGE',
         'KCO_DOBMAN',
         'KCO_CALLBACK_CHECK',
         'KCO_FOOTERLAYOUT',
@@ -204,7 +205,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.25';
+        $this->version = '2.1.27';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -244,6 +245,7 @@ class KlarnaOfficial extends PaymentModule
             || Configuration::updateValue('KCO_ROUNDOFF', 0) == false
             || Configuration::updateValue('KCOV3', 1) == false
             || Configuration::updateValue('KCO_IS_ACTIVE', 1) == false
+            || Configuration::updateValue('KCO_ALLOWMESSAGE', 1) == false
             || Configuration::updateValue('KPM_LOGO', 'blue-black') == false
             || Configuration::updateValue('KCO_TESTMODE', 1) == false
             || $this->setKCOCountrySettings() == false
@@ -1167,7 +1169,23 @@ class KlarnaOfficial extends PaymentModule
                     ),
                     'desc' => $this->l('Round off total value.'),
                 ),
-
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Allow messages'),
+                    'name' => 'KCO_ALLOWMESSAGE',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'allowmessage_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'), ),
+                        array(
+                            'id' => 'allowmessage_off',
+                            'value' => 0,
+                            'label' => $this->l('No'), ),
+                    ),
+                    'desc' => $this->l('Allow customers to add a message to the order.'),
+                ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Use two column checkout'),
@@ -3362,6 +3380,20 @@ class KlarnaOfficial extends PaymentModule
                                 'description' => 'Shipped all of the order',
                                 'order_lines' => $kcoorder['order_lines'],
                             );
+                            
+                            if("" != $order->shipping_number) {
+                                $carrier = new Carrier((int)($order->id_carrier), (int)($order->id_lang));
+                                if ("" != $carrier->url) {
+                                    $tracking_uri = urlencode(str_replace('@', $order->shipping_number, $carrier->url));
+                                } else {
+                                    $tracking_uri = "";
+                                }
+                                $shipping_info = array(
+                                    'tracking_number' => $order->shipping_number,
+                                    'tracking_uri' => $tracking_uri,
+                                );
+                                $data['shipping_info'] = array($shipping_info);
+                            }
 
                             $kcoorder->createCapture($data);
                             $invoice_number = $kcoorder['klarna_reference'];

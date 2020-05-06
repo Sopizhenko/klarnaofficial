@@ -180,6 +180,7 @@
                             </div>
                         </div>
                         {/if}
+                        {if 1 == $KCO_ALLOWMESSAGE}
                         <div class="xcard">
                                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
                                     <div class="">
@@ -197,6 +198,7 @@
                                     </div><!-- /.kco-target -->
                                 </form><!-- /#klarnamessage -->
                         </div>
+                        {/if}
                         <div class="xcard">
                             {if $giftAllowed==1}
                                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnagift">
