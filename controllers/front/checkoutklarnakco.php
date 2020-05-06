@@ -301,15 +301,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                                 $create['options']['shipping_details'] = $carrier->delay[$this->context->language->id];
                             }
                         }
-                        if (1 == (int) Configuration::get('KCO_CALLBACK_CHECK')) {
-                            $create['options']['require_validate_callback_success'] = true;
-                        }
-                        if (Configuration::get('KCO_ALLOWSEPADDR')) {
-                            $create['options']['allow_separate_shipping_address'] = true;
-                        }
-                        if (Configuration::get('KCO_FORCEPHONE')) {
-                            $create['options']['phone_mandatory'] = true;
-                        }
+                        $create['options']['require_validate_callback_success'] = (bool) Configuration::get('KCO_CALLBACK_CHECK');
+                        $create['options']['allow_separate_shipping_address'] = (bool) Configuration::get('KCO_ALLOWSEPADDR');
+                        $create['options']['phone_mandatory'] = (bool) Configuration::get('KCO_FORCEPHONE');
                         
                         if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE')) {
                             if (1 == (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL')) {
@@ -704,6 +698,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             'delivery_option_list' => $delivery_option_list,
                             'delivery_option' => $delivery_option,
                             'KCO_SHOWLINK' => (int) Configuration::get('KCO_SHOWLINK'),
+                            'KCO_ALLOWMESSAGE' => (int) Configuration::get('KCO_ALLOWMESSAGE'),
                             'layout' => $layout,
                             'kcourl' => $checkout_url,
                             'back' => '',

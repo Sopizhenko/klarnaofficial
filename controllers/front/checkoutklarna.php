@@ -733,6 +733,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
                         'delivery_option_list' => $delivery_option_list,
                         'delivery_option' => $delivery_option,
                         'KCO_SHOWLINK' => (int) Configuration::get('KCO_SHOWLINK'),
+                        'KCO_ALLOWMESSAGE' => (int) Configuration::get('KCO_ALLOWMESSAGE'),
                         'layout' => $layout,
                         'kcourl' => $checkout,
                         'back' => ''

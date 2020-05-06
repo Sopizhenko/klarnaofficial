@@ -228,6 +228,7 @@
             {if $controllername == 'checkoutklarnakco'}
                 <div class="kco-box"></div>
             {/if}
+            {if 1 == $KCO_ALLOWMESSAGE}
             <div class="message_container kco-box">
                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnamessage">
 
@@ -239,6 +240,7 @@
                     </p>
                 </form><!-- /#klarnamessage -->
             </div><!-- /.message_container.kco-box -->
+            {/if}
             {if $giftAllowed==1}
             <div class="gift_container kco-box">
                 <form action="{$link->getModuleLink('klarnaofficial', $controllername, [], true)|escape:'html':'UTF-8'}" method="post" id="klarnagift">
