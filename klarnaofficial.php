@@ -205,7 +205,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.27';
+        $this->version = '2.1.28';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -586,8 +586,8 @@ class KlarnaOfficial extends PaymentModule
         $toggle_js_inputs = array();
 
         $numInputs = 4;
-        foreach (Country::getCountries(Configuration::get('PS_LANG_DEFAULT'), true) as $country) {
-            $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code']] = $numInputs;
+        foreach (Country::getCountries(Configuration::get('PS_LANG_DEFAULT'), true) as $country_data) {
+            $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country_data['iso_code']] = $numInputs;
         }
 
         $cron_domain = $this->context->link->getBaseLink(null, true, false);
