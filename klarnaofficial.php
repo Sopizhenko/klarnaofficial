@@ -193,16 +193,16 @@ class KlarnaOfficial extends PaymentModule
     public $osm_fields = array(
         'KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_',
         'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_THEME_COUNTRY_',
-        'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_',
+        // 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_',
         'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_COUNTRY_',
-        'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_',
+        // 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_',
     );
     
     public function __construct()
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.48';
+        $this->version = '1.9.49';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -616,7 +616,7 @@ class KlarnaOfficial extends PaymentModule
         
         $toggle_js_inputs = array();
 
-        $numInputs = 4;
+        $numInputs = 2;
         foreach (Country::getCountries(Configuration::get('PS_LANG_DEFAULT'), true) as $country) {
             $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code']] = $numInputs;
         }
@@ -794,38 +794,38 @@ class KlarnaOfficial extends PaymentModule
                 ),
             );
             /*Cart placement*/
-            $fields_form[0]['form']['input'][] =  array(
-                'tab' => 'onsite_messaging',
-                'type' => 'select',
-                'label' => $this->l('Cart placement'),
-                'name' => 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_'.$country['iso_code'],
-                'options' => array(
-                    'query' => $placements,
-                    'id' => 'value',
-                    'name' => 'label',
-                ),
-            );
-            $fields_form[0]['form']['input'][] =  array(
-                'tab' => 'onsite_messaging',
-                'type' => 'select',
-                'label' => $this->l('Cart placement theme'),
-                'name' => 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_'.$country['iso_code'],
-                'options' => array(
-                    'query' => array(
-                        array(
-                            'value' => self::OSM_THEME_DEFAULT,
-                            'label' => $this->l('Default'), ),
-                        array(
-                            'value' => self::OSM_THEME_DARK,
-                            'label' => $this->l('Dark'), ),
-                        array(
-                            'value' => self::OSM_THEME_CUSTOM,
-                            'label' => $this->l('Custom'), ),
-                    ),
-                    'id' => 'value',
-                    'name' => 'label',
-                ),
-            );
+            // $fields_form[0]['form']['input'][] =  array(
+                // 'tab' => 'onsite_messaging',
+                // 'type' => 'select',
+                // 'label' => $this->l('Cart placement'),
+                // 'name' => 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_'.$country['iso_code'],
+                // 'options' => array(
+                    // 'query' => $placements,
+                    // 'id' => 'value',
+                    // 'name' => 'label',
+                // ),
+            // );
+            // $fields_form[0]['form']['input'][] =  array(
+                // 'tab' => 'onsite_messaging',
+                // 'type' => 'select',
+                // 'label' => $this->l('Cart placement theme'),
+                // 'name' => 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_'.$country['iso_code'],
+                // 'options' => array(
+                    // 'query' => array(
+                        // array(
+                            // 'value' => self::OSM_THEME_DEFAULT,
+                            // 'label' => $this->l('Default'), ),
+                        // array(
+                            // 'value' => self::OSM_THEME_DARK,
+                            // 'label' => $this->l('Dark'), ),
+                        // array(
+                            // 'value' => self::OSM_THEME_CUSTOM,
+                            // 'label' => $this->l('Custom'), ),
+                    // ),
+                    // 'id' => 'value',
+                    // 'name' => 'label',
+                // ),
+            // );
         }
         
         $helper = new HelperForm();
@@ -4515,11 +4515,11 @@ class KlarnaOfficial extends PaymentModule
     
     public function fixPrestashopRoundingIssues($value, $multiplier, $scale = 0)
     {
-        if (function_exists('bcmul')) {
-            return bcmul($value, $multiplier, $scale);
-        } else {
-            return round($value * $multiplier, $scale);
-        }
+        // if (function_exists('bcmul')) {
+            // return bcmul($value, $multiplier, $scale);
+        // } else {
+            return (string) round($value * $multiplier, $scale);
+        // }
     }
     
     public function getKlarnaCountryInformation($currency_iso_code, $language_iso_code)
