@@ -92,7 +92,8 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         $totalCartValue = $cart->getOrderTotal(true, Cart::BOTH, null, $cart->id_carrier, false);
         $totalCartValue_tax_excl = $cart->getOrderTotal(false, Cart::BOTH, null, $cart->id_carrier, false);
         $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
-        $klarnadata->order_amount = $totalCartValue * 100;
+        // $klarnadata->order_amount = $totalCartValue * 100;
+        $klarnadata->order_amount = $this->module->fixPrestashopRoundingIssues($totalCartValue, 100, 0);
         $klarnadata->order_tax_amount = $total_tax_value * 100;
         
         echo json_encode($klarnadata);
