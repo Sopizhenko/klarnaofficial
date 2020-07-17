@@ -26,51 +26,61 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
 
     public function postProcess()
     {
+        require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
         $klarnadata = Tools::file_get_contents('php://input');
-        
         $klarna_result = json_decode($klarnadata, true);
-        // $occurred_at = $klarna_result["occurred_at"];
-        $event_type = $klarna_result["event_type"];
-        $order_id = $klarna_result["order_id"];
+        $order_id = pSQL($klarna_result["order_id"]);
         
-        $sql = "SELECT id_cart, id_order FROM `"._DB_PREFIX_.
-                        "klarna_orders` WHERE `reservation`='$order_id'";
-        $row = Db::getInstance()->getRow($sql);
-        $id_order = 0;
-        
-        if (0 == (int)$row["id_order"]) {
-            /*NO ORDER FOUND, CHECK IF CART HAS ORDER*/
-            if (0 == (int)$row["id_cart"]) {
-                /*NO CART FOUND, KILL PROCESS*/
-                exit;
-            } else {
-                $sql = 'SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_cart` = '.(int)$row["id_cart"];
-                $id_order = Db::getInstance()->getValue($sql);
-            }
-        } else {
-            $id_order = (int)$row["id_order"];
-        }
-        
-        if (0 == (int)$id_order) {
-            /*RESERVATION NOT FOUND IN SYSTEM, KILL PROCESS*/
-            exit;
-        }
-        
-        $new_pending_status = 0;
-        if ("FRAUD_RISK_REJECTED" == $event_type) {
-            $new_pending_status = Configuration::get('PS_OS_ERROR', _PS_OS_ERROR_);
-        } elseif ("FRAUD_RISK_ACCEPTED" == $event_type) {
-            $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT_ACCEPTED');
-        } elseif ("FRAUD_RISK_STOPPED" == $event_type) {
-            $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT');
-        }
+        $eid = Configuration::get('KCOV3_MID');
+        $shared_secret = Configuration::get('KCOV3_SECRET');
 
-        if (0 != (int)$id_order && 0 != (int)$new_pending_status) {
-            $history = new OrderHistory();
-            $history->id_order = $id_order;
-            $history->changeIdOrderState((int)$new_pending_status, $id_order, true);
-            $templateVars = array();
-            $history->addWithemail(true, $templateVars);
+        if ((int) Configuration::get('KCO_TESTMODE') == 1) {
+            $connector = \Klarna\Rest\Transport\Connector::create(
+                $eid,
+                $shared_secret,
+                \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
+            );
+        } else {
+            $connector = \Klarna\Rest\Transport\Connector::create(
+                $eid,
+                $shared_secret,
+                \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
+            );
         }
+        
+        $order = new Klarna\Rest\OrderManagement\Order($connector, $order_id);
+        $order->fetch();
+        $new_pending_status = 0;
+        if (isset($order['fraud_status']) && $order['fraud_status'] != "PENDING") {
+            if ($order['fraud_status'] == "ACCEPTED") {
+                $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT_ACCEPTED');
+            } elseif ($order['fraud_status'] == "REJECTED") {
+                $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT_REJECTED');
+            }
+            
+            if ($new_pending_status > 0) {
+                $sql = "SELECT eid, id_shop, id_order FROM `"._DB_PREFIX_.
+                        "klarna_orders` WHERE `reservation`='$order_id'";
+                $row = Db::getInstance()->getRow($sql);
+                
+                $id_order = (int) $row["id_order"];
+                $id_shop = (int) $row["id_shop"];
+                if (0 == (int) $id_order) {
+                    /*RESERVATION NOT FOUND IN SYSTEM, KILL PROCESS*/
+                    exit;
+                }
+                if (0 == (int) $id_shop) {
+                    /*ID SHOP NOT FOUND IN SYSTEM, KILL PROCESS*/
+                    exit;
+                }
+                
+                $history = new OrderHistory();
+                $history->id_order = $id_order;
+                $history->changeIdOrderState((int)$new_pending_status, $id_order, true);
+                $templateVars = array();
+                $history->addWithemail(true, $templateVars);
+            }
+        }
+        exit;
     }
 }
