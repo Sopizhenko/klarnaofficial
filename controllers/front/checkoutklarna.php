@@ -36,7 +36,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
     {
         parent::setMedia();
         //if ($this->context->getMobileDevice() == false)
-        //	$this->addJqueryPlugin(array('fancybox'));
+        //$this->addJqueryPlugin(array('fancybox'));
         $this->context->controller->addCSS(_MODULE_DIR_.'klarnaofficial/views/css/klarnacheckout.css', 'all');
         $this->addJS(_MODULE_DIR_.'klarnaofficial/views/js/klarna_checkout.js');
     }
