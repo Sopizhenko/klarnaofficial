@@ -79,7 +79,7 @@ class KlarnaOfficialCheckoutKlarnaUsModuleFrontController extends ModuleFrontCon
         
         $layout = 'desktop';
         //if($this->context->getMobileDevice())
-        //	$layout = 'mobile';
+        //$layout = 'mobile';
         require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
         $mobile_detect_class = new Mobile_Detect();
         if ($mobile_detect_class->isMobile() or $mobile_detect_class->isMobile()) {
