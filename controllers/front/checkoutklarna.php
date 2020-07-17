@@ -31,7 +31,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
     {
         parent::setMedia();
         //if ($this->context->getMobileDevice() == false)
-        //	$this->addJqueryPlugin(array('fancybox'));
+        //$this->addJqueryPlugin(array('fancybox'));
         $this->context->controller->addCSS(_MODULE_DIR_.'klarnaofficial/views/css/klarnacheckout.css', 'all');
         $this->addJS(_MODULE_DIR_.'klarnaofficial/views/js/klarna_checkout.js');
     }
@@ -137,7 +137,7 @@ class KlarnaOfficialCheckoutKlarnaModuleFrontController extends ModuleFrontContr
         }
         $layout = 'desktop';
         //if ($this->context->getMobileDevice())
-        //	$layout = 'mobile';
+        //$layout = 'mobile';
         require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
         $mobile_detect_class = new Mobile_Detect();
         if ($mobile_detect_class->isMobile() or $mobile_detect_class->isMobile()) {
