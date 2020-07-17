@@ -732,7 +732,7 @@ class KlarnaOfficial extends PaymentModule
             $placements[] = array('value' => $placementID, 'label' => $placementID);
         }
         
-        $countries = Country::getCountries($this->context->language->id, true);
+        // $countries = Country::getCountries($this->context->language->id, true);
         $fields_form = array();
         $fields_form[0]['form'] = array(
             'legend' => array(
