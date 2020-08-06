@@ -31,7 +31,7 @@ function upgrade_module_2_1_31($module)
 }
 
 function rrmdir($dir)
-{ 
+{
     if (is_dir($dir)) {
         $objects = scandir($dir);
         foreach ($objects as $object) {
