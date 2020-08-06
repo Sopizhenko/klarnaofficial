@@ -23,23 +23,26 @@ function upgrade_module_2_1_31($module)
     /*TRY TO REMOVE UNWANTED FILES*/
     try {
         rrmdir(dirname(__FILE__). '/../libraries/KCOUK');
-    } catch(Exception $e) {
-
+    } catch (Exception $e) {
+        /*REMOVAL IS NOT ESSENTIAL*/
+        return true;
     }
     return true;
 }
 
-function rrmdir($dir) { 
-   if (is_dir($dir)) { 
-     $objects = scandir($dir);
-     foreach ($objects as $object) { 
-       if ($object != "." && $object != "..") { 
-         if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object))
-           rrmdir($dir. DIRECTORY_SEPARATOR .$object);
-         else
-           unlink($dir. DIRECTORY_SEPARATOR .$object); 
-       } 
-     }
-     rmdir($dir); 
-   } 
- }
+function rrmdir($dir)
+{ 
+    if (is_dir($dir)) {
+        $objects = scandir($dir);
+        foreach ($objects as $object) {
+            if ($object != "." && $object != "..") {
+                if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
+                    rrmdir($dir. DIRECTORY_SEPARATOR .$object);
+                } else {
+                    unlink($dir. DIRECTORY_SEPARATOR .$object);
+                }
+            }
+        }
+        rmdir($dir);
+    }
+}

@@ -53,7 +53,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
     public function initContent()
     {
         $ssid = 'gb';
-        $eid = '';
         $sharedSecret = '';
         parent::initContent();
         
@@ -490,7 +489,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         }
                         $checkout = $KlarnaCheckoutCommonFeatures->postToKlarna($create, $mid, $sharedSecret, $this->module->version, '/checkout/v3/orders/'.$order_id);
                         $checkout = json_decode($checkout);
-                        if(isset($checkout->error_code)) {
+                        if (isset($checkout->error_code)) {
                             $error_message_string = "";
                             foreach ($checkout->error_messages as $error_message) {
                                 $error_message_string .= $error_message.PHP_EOL;
@@ -820,39 +819,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
             'HOOK_SHOPPING_CART' => Hook::exec('displayShoppingCartFooter', $summary),
             'HOOK_SHOPPING_CART_EXTRA' => Hook::exec('displayShoppingCart', $summary),
         ));
-    }
-    
-    public function getConnector($ssid, $eid, $sharedSecret)
-    {
-        if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-            if ($ssid=='us') {
-                $url = 'https://api-na.playground.klarna.com/';
-            } else {
-                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL;
-            }
-            
-            $klarna_agent = \Klarna\Rest\Transport\UserAgent::createDefault();
-            $klarna_agent->setField('Prestashop', _PS_VERSION_);
-            $klarna_agent->setField('Klarnaofficial', $this->module->version);
-            $connector = \Klarna\Rest\Transport\Connector::create(
-                $eid,
-                $sharedSecret,
-                $url,
-                $klarna_agent
-            );
-        } else {
-            if ($ssid=='us') {
-                $url = 'https://api-na.klarna.com/';
-            } else {
-                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL;
-            }
-            $connector = \Klarna\Rest\Transport\Connector::create(
-                $eid,
-                $sharedSecret,
-                $url
-            );
-        }
-        return $connector;
     }
     
     protected function getCheckoutSession()
