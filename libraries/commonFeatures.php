@@ -159,36 +159,62 @@ class KlarnaCheckoutCommonFeatures
     }
     
     
-    public function getConnector($ssid, $eid, $sharedSecret, $kcoTestMode, $version)
+    public function getFromKlarna($mid, $sharedSecret, $version, $endpoint)
     {
-        $userAgent = \Klarna\Rest\Transport\UserAgent::createDefault();
-        $userAgent->setField('prestashop', 'version', _PS_VERSION_);
-        $userAgent->setField('klarnaofficial', 'version', $version);
-        
-        if ($kcoTestMode == 1) {
-            if ($ssid=='us') {
-                $url = 'https://api-na.playground.klarna.com/';
-            } else {
-                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL;
-            }
-            
-            $connector = \Klarna\Rest\Transport\Connector::create(
-                $eid,
-                $sharedSecret,
-                $url
-            );
+        $url = $this->getKlarnaUrl(Configuration::get('KCO_TESTMODE')).$endpoint;
+        $headers = $this->getKlarnaHeaders($version);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); 
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_USERPWD, $mid.':'.$sharedSecret);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $contents = curl_exec($ch);
+        curl_close ($ch);
+        return $contents;
+    }
+    
+    public function postToKlarna($data, $mid, $sharedSecret, $version, $endpoint, $patch = false)
+    {
+        $url = $this->getKlarnaUrl(Configuration::get('KCO_TESTMODE')).$endpoint;
+        $headers = $this->getKlarnaHeaders($version);
+        $ch = curl_init($url);
+        if (true === $patch) {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
         } else {
-            if ($ssid=='us') {
-                $url = 'https://api-na.klarna.com/';
-            } else {
-                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL;
-            }
-            $connector = \Klarna\Rest\Transport\Connector::create(
-                $eid,
-                $sharedSecret,
-                $url
-            );
+            curl_setopt($ch, CURLOPT_POST, 1);
         }
-        return $connector;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); 
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_USERPWD, $mid.':'.$sharedSecret);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $contents = curl_exec($ch);
+        curl_close ($ch);
+        return $contents;
+    }
+    
+    public function getKlarnaUrl($kcoTestMode)
+    {
+        if ($kcoTestMode == 1) {
+            $url = 'https://api.playground.klarna.com';
+        } else {
+            $url = 'https://api.klarna.com';
+        }
+        return $url;
+    }
+    
+    public function getKlarnaHeaders($version)
+    {
+        $headers = array(
+            'Content-Type:application/json',
+            'UserAgent:Prestaworks.Klarna.kco_rest_php:prestashop:version:'._PS_VERSION_.':klarnaofficial:version:'.$version
+        );
+        return $headers;
     }
 }

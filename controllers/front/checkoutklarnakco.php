@@ -133,23 +133,12 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
         $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
-        if (Configuration::get('KCOV3')) {
-            $eid = Configuration::get('KCOV3_MID');
-            $sharedSecret = Configuration::get('KCOV3_SECRET');
-        }
-        // if (!Configuration::get('KCOV3')) {
-            // require_once dirname(__FILE__).'/../../libraries/kcocommonredirectcheck.php';
-        // } else {
-            // $eid = Configuration::get('KCOV3_MID');
-            // $sharedSecret = Configuration::get('KCOV3_SECRET');
-        // }
+        $mid = Configuration::get('KCOV3_MID');
+        $sharedSecret = Configuration::get('KCOV3_SECRET');
 
         $shipping_options = array();
         $carrieraddress = new Address($this->context->cart->id_address_delivery);
-        // echo "Address=".$this->context->cart->id_address_delivery."<br>";
-        // print_r($country_information);
-        // print_r($this->context->cart);
-        // print_r($carrieraddress);
+
         foreach ($this->context->cart->getDeliveryOptionList() as $options) {
             foreach ($options as $option) {
                 foreach ($option["carrier_list"] as $carrieroption) {
@@ -174,8 +163,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         }
 
         $layout = 'desktop';
-        //if ($this->context->getMobileDevice())
-        //$layout = 'mobile';
+
         require_once _PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php';
         $mobile_detect_class = new Mobile_Detect();
         if ($mobile_detect_class->isMobile() or $mobile_detect_class->isMobile()) {
@@ -270,16 +258,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     if (version_compare(phpversion(), '5.4.0', '<')) {
                         $this->context->smarty->assign('klarna_error', 'PHP 5.4 Required');
                     } else {
-                        require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
-                        $connector = $KlarnaCheckoutCommonFeatures->getConnector(
-                            $ssid,
-                            $eid,
-                            $sharedSecret,
-                            (int) (Configuration::get('KCO_TESTMODE')),
-                            $this->module->version
-                        );
-
-                        $checkout = new \Klarna\Rest\Checkout\Order($connector);
 
                         $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
                         $totalCartValue_tax_excl = $this->context->cart->getOrderTotal(false, Cart::BOTH);
@@ -287,10 +265,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $create['purchase_country'] = $country_information['purchase_country'];
                         $create['purchase_currency'] = $country_information['purchase_currency'];
                         $create['locale'] = $country_information['locale'];
-                        // $create['order_amount'] = $totalCartValue * 100;
-                        // $create['order_amount'] = bcmul($totalCartValue, 100, 0);
                         $create['order_amount'] = $this->module->fixPrestashopRoundingIssues($totalCartValue, 100, 0);
-                        // $create['order_tax_amount'] = $total_tax_value * 100;
                        
                         if (0 == (int) Configuration::get('KCO_AUTOFOCUS')) {
                             $create['gui']['options'] = array('disable_autofocus');
@@ -497,20 +472,22 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $total_tax_value = 0;
                         }
                         $create['order_tax_amount'] = $total_tax_value;
-                        
-                        // echo "------------".$eid;
-                         // echo "<pre>";print_r($create);echo "</pre>";
+
                         if (!isset($_SESSION['klarna_checkout_uk'])) {
-                            $checkout->create($create);
-                            $checkout->fetch();
-                            $_SESSION['klarna_checkout_uk'] = $checkout['order_id'];
+                            $order_id = '';
                         } else {
-                            $checkout = new \Klarna\Rest\Checkout\Order(
-                                $connector,
-                                $_SESSION['klarna_checkout_uk']
-                            );
-                            $checkout->update($create);
-                            $checkout->fetch();
+                            $order_id = $_SESSION['klarna_checkout_uk'];
+                        }
+                        $checkout = $KlarnaCheckoutCommonFeatures->postToKlarna($create, $mid, $sharedSecret, $this->module->version, '/checkout/v3/orders/'.$order_id);
+                        $checkout = json_decode($checkout);
+                        $_SESSION['klarna_checkout_uk'] = $checkout->order_id;
+                        
+                        if(isset($checkout->error_code)) {
+                            $error_message_string = "";
+                            foreach ($checkout->error_messages as $error_message) {
+                                $error_message_string .= $error_message.PHP_EOL;
+                            }
+                            throw new Exception($error_message_string);
                         }
 
                         $id_country = 0;
@@ -523,7 +500,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
 
                         $this->context->cart->getSummaryDetails();
 
-                        $snippet = $checkout['html_snippet'];
+                        $snippet = $checkout->html_snippet;
                         if (Tools::getIsset('kco_update') and Tools::getValue('kco_update') == '1') {
                             die($snippet);
                         }
@@ -609,66 +586,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         );
 
                         $no_active_countries = 0;
-                        // $show_sweden = false;
-                        // $show_norway = false;
-                        // $show_finland = false;
-                        // $show_germany = false;
-                        // $show_austria = false;
-                        // $show_uk = false;
-                        // $show_us = false;
-                        // $show_nl = false;
-                        // if ((int) (Configuration::get('KCO_SWEDEN')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_sweden = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_SWEDEN')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_sweden = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_FINLAND')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_finland = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_FINLAND')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_finland = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_NL')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_nl = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_NORWAY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_norway = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_NORWAY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_norway = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_GERMANY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_germany = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_GERMANY')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_germany = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_UK')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_uk = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_US')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_us = true;
-                        // }
-                        // if ((int) (Configuration::get('KCO_AUSTRIA')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_austria = true;
-                        // }
-                        // if ((int) (Configuration::get('KCOV3_AUSTRIA')) == 1) {
-                            // ++$no_active_countries;
-                            // $show_austria = true;
-                        // }
                         $this->assignSummaryInformations();
                         
                         
@@ -682,15 +599,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $this->context->smarty->assign(array(
                             'no_active_countries' => $no_active_countries,
                             'show_prefil_link' => $show_prefil_link,
-                            // 'show_germany' => $show_germany,
-                            // 'show_norway' => $show_norway,
-                            // 'show_uk' => $show_uk,
-                            // 'show_us' => $show_us,
-                            // 'show_nl' => $show_nl,
-                            // 'show_austria' => $show_austria,
-                            // 'show_finland' => $show_finland,
-                            // 'show_sweden' => $show_sweden,
-                            // 'kco_selected_country' => $country_information['purchase_country'],
                             'klarna_checkout' => $snippet,
                             'controllername' => 'checkoutklarnakco',
                             'free_shipping' => $free_shipping,

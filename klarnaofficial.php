@@ -202,7 +202,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.51';
+        $this->version = '1.9.52';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -654,6 +654,22 @@ class KlarnaOfficial extends PaymentModule
             'REQUEST_URI' => Tools::safeOutput($_SERVER['REQUEST_URI']),
         ));
 
+        /*LEGACY WARNINGS*/
+        $KPM_SHOW_IN_PAYMENTS = Configuration::get('KPM_SHOW_IN_PAYMENTS');
+        $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE');
+        $KCOV3 = Configuration::get('KCOV3');
+        $show_kco_v2_warning = false;
+        $show_kpm_warning = false;
+        if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
+            $show_kco_v2_warning = true;
+        }
+        if (true == $KPM_SHOW_IN_PAYMENTS) {
+            $show_kpm_warning = true;
+        }
+        $this->context->smarty->assign('show_kpm_warning', $show_kpm_warning);
+        $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
+        /*LEGACY WARNINGS*/
+        
         return '<script type="text/javascript">var pwd_base_uri = "'.
         __PS_BASE_URI__.'";var pwd_refer = "'.
         (int) Tools::getValue('ref').'";</script>'.
@@ -1942,14 +1958,14 @@ class KlarnaOfficial extends PaymentModule
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Username'),
+                        'label' => $this->l('Klarna API Username'),
                         'name' => 'KCOV3_MID',
                         'class' => 'fixed-width-lg',
                         'required' => true,
                     ),
                 array(
                         'type' => 'text',
-                        'label' => $this->l('Password'),
+                        'label' => $this->l('Klarna API Password'),
                         'name' => 'KCOV3_SECRET',
                         'required' => true,
                     ),
@@ -3259,6 +3275,23 @@ class KlarnaOfficial extends PaymentModule
             $invoice_download_link = "https://online.klarna.com/invoices/$invoice_number.pdf?secret=$digest_secret";
             $this->context->smarty->assign('invoice_download_link', $invoice_download_link);
         }
+        
+        /*LEGACY WARNINGS*/
+        $KPM_SHOW_IN_PAYMENTS = Configuration::get('KPM_SHOW_IN_PAYMENTS', null, null, $order->id_shop);
+        $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE', null, null, $order->id_shop);
+        $KCOV3 = Configuration::get('KCOV3', null, null, $order->id_shop);
+        $show_kco_v2_warning = false;
+        $show_kpm_warning = false;
+        if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
+            $show_kco_v2_warning = true;
+        }
+        if (true == $KPM_SHOW_IN_PAYMENTS) {
+            $show_kpm_warning = true;
+        }
+        $this->context->smarty->assign('show_kpm_warning', $show_kpm_warning);
+        $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
+        /*LEGACY WARNINGS*/
+        
         return $this->display(__FILE__, 'klarnaofficial_adminorder.tpl');
     }
 
@@ -3292,45 +3325,25 @@ class KlarnaOfficial extends PaymentModule
                 if ($reservation_number != '') {
                     try {
                         if ($eid == Configuration::get('KCOV3_MID', null, null, $order->id_shop)) {
-                            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
+                            require_once dirname(__FILE__).'/libraries/commonFeatures.php';
+                            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
                             
-                            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL;
-                            } else {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL;
-                            }
+                            $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number);
+                            $kcoorder = json_decode($kcoorder, true);
                             
-                            $connector = \Klarna\Rest\Transport\Connector::create(
-                                $eid,
-                                $shared_secret,
-                                $url
-                            );
-
                             if ($invoice_number != '') {
-                                $kcoorder = new \Klarna\Rest\OrderManagement\Order(
-                                    $connector,
-                                    $reservation_number
-                                );
-                                $kcoorder->fetch();
-
                                 $data = array(
                                     'refunded_amount' => $kcoorder['order_amount'],
                                     'description' => 'Refund all of the order',
                                     'order_lines' => $kcoorder['order_lines'],
                                 );
-
-                                $kcoorder->refund($data);
+                                $KlarnaCheckoutCommonFeatures->postToKlarna($data, $eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/refunds');
                                 $sql = 'UPDATE `'._DB_PREFIX_.
                                 "klarna_orders` SET risk_status='credit' WHERE id_order=".
                                 (int) $params['id_order'];
                                 Db::getInstance()->execute($sql);
                             } else {
-                                $kcoorder = new \Klarna\Rest\OrderManagement\Order(
-                                    $connector,
-                                    $reservation_number
-                                );
-
-                                $kcoorder->cancel();
+                                $KlarnaCheckoutCommonFeatures->postToKlarna($data, $eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/cancel');
                                 $sql = 'UPDATE `'._DB_PREFIX_.
                                 "klarna_orders` SET risk_status='cancel' WHERE id_order=".
                                 (int) $params['id_order'];
@@ -3385,32 +3398,18 @@ class KlarnaOfficial extends PaymentModule
                         $risk_status = '';
 
                         if ($eid == Configuration::get('KCOV3_MID', null, null, $order->id_shop)) {
-                            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
+                            require_once dirname(__FILE__).'/libraries/commonFeatures.php';
+                            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
                             
-                            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL;
-                            } else {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL;
-                            }
+                            $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number);
+                            $kcoorder = json_decode($kcoorder, true);
+                            $risk_status = pSQL($kcoorder['fraud_status']);
                             
-                            $connector = \Klarna\Rest\Transport\Connector::create(
-                                $eid,
-                                $shared_secret,
-                                $url
-                            );
-
-                            $kcoorder = new \Klarna\Rest\OrderManagement\Order(
-                                $connector,
-                                $reservation_number
-                            );
-                            $kcoorder->fetch();
-
                             $data = array(
                                 'captured_amount' => $kcoorder['order_amount'],
                                 'description' => 'Shipped all of the order',
                                 'order_lines' => $kcoorder['order_lines'],
                             );
-                            
                             if ("" != $order->shipping_number) {
                                 $carrier = new Carrier((int)($order->id_carrier), (int)($order->id_lang));
                                 if ("" != $carrier->url) {
@@ -3424,10 +3423,11 @@ class KlarnaOfficial extends PaymentModule
                                 );
                                 $data['shipping_info'] = array($shipping_info);
                             }
-
-                            $kcoorder->createCapture($data);
-                            $invoice_number = $kcoorder['klarna_reference'];
-                            $risk_status = $kcoorder['fraud_status'];
+                            
+                            $KlarnaCheckoutCommonFeatures->postToKlarna($data, $eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/captures');
+                            $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/captures');
+                            $kcoorder = json_decode($kcoorder, true);
+                            $invoice_number = $kcoorder[0]['klarna_reference'];
                         } else {
                             $k = $this->initKlarnaAPI($eid, $shared_secret, $countryIso, $languageIso, $currencyIso);
                             $method = Configuration::get('KCO_SENDTYPE', null, null, $order->id_shop);
@@ -3663,37 +3663,24 @@ class KlarnaOfficial extends PaymentModule
                 Tools::redirect('index.php');
             }
         } elseif (Tools::getIsset("kcotpv3")) {
-            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
-            $sid = Tools::getValue('sid');
-
-            if (Configuration::get('KCOV3')) {
-                $merchantId = Configuration::get('KCOV3_MID');
-                $sharedSecret = Configuration::get('KCOV3_SECRET');
-            }
-
-            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
-                );
-           
-                $orderId = Tools::getValue('klarna_order_id');
-
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
             } else {
-                $connector = \Klarna\Rest\Transport\Connector::create(
-                    $merchantId,
-                    $sharedSecret,
-                    \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
-                );
-              
-                $orderId = Tools::getValue('klarna_order_id');
-                $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-                $checkout->fetch();
+                if (session_id() === '') {
+                    session_start();
+                }
             }
-
+            $sql = "SELECT reservation FROM "._DB_PREFIX_."klarna_orders WHERE id_order=".(int) $params["objOrder"]->id;
+            $klarna_order_id = Db::getInstance()->getValue($sql);
+            $merchantId = Configuration::get('KCOV3_MID');
+            $sharedSecret = Configuration::get('KCOV3_SECRET');
+            require_once dirname(__FILE__).'/libraries/commonFeatures.php';
+            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
+            $version = $this->version;
+            $checkout = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/checkout/v3/orders/'.$klarna_order_id);
+            $checkout = json_decode($checkout, true);
             $snippet = $checkout['html_snippet'];
             
             $this->context->smarty->assign('orderreference', $params["objOrder"]->reference);
