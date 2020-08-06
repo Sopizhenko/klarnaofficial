@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2015 Prestaworks AB.
  *
@@ -18,12 +17,29 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of Prestaworks AB
  */
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
+function upgrade_module_2_1_31($module)
+{
+    /*TRY TO REMOVE UNWANTED FILES*/
+    try {
+        rrmdir(dirname(__FILE__). '/../libraries/KCOUK');
+    } catch(Exception $e) {
 
-header('Location: ../');
-exit;
+    }
+    return true;
+}
+
+function rrmdir($dir) { 
+   if (is_dir($dir)) { 
+     $objects = scandir($dir);
+     foreach ($objects as $object) { 
+       if ($object != "." && $object != "..") { 
+         if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object))
+           rrmdir($dir. DIRECTORY_SEPARATOR .$object);
+         else
+           unlink($dir. DIRECTORY_SEPARATOR .$object); 
+       } 
+     }
+     rmdir($dir); 
+   } 
+ }

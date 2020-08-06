@@ -148,10 +148,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
 
         $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
-        if (Configuration::get('KCOV3')) {
-            $eid = Configuration::get('KCOV3_MID');
-            $sharedSecret = Configuration::get('KCOV3_SECRET');
-        }
+        $mid = Configuration::get('KCOV3_MID');
+        $sharedSecret = Configuration::get('KCOV3_SECRET');
+            
         $shipping_options = array();
         $carrieraddress = new Address($this->context->cart->id_address_delivery);
         
@@ -270,29 +269,13 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     if (version_compare(phpversion(), '5.4.0', '<')) {
                         $this->context->smarty->assign('klarna_error', 'PHP 5.4 Required');
                     } else {
-                        require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
-                        $connector = $KlarnaCheckoutCommonFeatures->getConnector(
-                            $ssid,
-                            $eid,
-                            $sharedSecret,
-                            (int) (Configuration::get('KCO_TESTMODE')),
-                            $this->module->version
-                        );
-
-                        $checkout = new \Klarna\Rest\Checkout\Order($connector);
-
                         $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-                        // $totalCartValue_tax_excl = $this->context->cart->getOrderTotal(false, Cart::BOTH);
-                        // $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
                         $total_tax_value = 0;
                         
                         $create['purchase_country'] = $country_information['purchase_country'];
                         $create['purchase_currency'] = $country_information['purchase_currency'];
                         $create['locale'] = $country_information['locale'];
-                        // $create['order_amount'] = $totalCartValue * 100;
                         $create['order_amount'] = $this->module->fixPrestashopRoundingIssues($totalCartValue, 100, 0);
-                        
-                        // $create['order_tax_amount'] = $total_tax_value * 100;
                        
                         if (0 == (int) Configuration::get('KCO_AUTOFOCUS')) {
                             $create['gui']['options'] = array('disable_autofocus');
@@ -496,28 +479,26 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                             $total_tax_value = 0;
                         }
                         $create['order_tax_amount'] = $total_tax_value;
-                        
-                        // echo "------------".$eid;
-                        // echo "<pre>";print_r($create);echo "</pre>";
-                         
                         $this->assignSmartyVars($ssid, $country_information);
                         
                         Hook::exec('actionKlarnaBeforeSendData', array('create' => &$create));
                         
                         if (!isset($_SESSION['klarna_checkout_uk'])) {
-                            $checkout->create($create);
-                            $checkout->fetch();
-                            $_SESSION['klarna_checkout_uk'] = $checkout['order_id'];
+                            $order_id = '';
                         } else {
-                            $checkout = new \Klarna\Rest\Checkout\Order(
-                                $connector,
-                                $_SESSION['klarna_checkout_uk']
-                            );
-                            $checkout->update($create);
-                            $checkout->fetch();
+                            $order_id = $_SESSION['klarna_checkout_uk'];
                         }
-
-                        $snippet = $checkout['html_snippet'];
+                        $checkout = $KlarnaCheckoutCommonFeatures->postToKlarna($create, $mid, $sharedSecret, $this->module->version, '/checkout/v3/orders/'.$order_id);
+                        $checkout = json_decode($checkout);
+                        if(isset($checkout->error_code)) {
+                            $error_message_string = "";
+                            foreach ($checkout->error_messages as $error_message) {
+                                $error_message_string .= $error_message.PHP_EOL;
+                            }
+                            throw new Exception($error_message_string);
+                        }
+                        $_SESSION['klarna_checkout_uk'] = $checkout->order_id;
+                        $snippet = $checkout->html_snippet;
                         if (Tools::getIsset('kco_update') and Tools::getValue('kco_update') == '1') {
                             die($snippet);
                         }

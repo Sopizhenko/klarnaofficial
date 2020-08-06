@@ -205,7 +205,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.30';
+        $this->version = '2.1.31';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -622,6 +622,22 @@ class KlarnaOfficial extends PaymentModule
             'pclasslist' => $this->renderPclassList(),
             'REQUEST_URI' => Tools::safeOutput($_SERVER['REQUEST_URI']),
         ));
+        
+        /*LEGACY WARNINGS*/
+        $KPM_SHOW_IN_PAYMENTS = Configuration::get('KPM_SHOW_IN_PAYMENTS');
+        $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE');
+        $KCOV3 = Configuration::get('KCOV3');
+        $show_kco_v2_warning = false;
+        $show_kpm_warning = false;
+        if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
+            $show_kco_v2_warning = true;
+        }
+        if (true == $KPM_SHOW_IN_PAYMENTS) {
+            $show_kpm_warning = true;
+        }
+        $this->context->smarty->assign('show_kpm_warning', $show_kpm_warning);
+        $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
+        /*LEGACY WARNINGS*/
 
         return '<script type="text/javascript">var pwd_base_uri = "'.
         __PS_BASE_URI__.'";var pwd_refer = "'.
@@ -1914,14 +1930,14 @@ class KlarnaOfficial extends PaymentModule
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Username'),
+                        'label' => $this->l('Klarna API Username'),
                         'name' => 'KCOV3_MID',
                         'class' => 'fixed-width-lg',
                         'required' => true,
                     ),
-                array(
+                    array(
                         'type' => 'text',
-                        'label' => $this->l('Password'),
+                        'label' => $this->l('Klarna API Password'),
                         'name' => 'KCOV3_SECRET',
                         'required' => true,
                     ),
@@ -1942,7 +1958,7 @@ class KlarnaOfficial extends PaymentModule
                         ),
                         'desc' => $this->l('Activate widget on product page.'),
                     ),
-                array(
+                    array(
                         'type' => 'switch',
                         'label' => $this->l('Use Guest accounts'),
                         'name' => 'KCOV3_USEGUESTACCOUNTS',
@@ -1959,7 +1975,7 @@ class KlarnaOfficial extends PaymentModule
                         ),
                         'desc' => $this->l('Create guest accounts when new customer.'),
                     ),
-                array(
+                    array(
                         'type' => 'switch',
                         'label' => $this->l('Active Prefill notification'),
                         'name' => 'KCOV3_PREFILNOT',
@@ -1976,7 +1992,7 @@ class KlarnaOfficial extends PaymentModule
                         ),
                         'desc' => $this->l('Activate prefill notification for logged in customers.'),
                     ),
-                array(
+                    array(
                         'type' => 'select',
                         'label' => $this->l('Show Klarna banner in footer.'),
                         'name' => 'KCOV3_FOOTERBANNER',
@@ -2004,7 +2020,7 @@ class KlarnaOfficial extends PaymentModule
                         ),
                     ),
                 
-                array(
+                    array(
                         'type' => 'switch',
                         'label' => $this->l('Activate custom checkbox'),
                         'name' => 'KCOV3_CUSTOM_CHECKBOX',
@@ -2022,43 +2038,43 @@ class KlarnaOfficial extends PaymentModule
                         'desc' => $this->l('Activate custom checkbox.'),
                     ),
                     
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Custom checkbox prechecked'),
-                    'name' => 'KCOV3_CUSTOM_CHECKBOX_PRECHECKED',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'ccpc_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'ccpc_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Custom checkbox prechecked'),
+                        'name' => 'KCOV3_CUSTOM_CHECKBOX_PRECHECKED',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'ccpc_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'ccpc_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('the checkbox is prechecked.'),
                     ),
-                    'desc' => $this->l('the checkbox is prechecked.'),
-                ),
                 
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Custom checkbox required'),
-                    'name' => 'KCOV3_CUSTOM_CHECKBOX_REQUIRED',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'ccr_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'ccr_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Custom checkbox required'),
+                        'name' => 'KCOV3_CUSTOM_CHECKBOX_REQUIRED',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'ccr_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'), ),
+                            array(
+                                'id' => 'ccr_off',
+                                'value' => 0,
+                                'label' => $this->l('No'), ),
+                        ),
+                        'desc' => $this->l('the checkbox is required to be checked.'),
                     ),
-                    'desc' => $this->l('the checkbox is required to be checked.'),
-                ),
                     
-                array(
+                    array(
                         'type' => 'text',
                         'label' => $this->l('Custom Checkbox text'),
                         'name' => 'KCOV3_CUSTOM_CHECKBOX_TEXT',
@@ -2066,8 +2082,7 @@ class KlarnaOfficial extends PaymentModule
                         'lang' => true,
                     ),
                     
-                    
-                array(
+                    array(
                         'type' => 'switch',
                         'label' => $this->l('Activate EPM'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE',
@@ -2084,7 +2099,7 @@ class KlarnaOfficial extends PaymentModule
                         ),
                         'desc' => $this->l('Active External Payment Method (EPM). Approval required, check documentation'),
                     ),
-                array(
+                    array(
                         'type' => 'select',
                         'label' => $this->l('EPM label'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_OPTION',
@@ -2183,35 +2198,35 @@ class KlarnaOfficial extends PaymentModule
                             'name' => 'label',
                         ),
                     ),
-                array(
+                    array(
                         'type' => 'text',
                         'label' => $this->l('EPM image url'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_IMGURL',
                         'required' => false,
                         'desc' => $this->l('Requires URI with https. Logo is displayed in checkout footer and in the list of offered payment methods'),
                     ),
-                array(
+                    array(
                         'type' => 'text',
                         'label' => $this->l('EPM Fee'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_FEE',
                         'required' => false,
                         'desc' => $this->l('Enter in minor units, fee to be displayed in the checkout'),
                     ),
-                array(
+                    array(
                         'type' => 'text',
                         'label' => $this->l('EPM limit countries'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_COUNTRIES',
                         'required' => false,
                         'desc' => $this->l('Enter ISO codes separated by a comma (se,de) if you want to limit the option to specific countries.'),
                     ),
-                array(
+                    array(
                         'type' => 'text',
                         'label' => $this->l('EPM external url'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_EXTERNALURL',
                         'required' => false,
                         'desc' => $this->l('Enter external redirect url. You as a merchant are responsible to implement the handling of the payments and order handling after redirect. If empty, redirected to Prestashop default checkout.'),
                     ),
-                array(
+                    array(
                         'type' => 'text',
                         'label' => $this->l('EPM Description'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_DESC',
@@ -2219,7 +2234,7 @@ class KlarnaOfficial extends PaymentModule
                         'desc' => 'Custom description displayed when EPM selected (max 500 characters). Else default text displayed (i.e. for English: PayPal is provided by "Your business name")',
                         'lang' => true,
                     ),
-                array(
+                    array(
                         'type' => 'select',
                         'label' => $this->l('EPM label'),
                         'name' => 'KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL',
@@ -3229,6 +3244,23 @@ class KlarnaOfficial extends PaymentModule
             $invoice_download_link = "https://online.klarna.com/invoices/$invoice_number.pdf?secret=$digest_secret";
             $this->context->smarty->assign('invoice_download_link', $invoice_download_link);
         }
+        
+        /*LEGACY WARNINGS*/
+        $KPM_SHOW_IN_PAYMENTS = Configuration::get('KPM_SHOW_IN_PAYMENTS', null, null, $order->id_shop);
+        $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE', null, null, $order->id_shop);
+        $KCOV3 = Configuration::get('KCOV3', null, null, $order->id_shop);
+        $show_kco_v2_warning = false;
+        $show_kpm_warning = false;
+        if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
+            $show_kco_v2_warning = true;
+        }
+        if (true == $KPM_SHOW_IN_PAYMENTS) {
+            $show_kpm_warning = true;
+        }
+        $this->context->smarty->assign('show_kpm_warning', $show_kpm_warning);
+        $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
+        /*LEGACY WARNINGS*/
+        
         return $this->display(__FILE__, 'klarnaofficial_adminorder.tpl');
     }
 
@@ -3262,45 +3294,25 @@ class KlarnaOfficial extends PaymentModule
                 if ($reservation_number != '') {
                     try {
                         if ($eid == Configuration::get('KCOV3_MID', null, null, $order->id_shop)) {
-                            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
+                            require_once dirname(__FILE__).'/libraries/commonFeatures.php';
+                            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
                             
-                            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL;
-                            } else {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL;
-                            }
+                            $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number);
+                            $kcoorder = json_decode($kcoorder, true);
                             
-                            $connector = \Klarna\Rest\Transport\Connector::create(
-                                $eid,
-                                $shared_secret,
-                                $url
-                            );
-
                             if ($invoice_number != '') {
-                                $kcoorder = new \Klarna\Rest\OrderManagement\Order(
-                                    $connector,
-                                    $reservation_number
-                                );
-                                $kcoorder->fetch();
-
                                 $data = array(
                                     'refunded_amount' => $kcoorder['order_amount'],
                                     'description' => 'Refund all of the order',
                                     'order_lines' => $kcoorder['order_lines'],
                                 );
-
-                                $kcoorder->refund($data);
+                                $KlarnaCheckoutCommonFeatures->postToKlarna($data, $eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/refunds');
                                 $sql = 'UPDATE `'._DB_PREFIX_.
                                 "klarna_orders` SET risk_status='credit' WHERE id_order=".
                                 (int) $params['id_order'];
                                 Db::getInstance()->execute($sql);
                             } else {
-                                $kcoorder = new \Klarna\Rest\OrderManagement\Order(
-                                    $connector,
-                                    $reservation_number
-                                );
-
-                                $kcoorder->cancel();
+                                $KlarnaCheckoutCommonFeatures->postToKlarna($data, $eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/cancel');
                                 $sql = 'UPDATE `'._DB_PREFIX_.
                                 "klarna_orders` SET risk_status='cancel' WHERE id_order=".
                                 (int) $params['id_order'];
@@ -3355,32 +3367,18 @@ class KlarnaOfficial extends PaymentModule
                         $risk_status = '';
 
                         if ($eid == Configuration::get('KCOV3_MID', null, null, $order->id_shop)) {
-                            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
+                            require_once dirname(__FILE__).'/libraries/commonFeatures.php';
+                            $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
                             
-                            if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL;
-                            } else {
-                                $url = \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL;
-                            }
+                            $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number);
+                            $kcoorder = json_decode($kcoorder, true);
+                            $risk_status = pSQL($kcoorder['fraud_status']);
                             
-                            $connector = \Klarna\Rest\Transport\Connector::create(
-                                $eid,
-                                $shared_secret,
-                                $url
-                            );
-
-                            $kcoorder = new \Klarna\Rest\OrderManagement\Order(
-                                $connector,
-                                $reservation_number
-                            );
-                            $kcoorder->fetch();
-
                             $data = array(
                                 'captured_amount' => $kcoorder['order_amount'],
                                 'description' => 'Shipped all of the order',
                                 'order_lines' => $kcoorder['order_lines'],
                             );
-                            
                             if ("" != $order->shipping_number) {
                                 $carrier = new Carrier((int)($order->id_carrier), (int)($order->id_lang));
                                 if ("" != $carrier->url) {
@@ -3394,11 +3392,14 @@ class KlarnaOfficial extends PaymentModule
                                 );
                                 $data['shipping_info'] = array($shipping_info);
                             }
-
-                            $kcoorder->createCapture($data);
-                            $invoice_number = $kcoorder['klarna_reference'];
-                            $risk_status = $kcoorder['fraud_status'];
+                            
+                            $KlarnaCheckoutCommonFeatures->postToKlarna($data, $eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/captures');
+                            $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/captures');
+                            $kcoorder = json_decode($kcoorder, true);
+                            $invoice_number = $kcoorder[0]['klarna_reference'];
+                            
                         } else {
+                            /*OLD V2 OR KPM METHODS*/
                             $k = $this->initKlarnaAPI($eid, $shared_secret, $countryIso, $languageIso, $currencyIso);
                             $method = Configuration::get('KCO_SENDTYPE', null, null, $order->id_shop);
                             if ($method == 1) {
@@ -3418,11 +3419,16 @@ class KlarnaOfficial extends PaymentModule
                             if (isset($result[1])) {
                                 $invoice_number = $result[1];
                             }
+                            /*OLD V2 OR KPM METHODS*/
                         }
                         $risk_status = pSQL($risk_status);
+                        if ("" != $risk_status) {
+                            /*only keep this for legacy, remove when v2 and kpm is removed*/
+                            $riskupdate = "risk_status='$risk_status' ,";
+                        }
                         $invoice_number = pSQL($invoice_number);
                         $sql = 'UPDATE `'._DB_PREFIX_.
-                        "klarna_orders` SET risk_status='$risk_status' ,invoicenumber='$invoice_number' ".
+                        "klarna_orders` SET $riskupdate invoicenumber='$invoice_number' ".
                         "WHERE id_order=".(int) $params['id_order'];
                         Db::getInstance()->execute($sql);
                     } catch (Exception $e) {
@@ -3693,31 +3699,15 @@ class KlarnaOfficial extends PaymentModule
                     session_start();
                 }
             }
-            $sql = "SELECT reservation FROM "._DB_PREFIX_."klarna_orders WHERE id_order=".(int)$params["order"]->id;
-            $orderId = Db::getInstance()->getValue($sql);
-            
-            require_once dirname(__FILE__).'/libraries/KCOUK/autoload.php';
-            if (Configuration::get('KCOV3')) {
-                $merchantId = Configuration::get('KCOV3_MID');
-                $sharedSecret = Configuration::get('KCOV3_SECRET');
-            }
-            
+            $sql = "SELECT reservation FROM "._DB_PREFIX_."klarna_orders WHERE id_order=".(int) $params["order"]->id;
+            $klarna_order_id = Db::getInstance()->getValue($sql);
             $merchantId = Configuration::get('KCOV3_MID');
             $sharedSecret = Configuration::get('KCOV3_SECRET');
-            $ssid = Tools::getValue('sid');
             require_once dirname(__FILE__).'/libraries/commonFeatures.php';
             $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
-            $connector = $KlarnaCheckoutCommonFeatures->getConnector(
-                $ssid,
-                $merchantId,
-                $sharedSecret,
-                (int) (Configuration::get('KCO_TESTMODE')),
-                $this->version
-            );
-
-            $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-            $checkout->fetch();
-
+            $version = $this->version;
+            $checkout = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/checkout/v3/orders/'.$klarna_order_id);
+            $checkout = json_decode($checkout, true);
             $snippet = $checkout['html_snippet'];
             
             $this->context->smarty->assign('orderreference', $params["order"]->reference);
@@ -3830,14 +3820,11 @@ class KlarnaOfficial extends PaymentModule
     public function changeAddressOnKCOCart(
         $shipping,
         $billing,
-        $country_iso_codes,
         $customer,
         $cart
     ) {
         $delivery_address_id = 0;
         $invoice_address_id = 0;
-        // $shipping_iso = $country_iso_codes[$shipping['country']];
-        // $invocie_iso = $country_iso_codes[$billing['country']];
         $shipping_iso = Tools::strtoupper($shipping['country']);
         $invocie_iso = Tools::strtoupper($billing['country']);
         $shipping_country_id = Country::getByIso($shipping_iso);

@@ -33,8 +33,6 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
     public function initContent()
     {
         parent::initContent();
-        require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
-
         if (version_compare(phpversion(), '5.4.0', '>=')) {
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
@@ -50,25 +48,19 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
         try {
             $merchantId = Configuration::get('KCOV3_MID');
             $sharedSecret = Configuration::get('KCOV3_SECRET');
-            $ssid = Tools::getValue('sid');
             require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
             $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
-            $connector = $KlarnaCheckoutCommonFeatures->getConnector(
-                $ssid,
-                $merchantId,
-                $sharedSecret,
-                (int) (Configuration::get('KCO_TESTMODE')),
-                $this->module->version
-            );
-
-            $orderId = Tools::getValue('klarna_order_id');
-            $checkout = new \Klarna\Rest\Checkout\Order($connector, $orderId);
-            $checkout->fetch();
-                
+            $version = $this->module->version;
+            $klarna_order_id = pSQL(Tools::getValue('klarna_order_id'));
+            
+            $checkout = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/checkout/v3/orders/'.$klarna_order_id);
+            $checkout = json_decode($checkout, true);
+            
             $snippet = $checkout['html_snippet'];
 
             if ($checkout['status'] == 'checkout_incomplete') {
-                Tools::redirect('index.php?fc=module&module=klarnaofficial&controller=checkoutklarnakco');
+                $url = Context::getContext()->link->getModuleLink($this->module->name, 'checkoutklarnakco', array(), true);
+                Tools::redirect($url);
             }
             
             $id_cart = (int)$checkout['merchant_reference2'];
@@ -83,26 +75,6 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                 $result['id_order'] = $id_order;
             } else {
                 if ($checkout['status'] == 'checkout_complete') {
-                    $country_iso_codes = array(
-                    'SWE' => 'SE',
-                    'NOR' => 'NO',
-                    'FIN' => 'FI',
-                    'DNK' => 'DK',
-                    'DEU' => 'DE',
-                    'NLD' => 'NL',
-                    'se' => 'SE',
-                    'no' => 'NO',
-                    'fi' => 'FI',
-                    'dk' => 'DK',
-                    'de' => 'DE',
-                    'nl' => 'NL',
-                    'gb' => 'GB',
-                    'it' => 'IT',
-                    'fr' => 'FR',
-                    'us' => 'US',
-                    'at' => 'AT',
-                    );
-
                     $cart = new Cart((int) ($id_cart));
                     
                     if ($id_order > 0) {
@@ -159,7 +131,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         );
                     }
 
-                    $this->module->changeAddressOnKCOCart($shipping, $billing, $country_iso_codes, $customer, $cart);
+                    $this->module->changeAddressOnKCOCart($shipping, $billing, $customer, $cart);
 
                     $amount = (int) ($checkout['order_amount']);
                     $amount = (float) ($amount / 100);
@@ -180,6 +152,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $extra['transaction_id'] = $reference;
 
                     $id_shop = (int) $cart->id_shop;
+                    
+                    
                     
                     $sql = 'INSERT INTO `'._DB_PREFIX_.
                         "klarna_orders`(eid, id_order, id_cart, id_shop, ssn, invoicenumber,risk_status ,reservation) ".
@@ -219,20 +193,20 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
 
                     $order_reference = $this->module->currentOrder;
                     if (Configuration::get('KCO_ORDERID') == 1) {
-                        $order = new Order($this->module->currentOrder);
+                        $order = new Order((int) $this->module->currentOrder);
                         $order_reference = $order->reference;
                     }
-                    $update = new Klarna\Rest\OrderManagement\Order($connector, $reference);
-                    $update->fetch();
-                    
-                    $update->updateMerchantReferences(
-                        array(
-                                'merchant_reference1' => ''.$order_reference,
-                                'merchant_reference2' => ''.$cart->id,
-                        )
-                    );
-                    $update->acknowledge();
 
+                    $data = array(
+                        'merchant_reference1' => ''.$order_reference,
+                        'merchant_reference2' => ''.$cart->id,
+                    );
+
+                    $endpoint = '/ordermanagement/v1/orders/'.$reference.'/merchant-references';
+                    $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $version, $endpoint, true);
+                    
+                    $endpoint = '/ordermanagement/v1/orders/'.$reference.'/acknowledge';
+                    $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $version, $endpoint);
                     
                     $sql = 'UPDATE `'._DB_PREFIX_.
                         "klarna_orders` SET id_order=".
@@ -244,7 +218,9 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     
                     $result['id_order'] = $this->module->currentOrder;
                     
-                    if (isset($update['fraud_status']) && $update['fraud_status'] == "PENDING") {
+                    $klarnaorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/ordermanagement/v1/orders/'.$reference);
+                    $klarnaorder = json_decode($klarnaorder, true);
+                    if (isset($klarnaorder['fraud_status']) && $klarnaorder['fraud_status'] == "PENDING") {
                         $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT');
                         $history = new OrderHistory();
                         $history->id_order = $this->module->currentOrder;

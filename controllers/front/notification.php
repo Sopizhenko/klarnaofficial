@@ -26,41 +26,30 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
 
     public function postProcess()
     {
-        require_once dirname(__FILE__).'/../../libraries/KCOUK/autoload.php';
+        $merchantId = Configuration::get('KCOV3_MID');
+        $sharedSecret = Configuration::get('KCOV3_SECRET');
+        require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
         $klarnadata = Tools::file_get_contents('php://input');
         $klarna_result = json_decode($klarnadata, true);
-        $order_id = pSQL($klarna_result["order_id"]);
+        $klarna_order_id = pSQL($klarna_result["order_id"]);
         
-        $eid = Configuration::get('KCOV3_MID');
-        $shared_secret = Configuration::get('KCOV3_SECRET');
+        $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
+        $version = $this->module->version;
+        
+        $klarnaorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/ordermanagement/v1/orders/'.$klarna_order_id);
+        $klarnaorder = json_decode($klarnaorder, true);
 
-        if ((int) Configuration::get('KCO_TESTMODE') == 1) {
-            $connector = \Klarna\Rest\Transport\Connector::create(
-                $eid,
-                $shared_secret,
-                \Klarna\Rest\Transport\ConnectorInterface::EU_TEST_BASE_URL
-            );
-        } else {
-            $connector = \Klarna\Rest\Transport\Connector::create(
-                $eid,
-                $shared_secret,
-                \Klarna\Rest\Transport\ConnectorInterface::EU_BASE_URL
-            );
-        }
-        
-        $order = new Klarna\Rest\OrderManagement\Order($connector, $order_id);
-        $order->fetch();
         $new_pending_status = 0;
-        if (isset($order['fraud_status']) && $order['fraud_status'] != "PENDING") {
-            if ($order['fraud_status'] == "ACCEPTED") {
+        if (isset($klarnaorder['fraud_status']) && $klarnaorder['fraud_status'] != "PENDING") {
+            if ($klarnaorder['fraud_status'] == "ACCEPTED") {
                 $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT_ACCEPTED');
-            } elseif ($order['fraud_status'] == "REJECTED") {
+            } elseif ($klarnaorder['fraud_status'] == "REJECTED") {
                 $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT_REJECTED');
             }
             
             if ($new_pending_status > 0) {
                 $sql = "SELECT eid, id_shop, id_order FROM `"._DB_PREFIX_.
-                        "klarna_orders` WHERE `reservation`='$order_id'";
+                        "klarna_orders` WHERE `reservation`='$klarna_order_id'";
                 $row = Db::getInstance()->getRow($sql);
                 
                 $id_order = (int) $row["id_order"];
