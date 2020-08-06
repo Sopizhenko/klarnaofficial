@@ -258,7 +258,6 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     if (version_compare(phpversion(), '5.4.0', '<')) {
                         $this->context->smarty->assign('klarna_error', 'PHP 5.4 Required');
                     } else {
-
                         $totalCartValue = $this->context->cart->getOrderTotal(true, Cart::BOTH);
                         $totalCartValue_tax_excl = $this->context->cart->getOrderTotal(false, Cart::BOTH);
                         $total_tax_value = $totalCartValue - $totalCartValue_tax_excl;
@@ -482,7 +481,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $checkout = json_decode($checkout);
                         $_SESSION['klarna_checkout_uk'] = $checkout->order_id;
                         
-                        if(isset($checkout->error_code)) {
+                        if (isset($checkout->error_code)) {
                             $error_message_string = "";
                             foreach ($checkout->error_messages as $error_message) {
                                 $error_message_string .= $error_message.PHP_EOL;

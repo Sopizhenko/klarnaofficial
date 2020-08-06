@@ -52,8 +52,8 @@
         {l s='Your cart is empty' mod='klarnaofficial'}
     {elseif $klarna_error=='purchase_currency'}
         {l s='The selected currency can not be used for deliveries to your country.' mod='klarnaofficial'}
-        {l s='Currency' mod='klarnaofficial'}:{$klarnaCurrency}
-        {l s='Country' mod='klarnaofficial'}:{$klarnaCountry}
+        {l s='Currency' mod='klarnaofficial'}:{$klarnaCurrency|escape:'html':'UTF-8'}
+        {l s='Country' mod='klarnaofficial'}:{$klarnaCountry|escape:'html':'UTF-8'}
     {else}
         {$klarna_error|escape:'html':'UTF-8'}
     {/if}
@@ -217,7 +217,7 @@
                             {foreach $discounts as $discount}
                             <li>
                                 <span class="kco-del-list__title">{$discount.name|escape:'htmlall':'UTF-8'}</span><span class="kco-del-list__nbr">{if !$priceDisplay}{displayPrice price=$discount.value_real*-1}{else}{displayPrice price=$discount.value_tax_exc*-1}{/if}</span>
-                                {if strlen($discount.code)}<a href="{$link->getModuleLink('klarnaofficial', $controllername, [deleteDiscount => $discount.id_discount|intval], true)|escape:'html'}" class="kco-del-list__btn" title="{l s='Delete' mod='klarnaofficial'}"><i class="icon-remove"></i></a>{/if}
+                                {if strlen($discount.code)}<a href="{$link->getModuleLink('klarnaofficial', $controllername, [deleteDiscount => $discount.id_discount|intval], true)|escape:'html':'UTF-8'}" class="kco-del-list__btn" title="{l s='Delete' mod='klarnaofficial'}"><i class="icon-remove"></i></a>{/if}
                             </li>
                             {/foreach}
                         </ul>
