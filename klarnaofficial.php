@@ -621,7 +621,8 @@ class KlarnaOfficial extends PaymentModule
             $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code']] = $numInputs;
         }
         
-        $cron_domain = $this->context->link->getBaseLink(null, true, false);
+        // $cron_domain = $this->context->link->getBaseLink(null, true, false);
+        $cron_domain = $this->context->shop->getBaseURL();
 
         $this->context->smarty->assign(array(
             'klarnaisocodedef' => $country_iso_code,
