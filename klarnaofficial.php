@@ -205,7 +205,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.31';
+        $this->version = '2.1.32';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -3397,6 +3397,7 @@ class KlarnaOfficial extends PaymentModule
                             $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/captures');
                             $kcoorder = json_decode($kcoorder, true);
                             $invoice_number = $kcoorder[0]['klarna_reference'];
+                            
                         } else {
                             /*OLD V2 OR KPM METHODS*/
                             $k = $this->initKlarnaAPI($eid, $shared_secret, $countryIso, $languageIso, $currencyIso);

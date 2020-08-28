@@ -17,14 +17,14 @@ class KlarnaCheckoutCommonFeatures
             $rowvalue = ($price * (int) ($product['cart_quantity']));
             $totalCartValue += $rowvalue;
 
-            $tax_rate = (int) ($product['rate']) * 100;
+            $tax_rate = (int) (Tools::ps_round($product['rate'],2) * 100);
             
             if (0 == $tax_value) {
                 $tax_rate = 0;
             }
             
             if ($isv3) {
-                $rate = (int) ($product['rate']);
+                $rate = $product['rate'];
                 if (0 == $rate) {
                     $tax_rate = 0;
                     $tax_value = 0;
@@ -39,7 +39,7 @@ class KlarnaCheckoutCommonFeatures
                 $highest_tax_rate = $tax_rate;
             }
             
-            $price = ($price * 100);
+            $price = $price * 100;
             $checkoutcart[] = array(
                 'type' => 'physical',
                 'reference' => (isset($product['reference']) &&
@@ -52,12 +52,12 @@ class KlarnaCheckoutCommonFeatures
                 ),
                 'quantity' => (int) ($product['cart_quantity']),
                 'quantity_unit' => 'pcs',
-                'unit_price' => $price,
+                'unit_price' => (int) $price,
                 'product_url' => $product_url,
                 'image_url' => $image_url,
-                'tax_rate' => $tax_rate,
-                'total_amount' => (string) ($rowvalue * 100),
-                'total_tax_amount' => (string) ($tax_value * 100),
+                'tax_rate' => (int) $tax_rate,
+                'total_amount' => (int) ($rowvalue * 100),
+                'total_tax_amount' => (int) ($tax_value * 100),
             );
         }
         $shipping_cost_with_tax = $cart->getOrderTotal(true, Cart::ONLY_SHIPPING, null, $cart->id_carrier, false);
@@ -92,36 +92,37 @@ class KlarnaCheckoutCommonFeatures
                 'reference' => $shippingReference,
                 'name' => strip_tags($carrier->name),
                 'quantity' => 1,
-                'unit_price' => ($shipping_cost_with_tax * 100),
-                'tax_rate' => $shipping_tax_rate,
-                'total_amount' => (string) ($shipping_cost_with_tax * 100),
-                'total_tax_amount' => (string) ($shipping_tax_value * 100),
+                'unit_price' => (int) ($shipping_cost_with_tax * 100),
+                'tax_rate' => (int) $shipping_tax_rate,
+                'total_amount' => (int) ($shipping_cost_with_tax * 100),
+                'total_tax_amount' => (int) ($shipping_tax_value * 100),
             );
         }
         if ($cart->gift == 1) {
-            $cart_wrapping = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
-            if ($cart_wrapping > 0) {
+            $wrapping_cost_incl = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
+            if ($wrapping_cost_incl > 0) {
                 $wrapping_cost_excl = $cart->getOrderTotal(false, Cart::ONLY_WRAPPING);
-                $wrapping_cost_incl = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
-                $wrapping_vat = (($wrapping_cost_incl / $wrapping_cost_excl) - 1) * 100;
-                $wrapping_tax_value = ($wrapping_cost_incl - $wrapping_cost_excl);
+                $wrapping_vat = Tools::ps_round(($wrapping_cost_incl / $wrapping_cost_excl) -1, 2) * 100;
+                $wrapping_tax_value = $wrapping_cost_incl - ($wrapping_cost_incl / (1+($wrapping_vat/100)));
                 
-                $cart_wrapping = Tools::ps_round($cart_wrapping, 2);
-                $totalCartValue += $cart_wrapping;
+                $wrapping_cost_incl = Tools::ps_round($wrapping_cost_incl, 2);
+                $totalCartValue += $wrapping_cost_incl;
                 
                 $wrapping_vat = (int) ($wrapping_vat * 100);
                 if ($wrapping_vat > $highest_tax_rate) {
                     $highest_tax_rate = $wrapping_vat;
                 }
                 
+                $wrapping_tax_value = Tools::ps_round($wrapping_tax_value, 2);
+                
                 $checkoutcart[] = array(
                     'reference' => $wrappingreference,
                     'name' => $wrappingname,
                     'quantity' => 1,
-                    'unit_price' => ($cart_wrapping * 100),
-                    'tax_rate' => $wrapping_vat,
-                    'total_amount' => (string) ($cart_wrapping * 100),
-                    'total_tax_amount' => (string) ($wrapping_tax_value * 100),
+                    'unit_price' => (int) ($wrapping_cost_incl * 100),
+                    'tax_rate' => (int) $wrapping_vat,
+                    'total_amount' => (int) ($wrapping_cost_incl * 100),
+                    'total_tax_amount' => (int) ($wrapping_tax_value * 100),
                 );
             }
         }
@@ -152,10 +153,10 @@ class KlarnaCheckoutCommonFeatures
                         'reference' => '',
                         'name' => $discountname,
                         'quantity' => 1,
-                        'unit_price' => (string) (-($value_real * 100)),
+                        'unit_price' => (int) (-($value_real * 100)),
                         'tax_rate' => (int) ($common_tax_rate * 100),
-                        'total_amount' => (string) (-($value_real * 100)),
-                        'total_tax_amount' => (string) (-($tax_value * 100)),
+                        'total_amount' => (int) (-($value_real * 100)),
+                        'total_tax_amount' => (int) (-($tax_value * 100)),
                     );                    
                 }
             }
@@ -175,7 +176,7 @@ class KlarnaCheckoutCommonFeatures
                         'quantity' => 1,
                         'unit_price' => -($totalCartValue * 100),
                         'tax_rate' => (int) ($common_tax_rate * 100),
-                        'total_amount' => -($totalCartValue * 100),
+                        'total_amount' => (int) (-($totalCartValue * 100)),
                         'total_tax_amount' => -(int) ($common_tax_value * 100),
                     );
                 } else {

@@ -2,24 +2,9 @@
 /*  $KLARNACHECKOUT
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 
-    [id="center_column"] {
-        width: 100%;
-    }
-    [id="left_column"],
-    [id="right_column"],
-    .shipping_cart,
-    .order_delivery,
-    .delivery_option_icon,
-    [id="giftmessagearea"] {
-        display: none;
-    }
     .kco-main {
         font-size: 16px;
     }
-
-	#module-klarnaofficial-checkoutklarna #order_step,
-    #module-klarnaofficial-checkoutklarna .price_discount_delete,
-	#module-klarnaofficial-checkoutklarna .standard-checkout{ display: none; }
 	
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -537,29 +522,3 @@
                 .kco-del-list__btn:hover {
                     color: #e74635;
                 }
-#module-klarnaofficial-checkoutklarna div.shopping_cart span.remove_link{display:none;}
-#module-klarnaofficial-checkoutklarnauk div.shopping_cart span.remove_link{display:none;}
-
-#module-klarnaofficial-checkoutklarnauk #order_step,
-#module-klarnaofficial-checkoutklarnauk .cart_navigation,
-#module-klarnaofficial-checkoutklarnauk #voucher,
-#module-klarnaofficial-checkoutklarnauk .title-offers,
-#module-klarnaofficial-checkoutklarnauk #display_cart_vouchers,
-#module-klarnaofficial-checkoutklarnauk #cart_voucher * {
-	display: none;
-}
-
-#module-klarnaofficial-checkoutklarna #order_step,
-#module-klarnaofficial-checkoutklarna .cart_navigation,
-#module-klarnaofficial-checkoutklarna #voucher,
-#module-klarnaofficial-checkoutklarna .title-offers,
-#module-klarnaofficial-checkoutklarna #display_cart_vouchers,
-#module-klarnaofficial-checkoutklarna #cart_voucher * {
-	display: none;
-}
-
-#checkoutdiv {
-    border: 1px solid #d1d1d0;
-    border-radius: 8px;
-    padding: 2rem;
-}
