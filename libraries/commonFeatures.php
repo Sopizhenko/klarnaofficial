@@ -17,7 +17,17 @@ class KlarnaCheckoutCommonFeatures
             $rowvalue = ($price * (int) ($product['cart_quantity']));
             $totalCartValue += $rowvalue;
 
-            $tax_rate = (int) ($product['rate']) * 100;
+            $tax_rate = (int) (Tools::ps_round($product['rate'],2) * 100);
+            $rate = $product['rate'];
+            if (0 == $rate) {
+                $tax_rate = 0;
+                $tax_value = 0;
+            } else {
+                $tax_value = $price - ($price / (1+($rate/100)));
+                $tax_value = ($tax_value * (int) $product['cart_quantity']);
+                $tax_value = Tools::ps_round($tax_value,2);
+            }
+            
             if (0 == $tax_value) {
                 $tax_rate = 0;
             }
@@ -58,9 +68,18 @@ class KlarnaCheckoutCommonFeatures
                 //Prestashop error due to EU module?
                 $shipping_tax_rate = round(($shipping_cost_with_tax / $shipping_cost_without_tax) -1, 2) * 100;
             }
+            
             //$shipping_tax_value = ($shipping_cost_with_tax - $shipping_cost_without_tax);
             $shipping_tax_value = $shipping_cost_with_tax - ($shipping_cost_with_tax / (1+($shipping_tax_rate/100)));
-            $shipping_tax_value = round($shipping_tax_value, 2);
+            
+            if (0 == $shipping_tax_rate) {
+                $shipping_tax_value = 0;
+            }
+            
+            $shipping_cost_with_tax = Tools::ps_round($shipping_cost_with_tax, 2);
+            $shipping_tax_rate = Tools::ps_round($shipping_tax_rate, 2);
+            $shipping_tax_value = Tools::ps_round($shipping_tax_value, 2);
+            
             $totalCartValue += $shipping_cost_with_tax;
             
             $checkoutcart[] = array(
@@ -68,30 +87,33 @@ class KlarnaCheckoutCommonFeatures
                 'reference' => $shippingReference,
                 'name' => strip_tags($carrier->name),
                 'quantity' => 1,
-                'unit_price' => (string) ($shipping_cost_with_tax * 100),
+                'unit_price' => (int) ($shipping_cost_with_tax * 100),
                 'tax_rate' => (int) ($shipping_tax_rate * 100),
-                'total_amount' => (string) ($shipping_cost_with_tax * 100),
+                'total_amount' => (int) ($shipping_cost_with_tax * 100),
                 'total_tax_amount' => (int) ($shipping_tax_value * 100),
             );
         }
         if ($cart->gift == 1) {
-            $cart_wrapping = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
-            if ($cart_wrapping > 0) {
-                $wrapping_cost_excl = $cart->getOrderTotal(false, Cart::ONLY_WRAPPING);
-                $wrapping_cost_incl = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
-                $wrapping_vat = (($wrapping_cost_incl / $wrapping_cost_excl) - 1) * 100;
-                $wrapping_tax_value = ($wrapping_cost_incl - $wrapping_cost_excl);
+            $wrapping_cost_incl = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
+            if ($wrapping_cost_incl > 0) {
                 
-                $cart_wrapping = Tools::ps_round($cart_wrapping, 2);
-                $totalCartValue += $cart_wrapping;
+                $wrapping_cost_excl = $cart->getOrderTotal(false, Cart::ONLY_WRAPPING);
+                $wrapping_vat = Tools::ps_round(($wrapping_cost_incl / $wrapping_cost_excl) -1, 2) * 100;
+                $wrapping_tax_value = $wrapping_cost_incl - ($wrapping_cost_incl / (1+($wrapping_vat/100)));
+                
+                $wrapping_tax_value = Tools::ps_round($wrapping_tax_value, 2);
+                $wrapping_cost_incl = Tools::ps_round($wrapping_cost_incl, 2);
+                
+                
+                $totalCartValue += $wrapping_cost_incl;
                 
                 $checkoutcart[] = array(
                     'reference' => $wrappingreference,
                     'name' => $wrappingname,
                     'quantity' => 1,
-                    'unit_price' => (string) ($cart_wrapping * 100),
+                    'unit_price' => (int) ($wrapping_cost_incl * 100),
                     'tax_rate' => (int) ($wrapping_vat * 100),
-                    'total_amount' => (string) ($cart_wrapping * 100),
+                    'total_amount' => (int) ($wrapping_cost_incl * 100),
                     'total_tax_amount' => (int) ($wrapping_tax_value * 100),
                 );
             }
