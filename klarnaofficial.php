@@ -28,7 +28,7 @@ class KlarnaOfficial extends PaymentModule
     const OSM_THEME_DARK = 'dark';
     const OSM_THEME_CUSTOM = '';
     
-    const OSM_PLACEMENTS = array(
+    static public $OSM_PLACEMENTS = array(
         'top-strip-promotion-standard',
         'credit-promotion-small',
         'credit-promotion-standard',
@@ -38,7 +38,7 @@ class KlarnaOfficial extends PaymentModule
         'sidebar-promotion-auto-size',
     );
     
-    const OSM_VALID_COUNTRY_CURRENCY_COMBINATION = array(
+    static public $OSM_VALID_COUNTRY_CURRENCY_COMBINATION = array(
         'SE' => 'SEK',
         'DK' => 'DKK',
         'GB' => 'GBP',
@@ -205,7 +205,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.32';
+        $this->version = '2.1.33';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -744,7 +744,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $placements = array();
         $placements[] = array('value' => '0', 'label' => $this->l('Select type'));
-        foreach (self::OSM_PLACEMENTS as $placementID) {
+        foreach (self::$OSM_PLACEMENTS as $placementID) {
             $placements[] = array('value' => $placementID, 'label' => $placementID);
         }
         
@@ -4839,8 +4839,8 @@ class KlarnaOfficial extends PaymentModule
         $countryIsoCode = Context::getContext()->country->iso_code;
 
         // Check if country+currency matches any of the non-EUR cases defined in the constant, else should be EUR
-        if (isset(self::OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode])) {
-            $defaultCurrency = self::OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode];
+        if (isset(self::$OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode])) {
+            $defaultCurrency = self::$OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode];
 
             if ($defaultCurrency === Context::getContext()->currency->iso_code) {
                 return true;
