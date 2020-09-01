@@ -3397,7 +3397,6 @@ class KlarnaOfficial extends PaymentModule
                             $kcoorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($eid, $shared_secret, $this->version, '/ordermanagement/v1/orders/'.$reservation_number.'/captures');
                             $kcoorder = json_decode($kcoorder, true);
                             $invoice_number = $kcoorder[0]['klarna_reference'];
-                            
                         } else {
                             /*OLD V2 OR KPM METHODS*/
                             $k = $this->initKlarnaAPI($eid, $shared_secret, $countryIso, $languageIso, $currencyIso);
