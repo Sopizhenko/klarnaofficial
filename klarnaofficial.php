@@ -28,7 +28,7 @@ class KlarnaOfficial extends PaymentModule
     const OSM_THEME_DARK = 'dark';
     const OSM_THEME_CUSTOM = '';
     
-    static public $OSM_PLACEMENTS = array(
+    public static $OSM_PLACEMENTS = array(
         'top-strip-promotion-standard',
         'credit-promotion-small',
         'credit-promotion-standard',
@@ -38,7 +38,7 @@ class KlarnaOfficial extends PaymentModule
         'sidebar-promotion-auto-size',
     );
     
-    static public $OSM_VALID_COUNTRY_CURRENCY_COMBINATION = array(
+    public static $OSM_VALID_COUNTRY_CURRENCY_COMBINATION = array(
         'SE' => 'SEK',
         'DK' => 'DKK',
         'GB' => 'GBP',
