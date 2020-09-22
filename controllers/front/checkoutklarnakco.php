@@ -479,6 +479,9 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         }
                         $checkout = $KlarnaCheckoutCommonFeatures->postToKlarna($create, $mid, $sharedSecret, $this->module->version, '/checkout/v3/orders/'.$order_id);
                         $checkout = json_decode($checkout);
+                        if (!is_object($checkout)) {
+                            throw new Exception('Check credentials');
+                        }
                         $_SESSION['klarna_checkout_uk'] = $checkout->order_id;
                         
                         if (isset($checkout->error_code)) {

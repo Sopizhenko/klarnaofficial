@@ -34,7 +34,6 @@ $sql = array();
  
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'klarna_orders`';
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'klarna_errors`';
-$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'kpmpclasses`';
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'klarna_checkbox`';
 
 foreach ($sql as $query) {

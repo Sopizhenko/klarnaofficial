@@ -69,29 +69,6 @@ class KlarnaOfficial extends PaymentModule
     );
     
     public $configuration_params = array(
-        'KPM_ACCEPTED_PP',
-        'KPM_SHOW_IN_PAYMENTS',
-        'KPM_DISABLE_INVOICE',
-        'KPM_ACCEPTED_INVOICE',
-        'KPM_PENDING_PP',
-        'KPM_PENDING_INVOICE',
-        'KPM_LOGO',
-        'KPM_AT_SECRET',
-        'KPM_AT_EID',
-        'KPM_INVOICEFEE',
-        'KPM_NL_EID',
-        'KPM_NL_SECRET',
-        'KPM_DE_SECRET',
-        'KPM_DE_EID',
-        'KPM_DA_SECRET',
-        'KPM_DA_EID',
-        'KPM_FI_SECRET',
-        'KPM_FI_EID',
-        'KPM_NO_SECRET',
-        'KPM_NO_EID',
-        'KPM_SV_SECRET',
-        'KPM_SV_EID',
-        
         'KLARNA_ONSITE_MESSAGE',
         'KLARNA_ONSITE_MESSAGE_DCI',
         'KLARNA_ONSITEMESSAGING_CONFIGURATION',
@@ -202,7 +179,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.55';
+        $this->version = '1.9.56';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -251,22 +228,7 @@ class KlarnaOfficial extends PaymentModule
         $this->createTables();
 
         $states = OrderState::getOrderStates(Configuration::get('PS_LANG_DEFAULT'));
-        $name = $this->l('Klarna pending invoice');
-        $config_name = 'KPM_PENDING_INVOICE';
-        $this->createOrderStatus($name, $states, $config_name, false);
 
-        $name = $this->l('Klarna pending partpayment');
-        $config_name = 'KPM_PENDING_PP';
-        $this->createOrderStatus($name, $states, $config_name, false);
-
-        $name = $this->l('Klarna accepted invoice');
-        $config_name = 'KPM_ACCEPTED_INVOICE';
-        $this->createOrderStatus($name, $states, $config_name, true);
-
-        $name = $this->l('Klarna accepted partpayment');
-        $config_name = 'KPM_ACCEPTED_PP';
-        $this->createOrderStatus($name, $states, $config_name, true);
-        
         $name = $this->l('Klarna pending payment');
         $config_name = 'KCO_PENDING_PAYMENT';
         $this->createOrderStatus($name, $states, $config_name, false);
@@ -282,7 +244,6 @@ class KlarnaOfficial extends PaymentModule
         $metas = array();
         $metas[] = $this->setMeta('module-klarnaofficial-checkoutklarna');
         $metas[] = $this->setMeta('module-klarnaofficial-checkoutklarnauk');
-        $metas[] = $this->setMeta('module-klarnaofficial-kpmpartpayment');
         $metas[] = $this->setMeta('module-klarnaofficial-thankyou');
         $metas[] = $this->setMeta('module-klarnaofficial-thankyouuk');
         foreach (Theme::getThemes() as $theme) {
@@ -451,14 +412,6 @@ class KlarnaOfficial extends PaymentModule
                 Configuration::updateValue("KCO_FINLAND", Tools::getValue("KCO_FINLAND"));
                 Configuration::updateValue("KCO_NORWAY", Tools::getValue("KCO_NORWAY"));
                 Configuration::updateValue("KCO_AUSTRIA", Tools::getValue("KCO_AUSTRIA"));
-            }
-        }
-
-        $invoice_fee_not_found = false;
-        if (Configuration::get('KPM_INVOICEFEE') != '') {
-            $feeproduct = $this->getByReference(Configuration::get('KPM_INVOICEFEE'));
-            if (!Validate::isLoadedObject($feeproduct)) {
-                $invoice_fee_not_found = true;
             }
         }
 
@@ -644,29 +597,20 @@ class KlarnaOfficial extends PaymentModule
             'isSaved' => $isSaved,
             'toggle_js_inputs' => Tools::jsonEncode($toggle_js_inputs),
             'osmform' => $this->createOSMForm(),
-            'invoice_fee_not_found' => $invoice_fee_not_found,
             'commonform' => $this->createCommonForm(),
-            'kpmform' => $this->createKPMForm(),
             'kcocommonform' => $this->createKCOCommonForm(),
             'kcov3form' => $this->createKCOV3Form(),
             'kcoform' => $this->createKCOForm(),
-            'pclasslist' => $this->renderPclassList(),
             'REQUEST_URI' => Tools::safeOutput($_SERVER['REQUEST_URI']),
         ));
 
         /*LEGACY WARNINGS*/
-        $KPM_SHOW_IN_PAYMENTS = Configuration::get('KPM_SHOW_IN_PAYMENTS');
         $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE');
         $KCOV3 = Configuration::get('KCOV3');
         $show_kco_v2_warning = false;
-        $show_kpm_warning = false;
         if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
             $show_kco_v2_warning = true;
         }
-        if (true == $KPM_SHOW_IN_PAYMENTS) {
-            $show_kpm_warning = true;
-        }
-        $this->context->smarty->assign('show_kpm_warning', $show_kpm_warning);
         $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
         /*LEGACY WARNINGS*/
         
@@ -868,101 +812,6 @@ class KlarnaOfficial extends PaymentModule
         return $helper->generateForm($fields_form);
     }
     
-    public function renderPclassList()
-    {
-        $fields_list = array(
-            'eid' => array(
-                'title' => $this->l('EID'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'id' => array(
-                'title' => $this->l('Pclass'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'type' => array(
-                'title' => $this->l('Type'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'description' => array(
-                'title' => $this->l('Description'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'months' => array(
-                'title' => $this->l('Months'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'interestrate' => array(
-                'title' => $this->l('Interest rate'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'invoicefee' => array(
-                'title' => $this->l('Invoice fee'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'startfee' => array(
-                'title' => $this->l('Start fee'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'minamount' => array(
-                'title' => $this->l('Min amount'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'country' => array(
-                'title' => $this->l('Country'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-            'expire' => array(
-                'title' => $this->l('Valid to'),
-                'type' => 'text',
-                'search' => false,
-                'orderby' => false,
-            ),
-        );
-
-        $helper = new HelperList();
-        $helper->shopLinkType = '';
-        $helper->simple_header = false;
-        $helper->identifier = 'key_id';
-        $helper->actions = array('delete');
-        $helper->show_toolbar = true;
-        $helper->toolbar_btn['new'] = array(
-            'href' => AdminController::$currentIndex.'&configure='.
-            $this->name.'&updateplcass'.$this->name.
-            '&token='.Tools::getAdminTokenLite('AdminModules'),
-            'desc' => $this->l('Update pclasses'),
-        );
-
-        $helper->title = $this->l('Pclasses');
-        $helper->table = $this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-
-        $sql = "SELECT *, CONCAT(eid, '-', id) as key_id FROM `"._DB_PREFIX_."kpmpclasses`";
-        $content = Db::getInstance()->ExecuteS($sql);
-
-        return $helper->generateList($content, $fields_list);
-    }
-
     public function createCommonForm()
     {
         $states = OrderState::getOrderStates((int) $this->context->cookie->id_lang);
@@ -1612,307 +1461,6 @@ class KlarnaOfficial extends PaymentModule
             $helper->allow_employee_form_lang = 0;
         }
         $helper->submit_action = 'btnKCOCommonSubmit';
-        $helper->currentIndex = $this->context->link->getAdminLink(
-            'AdminModules',
-            false
-        ).'&configure='.$this->name.
-        '&tab_module='.$this->tab.'&module_name='.$this->name;
-        
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFieldsValues(),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
-        );
-
-        return $helper->generateForm($fields_form);
-    }
-    public function createKPMForm()
-    {
-        $fields_form = array();
-
-        $fields_form[0] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                'input' => array(
-                //KPM
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Klarna logo'),
-                    'name' => 'KPM_LOGO',
-                    'desc' => $this->l('Select what logo is used in the checkout.'),
-                    'options' => array(
-                        'query' => array(
-                        array(
-                            'value' => 'blue-black',
-                            'label' => $this->l('Light background'), ),
-                        array(
-                            'value' => 'white',
-                            'label' => $this->l('Dark background'), ),
-                    ),
-                        'id' => 'value',
-                        'name' => 'label',
-                    ),
-                ),
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Invoice fee product'),
-                    'name' => 'KPM_INVOICEFEE',
-                    'class' => 'fixed-width-lg',
-                    'required' => false,
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Show link in payments options'),
-                    'name' => 'KPM_SHOW_IN_PAYMENTS',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'kpmshowlink_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'kpmshowlink_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Show the link to KPM payments in Checkout.'),
-                ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Disable invoices'),
-                    'name' => 'KPM_DISABLE_INVOICE',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'kpminvoice_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'), ),
-                        array(
-                            'id' => 'kpminvoice_off',
-                            'value' => 0,
-                            'label' => $this->l('No'), ),
-                    ),
-                    'desc' => $this->l('Disables Invoice option in KPM.'),
-                ),
-                //KPM
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[1] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: SWEDEN
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Sweden EID'),
-                        'name' => 'KPM_SV_EID',
-                        'class' => 'fixed-width-lg',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Sweden shared secret'),
-                        'name' => 'KPM_SV_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[2] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: NORWAY
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Norway EID'),
-                        'name' => 'KPM_NO_EID',
-                        'class' => 'fixed-width-lg',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Norway shared secret'),
-                        'name' => 'KPM_NO_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[3] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: FINLAND
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Finland EID'),
-                        'class' => 'fixed-width-lg',
-                        'name' => 'KPM_FI_EID',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Finland shared secret'),
-                        'name' => 'KPM_FI_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[4] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: DENMARK
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Denmark EID'),
-                        'class' => 'fixed-width-lg',
-                        'name' => 'KPM_DA_EID',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Denmark shared secret'),
-                        'name' => 'KPM_DA_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[5] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: GERMANY
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Germany EID'),
-                        'class' => 'fixed-width-lg',
-                        'name' => 'KPM_DE_EID',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Germany shared secret'),
-                        'name' => 'KPM_DE_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[6] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: NETHERLANDS
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Netherlands EID'),
-                        'class' => 'fixed-width-lg',
-                        'name' => 'KPM_NL_EID',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Netherlands shared secret'),
-                        'name' => 'KPM_NL_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $fields_form[7] = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('General settings'),
-                    'icon' => 'icon-AdminAdmin',
-                  ),
-                  //KPM: AUSTRIA
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Austria EID'),
-                        'class' => 'fixed-width-lg',
-                        'name' => 'KPM_AT_EID',
-                        'required' => false,
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Austria shared secret'),
-                        'name' => 'KPM_AT_SECRET',
-                        'required' => false,
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
-
-        $helper = new HelperForm();
-        $helper->show_toolbar = false;
-        $helper->table = $this->table;
-        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
-        $helper->default_form_language = $lang->id;
-        if (Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG')) {
-            $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG');
-        } else {
-            $helper->allow_employee_form_lang = 0;
-        }
-        $helper->submit_action = 'btnKPMSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink(
             'AdminModules',
             false
@@ -3099,7 +2647,6 @@ class KlarnaOfficial extends PaymentModule
             return;
         }
         $returnData = null;
-        $this->context->controller->addCSS(($this->_path).'views/css/kpm_common.css', 'all');
         if (Configuration::get('KCO_IS_ACTIVE')) {
             $this->context->controller->addJS(($this->_path).'views/js/kco_common.js');
             $this->smarty->assign(
@@ -3280,14 +2827,9 @@ class KlarnaOfficial extends PaymentModule
         $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE', null, null, $order->id_shop);
         $KCOV3 = Configuration::get('KCOV3', null, null, $order->id_shop);
         $show_kco_v2_warning = false;
-        $show_kpm_warning = false;
         if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
             $show_kco_v2_warning = true;
         }
-        if (true == $KPM_SHOW_IN_PAYMENTS) {
-            $show_kpm_warning = true;
-        }
-        $this->context->smarty->assign('show_kpm_warning', $show_kpm_warning);
         $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
         /*LEGACY WARNINGS*/
         
@@ -4076,137 +3618,6 @@ class KlarnaOfficial extends PaymentModule
             return true;
         } else {
             return false;
-        }
-    }
-
-    public function getRequiredKPMFields($iso_code)
-    {
-        if (Tools::strtolower($iso_code) == 'at') {
-            return array(
-                'ssn' => false,
-                'birthdate' => true,
-                'gender' => true,
-                'firstname' => true,
-                'lastname' => true,
-                'streetname' => true,
-                'company' => false,
-                'housenumber' => false,
-                'housenumberext' => false,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
-        } elseif (Tools::strtolower($iso_code) == 'dk') {
-            return array(
-                'ssn' => true,
-                'birthdate' => false,
-                'gender' => false,
-                'firstname' => true,
-                'lastname' => true,
-                'company' => false,
-                'streetname' => true,
-                'housenumber' => false,
-                'housenumberext' => false,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
-        } elseif (Tools::strtolower($iso_code) == 'fi') {
-            return array(
-                'ssn' => true,
-                'birthdate' => false,
-                'gender' => false,
-                'firstname' => true,
-                'lastname' => true,
-                'company' => false,
-                'streetname' => true,
-                'housenumber' => false,
-                'housenumberext' => false,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
-        } elseif (Tools::strtolower($iso_code) == 'de') {
-            return array(
-                'ssn' => false,
-                'birthdate' => true,
-                'gender' => true,
-                'firstname' => true,
-                'company' => false,
-                'lastname' => true,
-                'streetname' => true,
-                'housenumber' => true,
-                'housenumberext' => false,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
-        } elseif (Tools::strtolower($iso_code) == 'nl') {
-            return array(
-                'ssn' => false,
-                'birthdate' => true,
-                'gender' => true,
-                'firstname' => true,
-                'lastname' => true,
-                'company' => false,
-                'streetname' => true,
-                'housenumber' => true,
-                'housenumberext' => true,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
-        } elseif (Tools::strtolower($iso_code) == 'no') {
-            return array(
-                'ssn' => true,
-                'birthdate' => false,
-                'gender' => false,
-                'firstname' => true,
-                'lastname' => true,
-                'streetname' => true,
-                'company' => false,
-                'housenumber' => false,
-                'housenumberext' => false,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
-        } elseif (Tools::strtolower($iso_code) == 'se') {
-            return array(
-                'ssn' => true,
-                'birthdate' => false,
-                'gender' => false,
-                'firstname' => true,
-                'company' => true,
-                'lastname' => true,
-                'streetname' => true,
-                'housenumber' => false,
-                'housenumberext' => false,
-                'zipcode' => true,
-                'city' => true,
-                'country' => false,
-                'phone' => true,
-                'mobilephone' => true,
-                'email' => true
-            );
         }
     }
 

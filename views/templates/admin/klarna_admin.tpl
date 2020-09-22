@@ -68,8 +68,7 @@
 	</section>
 </div>
 
-{if $show_kpm_warning || $show_kco_v2_warning}
-    {if $show_kpm_warning}<div class="alert alert-danger">{l s='It seems you are using Klarna KPM services, this service will be discontinued at the end of September 2020.' mod='klarnaofficial'}<br /> <a href="https://www.klarna.com/international/business/migration-faq/" target="_blank">{l s='More information can be found here https://www.klarna.com/international/business/migration-faq/.' mod='klarnaofficial'}</a></div>{/if}
+{if $show_kco_v2_warning}
     {if $show_kco_v2_warning}<div class="alert alert-danger">{l s='It seems you are using Klarna KCO V2, this service will be discontinued at the end of October 2020.' mod='klarnaofficial'}<br /> <a href="https://www.klarna.com/international/business/migration-faq/" target="_blank">{l s='More information can be found here https://www.klarna.com/international/business/migration-faq/.' mod='klarnaofficial'}</a></div>{/if}
 {/if}
 
@@ -114,11 +113,6 @@
 		 {$errorMSG|escape:'htmlall':'UTF-8'}
 	</div>
 {/if}
-{if $invoice_fee_not_found}
-	<div class="alert alert-danger">
-		{l s='Invoice fee product not found!' mod='klarnaofficial'}
-	</div>
-{/if}
 
 
 
@@ -130,9 +124,7 @@
 		<li class="active"><a href="#pane7" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V3 (KCO)' mod='klarnaofficial'}</a></li>
         <li><a href="#pane1" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V2 (KCO)' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane8" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout Common' mod='klarnaofficial'}</a></li>
-        <li><a href="#pane2" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Payment Method (KPM)' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane3" data-toggle="tab"><i class="icon-cogs"></i> {l s='Common settings' mod='klarnaofficial'}</a></li>
-		<li><a href="#pane4" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Pclasses' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane5" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Terms and Conditions' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane6" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Setup' mod='klarnaofficial'}</a></li>
         <li><a href="#pane9" data-toggle="tab"><i class="icon-list-alt"></i> {l s='On Site Messaging' mod='klarnaofficial'}</a></li>
@@ -194,27 +186,7 @@
 				</div>
 			</div>
 		</div>
-		<div id="pane2" class="tab-pane">
-			<div class="tabbable row klarnacheckout-admin">
-				<div class="col-lg-12 tab-content">
-					<div class="sidebar col-lg-2">
-						<ul class="nav nav-tabs">
-							<li class="nav-item"><a href="javascript:;" title="{l s='General settings' mod='klarnaofficial'}" data-panel="2" data-fieldset="0"><i class="icon-AdminAdmin"></i>{l s='General settings' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="2" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="2" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="2" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Denmark' mod='klarnaofficial'}" data-panel="2" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Denmark' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="2" data-fieldset="5"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Netherlands' mod='klarnaofficial'}" data-panel="2" data-fieldset="6"><i class="icon-AdminParentLocalization"></i>{l s='Netherlands' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="2" data-fieldset="7"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
-						</ul>
-					</div>
-					<div id="klarnacheckout-admin" class="col-lg-10">
-						{$kpmform}
-					</div>
-				</div>
-			</div>
-		</div>
+
 		<div id="pane3" class="tab-pane">
 			<div class="tabbable row klarnacheckout-admin">
 				<div class="col-lg-12 tab-content">
@@ -228,9 +200,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div id="pane4" class="tab-pane">
-			{$pclasslist}
 		</div>
 		
 		<div id="pane5" class="tab-pane">

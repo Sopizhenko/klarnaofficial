@@ -47,23 +47,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'klarna_errors` (
 		  PRIMARY KEY (`id`)
 		)
 		ENGINE = '._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
-
-$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'kpmpclasses` (
-                `eid` int(10) unsigned NOT NULL,
-                `id` int(10) unsigned NOT NULL,
-                `type` tinyint(4) NOT NULL,
-                `description` varchar(255) NOT NULL,
-                `months` int(11) NOT NULL,
-                `interestrate` decimal(11,2) NOT NULL,
-                `invoicefee` decimal(11,2) NOT NULL,
-                `startfee` decimal(11,2) NOT NULL,
-                `minamount` decimal(11,2) NOT NULL,
-                `country` int(11) NOT NULL,
-                `expire` varchar(20) NOT NULL,
-                KEY `id` (`id`)
-            )
-            ENGINE = '._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
-            
+  
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'klarna_checkbox` (
 		  `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
 		  `id_cart` INTEGER UNSIGNED NOT NULL,

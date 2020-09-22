@@ -40,12 +40,11 @@
 		</div>
 	</div>
 </div>
-{if $show_kpm_warning || $show_kco_v2_warning}
+{if $show_kco_v2_warning}
 <div class="row">
 	<div class="col-lg-7">
 		<div class="panel">
 			<div class="panel-heading">{l s='Klarna' mod='klarnaofficial'}</div>
-            {if $show_kpm_warning}<div class="alert alert-danger">{l s='It seems you are using Klarna KPM services, this service will be discontinued at the end of September 2020.' mod='klarnaofficial'}</div>{/if}
             {if $show_kco_v2_warning}<div class="alert alert-danger">{l s='It seems you are using Klarna KCO V2, this service will be discontinued at the end of October 2020.' mod='klarnaofficial'}</div>{/if}
             <div>
             <a href="https://www.klarna.com/international/business/migration-faq/" target="_blank">{l s='More information can be found here https://www.klarna.com/international/business/migration-faq/.' mod='klarnaofficial'}</a>
