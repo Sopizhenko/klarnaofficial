@@ -46,7 +46,7 @@ function upgrade_module_2_1_35($module)
     foreach($kpm_settings as $kpm_setting) {
         @Configuration::deleteByName($kpm_setting);
     }
-    
+    $sql = array();
     $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'kpmpclasses`';
     foreach ($sql as $query) {
         @Db::getInstance()->execute($query);
