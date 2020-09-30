@@ -43,7 +43,7 @@ function upgrade_module_2_1_35($module)
         'KPM_SV_SECRET',
         'KPM_SV_EID'
     );
-    foreach($kpm_settings as $kpm_setting) {
+    foreach ($kpm_settings as $kpm_setting) {
         @Configuration::deleteByName($kpm_setting);
     }
     $sql = array();
