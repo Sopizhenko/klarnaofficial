@@ -113,10 +113,10 @@ function upgrade_module_1_9_56($module)
         'KPM_SV_SECRET',
         'KPM_SV_EID'
     );
-    foreach($kpm_settings as $kpm_setting) {
+    foreach ($kpm_settings as $kpm_setting) {
         @Configuration::deleteByName($kpm_setting);
     }
-    
+    $sql = array();
     $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'kpmpclasses`';
     foreach ($sql as $query) {
         @Db::getInstance()->execute($query);
