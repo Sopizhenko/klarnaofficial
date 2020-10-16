@@ -23,7 +23,7 @@ class CartController extends CartControllerCore
     public function initContent()
     {
         if ($this->context->cart->checkQuantities()) {
-            if ((int)Configuration::get('KCO_IS_ACTIVE') &&
+            if ((int)Configuration::get('KCOV3') &&
                 Tools::getValue('action') === 'show' &&
                 (int)Tools::getValue('ajax') !== 1 &&
                 (int)Tools::getValue('update') !== 1 &&

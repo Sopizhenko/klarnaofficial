@@ -19,20 +19,11 @@
 
 
 <div class="klarna-banners">
-{if $showbanner || $showbanner1}
+{if $showbanner1}
 	<section class="col-xs-12 col-md-6 banner banner--klarna{if $showbanner1}2{/if}">
 		<h2 class="banner__title">
-            {if $showbanner1}
-                {l s='Klarna is entering a new world of smoooth.' mod='klarnaofficial'}
-            {else}
                 {l s='Go live with Klarna' mod='klarnaofficial'}
-            {/if}
 		</h2>
-        {if $showbanner1}
-        <p>
-            {l s='The future proof integration is here! We would love for you to join us on the ride, and to do so you need to upgrade your new Klarna integration. You\'ll then always get the latest features Klarna develops!' mod='klarnaofficial'}
-        </p>
-        {else}
             <p>
                 <strong>
                     {l s='You just downloaded our Klarna module. Fantastic!' mod='klarnaofficial'}
@@ -41,14 +32,9 @@
             <p>
                 {l s='To offer your customers the benefit of paying with Klarna, you must first retrieve your credentials. Sign up for a Klarna account and gain access to the Klarna Merchant Portal where you can generate and download your credentials. You\'ll be up an running in no time!' mod='klarnaofficial'}
             </p>
-        {/if}
 		<div style="position:relative;width:100%;">
-			<a class="banner__cta" target="_blank" href="{if $showbanner1}https://hello.klarna.com/product-upgrade.html{else}https://eu.portal.klarna.com/signup/prestashop?country={$country|escape:'htmlall':'UTF-8'}&platformVersion={$platformVersion|escape:'htmlall':'UTF-8'}&plugin={$plugin|escape:'htmlall':'UTF-8'}&pluginVersion={$pluginVersion|escape:'htmlall':'UTF-8'}{/if}">
-            {if $showbanner1}
-                {l s='Check it out' mod='klarnaofficial'}
-            {else}
+			<a class="banner__cta" target="_blank" href="https://eu.portal.klarna.com/signup/prestashop?country={$country|escape:'htmlall':'UTF-8'}&platformVersion={$platformVersion|escape:'htmlall':'UTF-8'}&plugin={$plugin|escape:'htmlall':'UTF-8'}&pluginVersion={$pluginVersion|escape:'htmlall':'UTF-8'}">
                 {l s='Go live now' mod='klarnaofficial'}
-            {/if}
             </a>
 			<img class="lockup" src="../modules/klarnaofficial/views/img/klarna_lockup_logo.png" />
 		</div>
@@ -116,7 +102,6 @@
 <div class="tabbable">
 	<ul class="nav nav-tabs">
         <li class="active"><a href="#pane7" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V3 (KCO)' mod='klarnaofficial'}</a></li>
-		<li><a href="#pane1" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout V2 (KCO)' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane8" data-toggle="tab"><i class="icon-AdminParentOrders"></i> {l s='Klarna Checkout Common' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane3" data-toggle="tab"><i class="icon-cogs"></i> {l s='Common settings' mod='klarnaofficial'}</a></li>
 		<li><a href="#pane5" data-toggle="tab"><i class="icon-list-alt"></i> {l s='Terms and Conditions' mod='klarnaofficial'}</a></li>
@@ -125,29 +110,7 @@
 	</ul>
 	<div class="panel">
 	<div class="tab-content">
-		<div id="pane1" class="tab-pane">
-        {if $kcov3_is_active}
-            <div class="alert alert-danger">
-                {l s='Klarna V2 and V3 should not be used at the same time!' mod='klarnaofficial'}
-            </div>
-        {/if}
-			<div class="tabbable row klarnacheckout-admin{if $kcov3_is_active} hidden{/if}">
-				<div class="col-lg-12 tab-content">
-					<div class="sidebar col-lg-2">
-						<ul class="nav nav-tabs">							
-							<li class="nav-item"><a href="javascript:;" title="{l s='Sweden' mod='klarnaofficial'}" data-panel="1" data-fieldset="0"><i class="icon-AdminParentLocalization"></i>{l s='Sweden' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Norway' mod='klarnaofficial'}" data-panel="1" data-fieldset="1"><i class="icon-AdminParentLocalization"></i>{l s='Norway' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Finland' mod='klarnaofficial'}" data-panel="1" data-fieldset="2"><i class="icon-AdminParentLocalization"></i>{l s='Finland' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Germany' mod='klarnaofficial'}" data-panel="1" data-fieldset="3"><i class="icon-AdminParentLocalization"></i>{l s='Germany' mod='klarnaofficial'}</a></li>
-							<li class="nav-item"><a href="javascript:;" title="{l s='Austria' mod='klarnaofficial'}" data-panel="1" data-fieldset="4"><i class="icon-AdminParentLocalization"></i>{l s='Austria' mod='klarnaofficial'}</a></li>
-						</ul>
-					</div>
-					<div id="klarnacheckout-admin" class="col-lg-10">
-						{$kcoform nofilter}
-					</div>
-				</div>
-			</div>
-		</div>
+
         
         <div id="pane8" class="tab-pane">
 			<div class="tabbable row klarnacheckout-admin">
