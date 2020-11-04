@@ -22,9 +22,9 @@
         <p class="payment_module">
             <a 
             class="klarnacheckout_account" 
-            href="{$link->getModuleLink('klarnaofficial', 'checkoutklarna')|escape:'html':'UTF-8'}" 
+            href="{$link->getModuleLink('klarnaofficial', 'checkoutklarnakco')|escape:'html':'UTF-8'}" 
             title="{l s='Klarna Checkout' mod='klarnaofficial'}">
-            	<img src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg?width=200" />
+            	<img src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" />
 				{l s='Klarna Checkout' mod='klarnaofficial'}
             </a>
         </p>
