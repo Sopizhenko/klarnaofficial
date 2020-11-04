@@ -29,32 +29,4 @@
     {if $klarnav3_footer_layout == 4}
         <img src="https://cdn.klarna.com/1.0/shared/image/generic/badge/{$kco_footer_locale|escape:'html':'UTF-8'}/checkout/short-white.png?width=312" />
     {/if}
-{else}
-    {if $klarna_footer_layout == 'blue-black' || $klarna_footer_layout == 'white' || $klarna_footer_layout == 'blue+tuv' || $klarna_footer_layout == 'white+tuv'}
-        <div class="klarna-widget klarna-logo-tooltip"
-            data-eid="{$kco_footer_eid|escape:'html':'UTF-8'}"
-            data-locale="{$kco_footer_locale|escape:'html':'UTF-8'}"
-            data-logo-name="{$klarna_footer_layout|escape:'html':'UTF-8'}"
-            data-logo-width="120">
-        </div>
-    {else}
-        {if ($kco_footer_locale|escape:'html':'UTF-8' == 'nl_nl')}
-            <img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/nl_nl/basic/blue-black.png?width=100" />
-        {elseif ($kco_footer_locale|escape:'html':'UTF-8' == 'da_dk')}
-            <div class="klarna-widget klarna-logo-tooltip"
-                data-eid="{$kco_footer_eid|escape:'html':'UTF-8'}"
-                data-locale="da_dk"
-                data-logo-name="blue-black"
-                data-logo-width="120">
-            </div>
-        {else}
-            <div class="klarna-widget klarna-{if $kco_footer_active}badge{else}logo{/if}-tooltip"
-                data-eid="{$kco_footer_eid|escape:'html':'UTF-8'}"
-                data-locale="{$kco_footer_locale|escape:'html':'UTF-8'}"
-                data-badge-name="{$klarna_footer_layout|escape:'html':'UTF-8'}"
-                data-badge-width="385">
-            </div>
-        {/if}
-    {/if}
-    <script async src="https://cdn.klarna.com/1.0/code/client/all.js"></script>
 {/if}

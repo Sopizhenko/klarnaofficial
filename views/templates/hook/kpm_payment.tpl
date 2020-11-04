@@ -16,26 +16,7 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of Prestaworks AB
 *}
-{if $KPM_SHOW_IN_PAYMENTS}
-    {if $hide_invoicepayment == false || $hide_partpayment == false}
-        <div class="row">
-            <div class="col-xs-12 col-md-12">
-                <p class="payment_module">
-                    <a 
-                    class="klarnacheckout_account" 
-                    href="{$link->getModuleLink('klarnaofficial', 'kpmpartpayment')|escape:'html':'UTF-8'}" 
-                    title="{l s='Pay by Invoice / Partpayment' mod='klarnaofficial'}">
-                        <img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/{$KPM_LOGO_ISO_CODE|escape:'htmlall':'UTF-8'}/basic/{$KPM_LOGO|escape:'htmlall':'UTF-8'}.png?width=200" />
-                        {if $hide_invoicepayment}{l s='Pay by Partpayment' mod='klarnaofficial'}{/if}
-                        {if $hide_partpayment}{l s='Pay by Invoice' mod='klarnaofficial'}{/if}
-                        {if !$hide_partpayment && !$hide_invoicepayment}{l s='Pay by Invoice / Partpayment' mod='klarnaofficial'}{/if}
-                    </a>
-                </p>
-            </div>
-        </div>
-    {/if}
-{/if}
-{if $KCO_SHOW_IN_PAYMENTS}
+
 <div class="row">
 	<div class="col-xs-12 col-md-12">
         <p class="payment_module">
@@ -43,10 +24,9 @@
             class="klarnacheckout_account" 
             href="{$link->getModuleLink('klarnaofficial', 'checkoutklarna')|escape:'html':'UTF-8'}" 
             title="{l s='Klarna Checkout' mod='klarnaofficial'}">
-            	<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/{$KPM_LOGO_ISO_CODE|escape:'htmlall':'UTF-8'}/basic/{$KPM_LOGO|escape:'htmlall':'UTF-8'}.png?width=200" />
+            	<img src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg?width=200" />
 				{l s='Klarna Checkout' mod='klarnaofficial'}
             </a>
         </p>
     </div>
 </div>
-{/if}

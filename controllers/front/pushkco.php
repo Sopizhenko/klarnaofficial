@@ -186,11 +186,18 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                     $shipping_country_id = Country::getByIso($shipping_iso);
                     $invocie_country_id = Country::getByIso($invocie_iso);
 
+                    if (!isset($billing['street_address2'])) {
+                        $billing['street_address2'] = "";
+                    }
+                    if (!isset($shipping['street_address2'])) {
+                        $shipping['street_address2'] = "";
+                    }
+                                
                     if (!isset($shipping['care_of'])) {
-                        $shipping['care_of'] = "";
+                        $shipping['care_of'] = $shipping['street_address2'];
                     }
                     if (!isset($billing['care_of'])) {
-                        $billing['care_of'] = "";
+                        $billing['care_of'] = $billing['street_address2'];
                     }
                     if (!isset($billing['organization_name'])) {
                         $billing['organization_name'] = "";
