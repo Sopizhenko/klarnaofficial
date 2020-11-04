@@ -147,7 +147,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.0';
+        $this->version = '2.2.1';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -2188,12 +2188,20 @@ class KlarnaOfficial extends PaymentModule
         $shipping_country_id = Country::getByIso($shipping_iso);
         $invocie_country_id = Country::getByIso($invocie_iso);
 
+        if (!isset($billing['street_address2'])) {
+            $billing['street_address2'] = "";
+        }
+        if (!isset($shipping['street_address2'])) {
+            $shipping['street_address2'] = "";
+        }
+                    
         if (!isset($shipping['care_of'])) {
-            $shipping['care_of'] = "";
+            $shipping['care_of'] = $shipping['street_address2'];
         }
         if (!isset($billing['care_of'])) {
-            $billing['care_of'] = "";
+            $billing['care_of'] = $billing['street_address2'];
         }
+        
         if (!isset($shipping['organization_name'])) {
             $shipping['organization_name'] = "";
         }
