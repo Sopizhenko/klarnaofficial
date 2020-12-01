@@ -147,7 +147,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.1';
+        $this->version = '2.2.2';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -3133,6 +3133,12 @@ class KlarnaOfficial extends PaymentModule
             return round($value * $multiplier, $scale);
         }
     }
+    
+    public function getAttachment()
+    {
+        return false;
+    }
+    
     public function getKlarnaCountryInformation($currency_iso_code, $language_iso_code)
     {
         if (!Configuration::get('KCOV3')) {

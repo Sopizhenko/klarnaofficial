@@ -290,6 +290,13 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         $create['options']['allow_separate_shipping_address'] = (bool) Configuration::get('KCO_ALLOWSEPADDR');
                         $create['options']['phone_mandatory'] = (bool) Configuration::get('KCO_FORCEPHONE');
                         
+                        $attachment = $this->module->getAttachment();
+                        
+                        if (false !== $attachment) {
+                            $create['attachment']['body'] = $attachment;
+                            $create['attachment']['content_type'] = 'application/vnd.klarna.internal.emd-v2+json';
+                        }
+                        
                         if (Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_ACTIVE')) {
                             if (1 == (int) Configuration::get('KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL')) {
                                 $KCOV3_EXTERNAL_PAYMENT_METHOD_LABEL = 'continue';
