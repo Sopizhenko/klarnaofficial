@@ -85,19 +85,16 @@ function upgrade_module_2_2_0($module)
     } catch (Exception $e) {
         /*REMOVAL IS NOT ESSENTIAL*/
     }
-    
     /*TRY TO REMOVE UNWANTED FILES*/
     try {
         rrmdir(dirname(__FILE__). '/../libraries/lib');
     } catch (Exception $e) {
         /*REMOVAL IS NOT ESSENTIAL*/
-        return true;
     }
     try {
         rrmdir(dirname(__FILE__). '/../libraries/Checkout');
     } catch (Exception $e) {
         /*REMOVAL IS NOT ESSENTIAL*/
-        return true;
     }
     
     $sql = "SELECT `id_hook` FROM `"._DB_PREFIX_."hook` WHERE `name` = 'displayFooter'";
