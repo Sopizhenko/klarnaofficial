@@ -22,13 +22,7 @@ $(document).ready(function()
       'updateCart',
       function (event) {
           if (event.reason != "KCOorderChange") {
-            
-            if(isv3) {
                 updateKCOV3();
-            } else {
-                showLoaderImg();
-                updateKCOV2();
-            }
           }
       }
     );
@@ -61,11 +55,6 @@ $(document).ready(function(){
     });
 });
 
-function showLoaderImg()
-{
-    $("#checkoutdiv").html('');
-}
-
 function updateKCOV3()
 {
     window._klarnaCheckout(function (api) {
@@ -79,6 +68,9 @@ function updateKCOV3()
 		data: 'kco_update=1',
 		success: function(jsonData)
 		{
+            if ('error' == jsonData) {
+                location.href = kcocarturl;
+            }
 			window._klarnaCheckout(function (api) {
               api.resume();
             });
@@ -87,22 +79,4 @@ function updateKCOV3()
 			alert(jsonData);
 		}
     });
-}
-
-function updateKCOV2()
-{
-	$.ajax({
-		type: 'GET',
-		url: kcourl,
-		async: false,
-		cache: false,
-		data: 'kco_update=1',
-		success: function(jsonData)
-		{
-			$("#checkoutdiv").html(jsonData);
-		},
-		error: function(XMLHttpRequest, textStatus, errorThrown) {
-			alert(jsonData);
-		}
-		});
 }

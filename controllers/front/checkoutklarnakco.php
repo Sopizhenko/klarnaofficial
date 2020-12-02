@@ -32,8 +32,10 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
     public function setMedia()
     {
         parent::setMedia();
-        $this->context->controller->addCSS(_MODULE_DIR_.'klarnaofficial/views/css/klarnacheckout.css', 'all');
-        $this->addJS(_MODULE_DIR_.'klarnaofficial/views/js/klarna_checkout.js');
+        $this->registerStylesheet('module-klarnaofficial-klarnacheckout', 'modules/klarnaofficial/views/css/klarnacheckout.css', array('media' => 'all', 'priority' => 40));
+        $this->registerJavascript('module-klarnaofficial-klarnacheckout','modules/klarnaofficial/views/js/klarna_checkout.js', array('position' => 'bottom', 'priority' => 80));
+        $original_cart_url = $this->context->link->getPageLink('order');
+        Media::addJsDef(array('kcocarturl' => $original_cart_url));
     }
 
     public function postProcess()
@@ -128,9 +130,17 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
         
         if (Tools::getIsset('kco_update') and Tools::getValue('kco_update') == '1') {
             if (!$this->context->cart->checkQuantities()) {
+                echo 'error';
                 die;
             }
             if ($this->context->cart->nbProducts() < 1) {
+                echo 'error';
+                die;
+            }
+            $currency = new Currency($this->context->cart->id_currency);
+            $minimal_purchase = Tools::convertPrice((float)Configuration::get('PS_PURCHASE_MINIMUM'), $currency);
+            if ($this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS) < $minimal_purchase) {
+                echo 'error';
                 die;
             }
         }
