@@ -36,15 +36,6 @@ class KlarnaOfficial extends PaymentModule
         'sidebar-promotion-auto-size',
     );
     
-    public static $OSM_VALID_COUNTRY_CURRENCY_COMBINATION = array(
-        'SE' => 'SEK',
-        'DK' => 'DKK',
-        'GB' => 'GBP',
-        'NO' => 'NOK',
-        'US' => 'USD',
-        'CH' => 'CHF'
-    );
-    
     public $shippingreferences = array(
         'sv' => 'Frakt',
         'da' => 'Fragt',
@@ -146,7 +137,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.0';
+        $this->version = '1.10.1';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -1694,10 +1685,19 @@ class KlarnaOfficial extends PaymentModule
     public static function isValidCountryCurrencyOSM()
     {
         $countryIsoCode = Context::getContext()->country->iso_code;
-
+        
+        $OSM_VALID_COUNTRY_CURRENCY_COMBINATION = array(
+            'SE' => 'SEK',
+            'DK' => 'DKK',
+            'GB' => 'GBP',
+            'NO' => 'NOK',
+            'US' => 'USD',
+            'CH' => 'CHF'
+        );
+    
         // Check if country+currency matches any of the non-EUR cases defined in the constant, else should be EUR
-        if (isset(self::$OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode])) {
-            $defaultCurrency = self::OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode];
+        if (isset($OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode])) {
+            $defaultCurrency = $OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode];
 
             if ($defaultCurrency === Context::getContext()->currency->iso_code) {
                 return true;
