@@ -95,13 +95,13 @@ function upgrade_module_1_10_0($module)
     
     /*TRY TO REMOVE UNWANTED FILES*/
     try {
-        rrmdir(dirname(__FILE__). '/../libraries/lib');
+        rrmdir1_10_0(dirname(__FILE__). '/../libraries/lib');
     } catch (Exception $e) {
         /*REMOVAL IS NOT ESSENTIAL*/
         return true;
     }
     try {
-        rrmdir(dirname(__FILE__). '/../libraries/Checkout');
+        rrmdir1_10_0(dirname(__FILE__). '/../libraries/Checkout');
     } catch (Exception $e) {
         /*REMOVAL IS NOT ESSENTIAL*/
         return true;
@@ -115,14 +115,14 @@ function upgrade_module_1_10_0($module)
     return true;
 }
 
-function rrmdir($dir)
+function rrmdir1_10_0($dir)
 {
     if (is_dir($dir)) {
         $objects = scandir($dir);
         foreach ($objects as $object) {
             if ($object != "." && $object != "..") {
                 if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
-                    rrmdir($dir. DIRECTORY_SEPARATOR .$object);
+                    rrmdir1_10_0($dir. DIRECTORY_SEPARATOR .$object);
                 } else {
                     unlink($dir. DIRECTORY_SEPARATOR .$object);
                 }
