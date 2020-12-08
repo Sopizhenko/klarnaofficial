@@ -137,7 +137,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.1';
+        $this->version = '1.10.2';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -341,7 +341,7 @@ class KlarnaOfficial extends PaymentModule
                         }
                     }
                     if ($has_custom_text) {
-                        $_POST[$param] = Tools::jsonEncode($texts);
+                        $_POST[$param] = json_encode($texts, JSON_UNESCAPED_UNICODE);
                     }
                 }
                 
