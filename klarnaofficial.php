@@ -147,7 +147,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.4';
+        $this->version = '2.2.3';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -1902,29 +1902,6 @@ class KlarnaOfficial extends PaymentModule
         $this->context->smarty->assign('klarnacheckout_risk_status', $klarna_orderinfo['risk_status']);
         $this->context->smarty->assign('klarnacheckout_eid', $klarna_orderinfo['eid']);
         $this->context->smarty->assign('klarna_errors', $klarna_errors);
-        if (Tools::strlen($klarna_orderinfo['invoicenumber']) > 0) {
-            $invoice_number = $klarna_orderinfo['invoicenumber'];
-            $eid = $klarna_orderinfo['eid'];
-            $eid_ss_comb = $this->getAllEIDSScombinations($order->id_shop);
-            $shared_secret = $eid_ss_comb[$eid];
-            $digest_secret = "$eid:$invoice_number:$shared_secret";
-            $digest_secret = hash("sha512", $digest_secret);
-            $digest_secret = pack('H*', $digest_secret);
-            $digest_secret = base64_encode($digest_secret);
-            $digest_secret = urlencode($digest_secret);
-            $invoice_download_link = "https://online.klarna.com/invoices/$invoice_number.pdf?secret=$digest_secret";
-            $this->context->smarty->assign('invoice_download_link', $invoice_download_link);
-        }
-        
-        /*LEGACY WARNINGS*/
-        $KCO_IS_ACTIVE = Configuration::get('KCO_IS_ACTIVE', null, null, $order->id_shop);
-        $KCOV3 = Configuration::get('KCOV3', null, null, $order->id_shop);
-        $show_kco_v2_warning = false;
-        if (true == $KCO_IS_ACTIVE && false == $KCOV3) {
-            $show_kco_v2_warning = true;
-        }
-        $this->context->smarty->assign('show_kco_v2_warning', $show_kco_v2_warning);
-        /*LEGACY WARNINGS*/
         
         return $this->display(__FILE__, 'klarnaofficial_adminorder.tpl');
     }

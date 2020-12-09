@@ -32,7 +32,6 @@
 				{l s='Risk status' mod='klarnaofficial'}: {$klarnacheckout_risk_status|escape:'html':'UTF-8'}<br />
 				</span>
                 {if $klarnacheckout_risk_status == 'Pending'}<a href="../modules/klarnaofficial/checkpendingorders.php" target="_blank">{l s='Check Pending status' mod='klarnaofficial'}</a>{/if}
-                {if isset($invoice_download_link)}<a href="{$invoice_download_link|escape:'html':'UTF-8'}" target="_blank">{l s='Download PDF' mod='klarnaofficial'}</a>{/if}
 			</div>
 			{foreach from=$klarna_errors item=klarna_error}
 				<div class="alert alert-danger"><p>{$klarna_error.error_message|escape:'html':'UTF-8'}</p></div>
