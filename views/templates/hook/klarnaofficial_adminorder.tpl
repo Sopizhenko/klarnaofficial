@@ -17,10 +17,10 @@
 *  International Registered Trademark & Property of Prestaworks AB
 *}
 <div class="row">
-	<div class="col-lg-7">
-		<div class="panel">
-			<div class="panel-heading">{l s='Klarna' mod='klarnaofficial'}</div>
-			<div>
+	<div class="col-md-4">
+		<div class="panel card">
+			<div class="card-header"><h3 class="card-header-title">{l s='Klarna' mod='klarnaofficial'}</h3></div>
+			<div class="card-body">
 				{*{l s='Social security number' mod='klarnaofficial'}: {$klarnacheckout_ssn|escape:'html':'UTF-8'}<br />*}
 				{if (isset($klarna_checkbox_info.text_at_time_of_purchase))}
                     {l s='Custom checkbox' mod='klarnaofficial'}:{if ($klarna_checkbox_info.checked)}{l s='True' mod='klarnaofficial'}{else}{l s='False' mod='klarnaofficial'}{/if}
@@ -35,7 +35,7 @@
                 {if isset($invoice_download_link)}<a href="{$invoice_download_link|escape:'html':'UTF-8'}" target="_blank">{l s='Download PDF' mod='klarnaofficial'}</a>{/if}
 			</div>
 			{foreach from=$klarna_errors item=klarna_error}
-				<div class="alert alert-danger">{$klarna_error.error_message|escape:'html':'UTF-8'}</div>
+				<div class="alert alert-danger"><p>{$klarna_error.error_message|escape:'html':'UTF-8'}</p></div>
 			{/foreach}
 		</div>
 	</div>
