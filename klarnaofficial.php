@@ -137,7 +137,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.2';
+        $this->version = '1.10.3';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -689,7 +689,7 @@ class KlarnaOfficial extends PaymentModule
                 array(
                     'type' => 'select',
                     'label' => $this->l('Activate order status'),
-                    'name' => 'KCO_ACTIVATE_STATE',
+                    'name' => 'KCO_ACTIVATE_STATE[]',
                     'multiple' => true,
                     'desc' => $this->l('Activate order will be sent to klarna when this order status is set.'),
                     'options' => array(
@@ -702,7 +702,7 @@ class KlarnaOfficial extends PaymentModule
                 array(
                     'type' => 'select',
                     'label' => $this->l('Cancel reservation status'),
-                    'name' => 'KCO_CANCEL_STATE',
+                    'name' => 'KCO_CANCEL_STATE[]',
                     'multiple' => true,
                     'desc' => $this->l('Cancel order will be sent to klarna when this order status is set.'),
                     'options' => array(
