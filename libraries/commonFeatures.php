@@ -2,7 +2,7 @@
 
 class KlarnaCheckoutCommonFeatures
 {
-    public function BuildCartArray($cart, $shippingReference, $wrappingreference, $wrappingname, $discountname, $isv3 = false) {
+    public function BuildCartArray($cart, $shippingReference, $wrappingreference, $wrappingname, $discountname) {
         $totalCartValue = 0;
         $highest_tax_rate = 0;
         
@@ -23,21 +23,30 @@ class KlarnaCheckoutCommonFeatures
                 $tax_rate = 0;
             }
             
-            if ($isv3) {
-                $rate = $product['rate'];
-                if (0 == $rate) {
-                    $tax_rate = 0;
-                    $tax_value = 0;
-                } else {
-                    $tax_value = $price - ($price / (1+($rate/100)));
-                    $tax_value = ($tax_value * (int) ($product['cart_quantity']));
-                    $tax_value = Tools::ps_round($tax_value,2);
-                }
+            $rate = $product['rate'];
+            if (0 == $rate) {
+                $tax_rate = 0;
+                $tax_value = 0;
+            } else {
+                $tax_value = $price - ($price / (1+($rate/100)));
+                $tax_value = ($tax_value * (int) ($product['cart_quantity']));
+                $tax_value = Tools::ps_round($tax_value,2);
             }
             
             if ($tax_rate > $highest_tax_rate) {
                 $highest_tax_rate = $tax_rate;
             }
+            
+            $depth = round($product['depth'], 0);
+            $height = round($product['height'], 0);
+            $width = round($product['width'], 0);
+            $dimensions['height'] = (int) $height;
+            $dimensions['length'] = (int) $width;
+            $dimensions['depth'] = (int) $depth;
+            $shipping_attributes = array(
+                'weight' => round(($product['weight']*1000), 0),
+                'dimensions' => $dimensions,
+            );
             
             $price = $price * 100;
             $checkoutcart[] = array(
@@ -58,6 +67,7 @@ class KlarnaCheckoutCommonFeatures
                 'tax_rate' => (int) $tax_rate,
                 'total_amount' => (int) ($rowvalue * 100),
                 'total_tax_amount' => (int) ($tax_value * 100),
+                'shipping_attributes' => $shipping_attributes,
             );
         }
         $shipping_cost_with_tax = $cart->getOrderTotal(true, Cart::ONLY_SHIPPING, null, $cart->id_carrier, false);
@@ -128,76 +138,38 @@ class KlarnaCheckoutCommonFeatures
         }
 
         //DISCOUNTS
-        if ($isv3) {
-            $rules = $cart->getCartRules(CartRule::FILTER_ACTION_ALL, false);
-            foreach($rules as $rule) {
-                $common_tax_rate = (($rule["value_real"] / $rule["value_tax_exc"]) - 1) * 100;
-                $common_tax_rate = Tools::ps_round($common_tax_rate, 2);
-                $discountname = $rule["name"];
-                $value_real = Tools::ps_round($rule["value_real"], 2);
+        $rules = $cart->getCartRules(CartRule::FILTER_ACTION_ALL, false);
+        foreach($rules as $rule) {
+            $common_tax_rate = (($rule["value_real"] / $rule["value_tax_exc"]) - 1) * 100;
+            $common_tax_rate = Tools::ps_round($common_tax_rate, 2);
+            $discountname = $rule["name"];
+            $value_real = Tools::ps_round($rule["value_real"], 2);
 
-                if ($value_real > 0) {
-                    $tax_value = $value_real - ($value_real / (1+($common_tax_rate/100)));
-                    $tax_value = Tools::ps_round($tax_value, 2);
-                } else {
-                    $tax_value = 0;
-                }
-                
-                if ($highest_tax_rate == 0) {
-                    $tax_value = 0;
-                    $common_tax_rate = 0;
-                }
-                if ($value_real > 0) {
-                    $checkoutcart[] = array(
-                        'type' => 'discount',
-                        'reference' => '',
-                        'name' => $discountname,
-                        'quantity' => 1,
-                        'unit_price' => (int) (-($value_real * 100)),
-                        'tax_rate' => (int) ($common_tax_rate * 100),
-                        'total_amount' => (int) (-($value_real * 100)),
-                        'total_tax_amount' => (int) (-($tax_value * 100)),
-                    );                    
-                }
+            if ($value_real > 0) {
+                $tax_value = $value_real - ($value_real / (1+($common_tax_rate/100)));
+                $tax_value = Tools::ps_round($tax_value, 2);
+            } else {
+                $tax_value = 0;
             }
-        } else {
-            $totalDiscounts = $cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
-            if ($totalDiscounts > 0) {
-                if ($totalDiscounts > $totalCartValue) {
-                    //Free order
-                    $totalCartValue = $cart->getOrderTotal(true, Cart::BOTH);
-                    $totalCartValue_tax_excl = $cart->getOrderTotal(false, Cart::BOTH);
-                    $common_tax_rate = (($totalCartValue / $totalCartValue_tax_excl) - 1) * 100;
-                    $common_tax_value = ($totalCartValue - $totalCartValue_tax_excl);
-                    $checkoutcart[] = array(
-                        'type' => 'discount',
-                        'reference' => '',
-                        'name' => $discountname,
-                        'quantity' => 1,
-                        'unit_price' => -($totalCartValue * 100),
-                        'tax_rate' => (int) ($common_tax_rate * 100),
-                        'total_amount' => (int) (-($totalCartValue * 100)),
-                        'total_tax_amount' => -(int) ($common_tax_value * 100),
-                    );
-                } else {
-                    $totalDiscounts_tax_excl = $cart->getOrderTotal(false, Cart::ONLY_DISCOUNTS);
-                    $common_tax_rate = (($totalDiscounts / $totalDiscounts_tax_excl) - 1) * 100;
-                    $common_tax_rate = Tools::ps_round($common_tax_rate, 0);
-                    $common_tax_value = ($totalDiscounts - $totalDiscounts_tax_excl);
-
-                    $checkoutcart[] = array(
-                        'type' => 'discount',
-                        'reference' => '',
-                        'name' => $discountname,
-                        'quantity' => 1,
-                        'unit_price' => (string) (-number_format(($totalDiscounts * 100), 2, '.', '')),
-                        'tax_rate' => (int) ($common_tax_rate * 100),
-                        'total_amount' => (string)(-number_format(($totalDiscounts * 100), 2, '.', '')),
-                        'total_tax_amount' => (string)(-(int) ($common_tax_value * 100)),
-                    );
-                }
+            
+            if ($highest_tax_rate == 0) {
+                $tax_value = 0;
+                $common_tax_rate = 0;
+            }
+            if ($value_real > 0) {
+                $checkoutcart[] = array(
+                    'type' => 'discount',
+                    'reference' => '',
+                    'name' => $discountname,
+                    'quantity' => 1,
+                    'unit_price' => (int) (-($value_real * 100)),
+                    'tax_rate' => (int) ($common_tax_rate * 100),
+                    'total_amount' => (int) (-($value_real * 100)),
+                    'total_tax_amount' => (int) (-($tax_value * 100)),
+                );                    
             }
         }
+        
         return $checkoutcart;
     }
 

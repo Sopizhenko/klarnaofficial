@@ -215,8 +215,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                     $shippingReference,
                     $wrappingreference,
                     $this->module->getL('Inslagning'),
-                    $this->module->getL('Discount'),
-                    true
+                    $this->module->getL('Discount')
                 );
                 
                 $callbackPage = $this->context->link->getModuleLink(

@@ -29,11 +29,10 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnaorder = Tools::jsonDecode($klarnadata, true);
         
-        $isV3 = false;
+
         if (isset($klarnaorder["merchant_reference2"])) {
             //This is a KCO V3 ORDER
             //Convert Data
-            $isV3 = true;
             $klarnaorder["merchant_reference"]["orderid2"] = $klarnaorder["merchant_reference2"];
             $klarnaorder["cart"]["items"] = $klarnaorder["order_lines"];
         }
@@ -80,8 +79,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
                         $shippingReference,
                         $wrappingreference,
                         $this->module->getL('Inslagning'),
-                        $this->module->getL('Discount'),
-                        $isV3
+                        $this->module->getL('Discount')
                     );
                     foreach ($klarnaorder["cart"]["items"] as $klarnakey => $itemInKlarna) {
                         foreach ($checkoutcart as $pskey => $itemInPrestashop) {

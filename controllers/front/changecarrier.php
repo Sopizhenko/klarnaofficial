@@ -90,8 +90,7 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
             $shippingReference,
             $wrappingreference,
             $this->module->l('Wrapping', 'KlarnaOfficialChangeCarrierModuleFrontController'),
-            $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController'),
-            true
+            $this->module->l('Discount', 'KlarnaOfficialChangeCarrierModuleFrontController')
         );
         $klarnadata->order_lines = $order_lines;
         $totalCartValue = $cart->getOrderTotal(true, Cart::BOTH, null, $cart->id_carrier, false);
