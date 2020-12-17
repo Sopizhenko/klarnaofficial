@@ -35,7 +35,7 @@ class KlarnaOfficial extends PaymentModule
         'homepage-promotion-tall',
         'sidebar-promotion-auto-size',
     );
-    
+
     public $shippingreferences = array(
         'sv' => 'Frakt',
         'da' => 'Fragt',
@@ -137,7 +137,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.3';
+        $this->version = '1.10.4';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -1694,7 +1694,7 @@ class KlarnaOfficial extends PaymentModule
             'US' => 'USD',
             'CH' => 'CHF'
         );
-    
+
         // Check if country+currency matches any of the non-EUR cases defined in the constant, else should be EUR
         if (isset($OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode])) {
             $defaultCurrency = $OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode];
@@ -2835,6 +2835,11 @@ class KlarnaOfficial extends PaymentModule
             );
         }
         
+        return false;
+    }
+    
+    public function getAttachment()
+    {
         return false;
     }
 }
