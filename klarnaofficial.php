@@ -137,7 +137,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.4';
+        $this->version = '1.10.5';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -2051,27 +2051,6 @@ class KlarnaOfficial extends PaymentModule
                                 (int) $params['id_order'];
                                 Db::getInstance()->execute($sql);
                             }
-                        } else {
-                            $k = $this->initKlarnaAPI($eid, $shared_secret, $countryIso, $languageIso, $currencyIso);
-                            if ($invoice_number != '') {
-                                $result = $k->creditInvoice("$invoice_number");
-                            } else {
-                                $result = $k->cancelReservation("$reservation_number");
-                            }
-                            //$invoice_number = '';
-                            $risk_status = '';
-
-                            if ($invoice_number != '') {
-                                $sql = 'UPDATE `'._DB_PREFIX_.
-                                "klarna_orders` SET risk_status='credit' WHERE id_order=".
-                                (int) $params['id_order'];
-                                Db::getInstance()->execute($sql);
-                            } else {
-                                $sql = 'UPDATE `'._DB_PREFIX_.
-                                "klarna_orders` SET risk_status='cancel' WHERE id_order=".
-                                (int) $params['id_order'];
-                                Db::getInstance()->execute($sql);
-                            }
                         }
                     } catch (Exception $e) {
                         $this->storemessageonorder((int) $params['id_order'], $e->getMessage());
@@ -2152,93 +2131,6 @@ class KlarnaOfficial extends PaymentModule
         $sql = 'INSERT INTO `'._DB_PREFIX_.
         "klarna_errors` (`id_order`, `error_message`) VALUES($id_order, '$message');";
         Db::getInstance()->execute($sql);
-    }
-
-    public function initKlarnaAPI($eid, $sharedSecret, $countryIso, $languageIso, $currencyIso, $id_shop = null)
-    {
-        require_once dirname(__FILE__).'/libraries/lib/Klarna.php';
-        require_once dirname(__FILE__).'/libraries/lib/transport/xmlrpc-3.0.0.beta/lib/xmlrpc.inc';
-        require_once dirname(__FILE__).'/libraries/lib/transport/xmlrpc-3.0.0.beta/lib/xmlrpc_wrappers.inc';
-
-        if ($countryIso == 'se') {
-            $klarna_country = KlarnaCountry::SE;
-        } elseif ($countryIso == 'no') {
-            $klarna_country = KlarnaCountry::NO;
-        } elseif ($countryIso == 'de') {
-            $klarna_country = KlarnaCountry::DE;
-        } elseif ($countryIso == 'da' || $countryIso == 'dk') {
-            $klarna_country = KlarnaCountry::DK;
-        } elseif ($countryIso == 'fi') {
-            $klarna_country = KlarnaCountry::FI;
-        } elseif ($countryIso == 'nl') {
-            $klarna_country = KlarnaCountry::NL;
-        } elseif ($countryIso == 'at') {
-            $klarna_country = KlarnaCountry::AT;
-        } else {
-            $klarna_country = "";
-        }
-
-        if ($currencyIso == 'sek') {
-            $klarna_currency = KlarnaCurrency::SEK;
-        } elseif ($currencyIso == 'nok') {
-            $klarna_currency = KlarnaCurrency::NOK;
-        } elseif ($currencyIso == 'eur') {
-            $klarna_currency = KlarnaCurrency::EUR;
-        } elseif ($currencyIso == 'dkk') {
-            $klarna_currency = KlarnaCurrency::DKK;
-        } else {
-            $klarna_currency = "";
-        }
-
-        if ($languageIso == 'sv') {
-            $klarna_lang = KlarnaLanguage::SV;
-        } elseif ($languageIso == 'no' || $languageIso == 'nb' || $languageIso == 'nn') {
-            $klarna_lang = KlarnaLanguage::NB;
-        } elseif ($languageIso == 'de') {
-            $klarna_lang = KlarnaLanguage::DE;
-        } elseif ($languageIso == 'da') {
-            $klarna_lang = KlarnaLanguage::DA;
-        } elseif ($languageIso == 'fi') {
-            $klarna_lang = KlarnaLanguage::FI;
-        } elseif ($languageIso == 'nl') {
-            $klarna_lang = KlarnaLanguage::NL;
-        } elseif ($languageIso == 'en') {
-            $klarna_lang = KlarnaLanguage::EN;
-        } else {
-            $klarna_lang = "";
-        }
-
-        if ($id_shop == null) {
-            $id_shop = $this->context->shop->id;
-        }
-
-        if (Configuration::get('KCO_TESTMODE', null, null, $id_shop)) {
-            $server = Klarna::BETA;
-        } else {
-            $server = Klarna::LIVE;
-        }
-        $k = new Klarna();
-
-        $dbsettings = array(
-            'user' => _DB_USER_,
-            'passwd' => _DB_PASSWD_,
-            'dsn' => _DB_SERVER_,
-            'db' => _DB_NAME_,
-            'table' => _DB_PREFIX_.'kpmpclasses',
-          );
-
-        $k->config(
-            $eid,
-            ''.$sharedSecret,
-            $klarna_country,
-            $klarna_lang,
-            $klarna_currency,
-            $server,
-            'mysql',
-            $dbsettings
-        );
-
-        return $k;
     }
 
     public function hookPayment($params)

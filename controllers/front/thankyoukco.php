@@ -101,8 +101,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $shipping = $checkout['shipping_address'];
                     $billing = $checkout['billing_address'];
 
-                    if (!Validate::isEmail($shipping['email'])) {
-                        $shipping['email'] = 'ingen_mejl_'.$id_cart.'@ingendoman.cc';
+                    if (!Validate::isEmail($billing['email'])) {
+                        $billing['email'] = 'ingen_mejl_'.$id_cart.'@ingendoman.cc';
                     }
                     
                     $newsletter = 0;
@@ -124,7 +124,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $cart->id_shop
                     );
         
-                    $id_customer = (int) (Customer::customerExists($shipping['email'], true, true));
+                    $id_customer = (int) (Customer::customerExists($billing['email'], true, true));
                     if ($id_customer > 0) {
                         $customer = new Customer($id_customer);
                         if ($newsletter == 1) {
@@ -136,9 +136,9 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         //add customer
                         $password = Tools::passwdGen(8);
                         $customer = new Customer();
-                        $customer->firstname = $this->module->truncateValue($shipping['given_name'], 32, true);
-                        $customer->lastname = $this->module->truncateValue($shipping['family_name'], 32, true);
-                        $customer->email = $shipping['email'];
+                        $customer->firstname = $this->module->truncateValue($billing['given_name'], 32, true);
+                        $customer->lastname = $this->module->truncateValue($billing['family_name'], 32, true);
+                        $customer->email = $billing['email'];
                         $customer->passwd = Tools::encrypt($password);
                         $customer->is_guest = 0;
                         if (0 == (int) $KCOV3_USEGUESTACCOUNTS) {
