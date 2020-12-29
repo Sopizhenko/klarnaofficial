@@ -147,7 +147,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.5';
+        $this->version = '2.2.6';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -2376,92 +2376,6 @@ class KlarnaOfficial extends PaymentModule
             $cart->resetStaticCache();
         }
         $cart->getDeliveryOptionList(null, true);
-    }
-    
-    public function changeAddressOnCart(
-        $firstname,
-        $lastname,
-        $address1,
-        $address2,
-        $company,
-        $postcode,
-        $city,
-        $old_address,
-        $klarna_phone
-    ) {
-        $customer = new Customer($old_address->id_customer);
-        $delivery_address_id = 0;
-        foreach ($customer->getAddresses($this->context->cart->id_lang) as $address) {
-            if ($address['firstname'] == $firstname and $address['lastname'] == $lastname
-                and $address['city'] == $city
-                and $address['address2'] == $address2
-                and $address['company'] == $company and $address['address1'] == $address1
-                and $address['postcode'] == $postcode and $address['phone_mobile'] == $klarna_phone) {
-                //LOAD SHIPPING ADDRESS
-                    $delivery_address_id = $address['id_address'];
-            }
-        }
-        if ($delivery_address_id == 0) {
-            $new_address = new Address();
-            $new_address->id_customer = $this->context->cart->id_customer;
-            $new_address->firstname = (Tools::strlen($firstname) > 0 ? $firstname : $old_address->firstname);
-            $new_address->lastname = (Tools::strlen($lastname) > 0 ? $lastname : $old_address->lastname);
-            $new_address->address1 = $address1;
-            $new_address->address2 = $address2;
-            $new_address->company = $company;
-            $new_address->postcode = $postcode;
-            $new_address->city = $city;
-            $new_address->phone = $old_address->phone;
-            $new_address->phone_mobile = $klarna_phone;
-            $new_address->id_country = $old_address->id_country;
-            $new_address->alias = 'Klarna';
-            $new_address->add();
-            $this->context->cart->id_address_delivery = $new_address->id;
-            $this->context->cart->id_address_invoice = $new_address->id;
-        } else {
-            $this->context->cart->id_address_delivery = $delivery_address_id;
-            $this->context->cart->id_address_invoice = $delivery_address_id;
-        }
-        Db::getInstance()->Execute(
-            'UPDATE '._DB_PREFIX_.
-            'cart_product SET id_address_delivery='.
-            (int) $this->context->cart->id_address_delivery.
-            ' WHERE id_cart='.(int) $this->context->cart->id
-        );
-        
-        Db::getInstance()->Execute(
-            'UPDATE '._DB_PREFIX_.'customization '.
-            'SET id_address_delivery='.(int) $this->context->cart->id_address_delivery.
-            ' WHERE id_cart='.(int) $this->context->cart->id
-        );
-        
-        $new_delivery_options = array();
-        $new_delivery_options[(int) ($this->context->cart->id_address_delivery)] = $this->context->cart->id_carrier.',';
-        if (version_compare(_PS_VERSION_, '1.7.3.0', '<')) {
-            $new_delivery_options_serialized = serialize($new_delivery_options);
-        } else {
-            $new_delivery_options_serialized = json_encode($new_delivery_options);
-        }
-        
-        $update_sql = 'UPDATE '._DB_PREFIX_.'cart '.
-                'SET delivery_option=\''.
-                pSQL($new_delivery_options_serialized).
-                '\' WHERE id_cart='.
-                (int) $this->context->cart->id;
-        
-        Db::getInstance()->execute($update_sql);
-        
-        if ($this->context->cart->id_carrier > 0) {
-            $this->context->cart->delivery_option = $new_delivery_options_serialized;
-        } else {
-            $this->context->cart->delivery_option = '';
-        }
-        
-        $this->context->cart->update(true);
-        $this->context->cart->getPackageList(true);
-        $this->context->cart->getDeliveryOptionList(null, true);
-        $cache_id = 'objectmodel_cart_'.$this->context->cart->id.'*';
-        Cache::clean($cache_id);
     }
 
     public function getL($key)

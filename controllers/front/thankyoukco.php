@@ -88,8 +88,8 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     $shipping = $checkout['shipping_address'];
                     $billing = $checkout['billing_address'];
 
-                    if (!Validate::isEmail($shipping['email'])) {
-                        $shipping['email'] = 'ingen_mejl_'.$id_cart.'@ingendoman.cc';
+                    if (!Validate::isEmail($billing['email'])) {
+                        $billing['email'] = 'ingen_mejl_'.$id_cart.'@ingendoman.cc';
                     }
                     
                     $newsletter = 0;
@@ -106,7 +106,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     }
 
                     if (0 == (int)$cart->id_customer) {
-                        $id_customer = (int) (Customer::customerExists($shipping['email'], true, true));
+                        $id_customer = (int) (Customer::customerExists($billing['email'], true, true));
                     } else {
                         $id_customer = (int)$cart->id_customer;
                     }
@@ -121,9 +121,9 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                         $id_gender = 9;
                         $date_of_birth = "";
                         $customer = $this->module->createNewCustomer(
-                            $shipping['given_name'],
-                            $shipping['family_name'],
-                            $shipping['email'],
+                            $billing['given_name'],
+                            $billing['family_name'],
+                            $billing['email'],
                             $newsletter,
                             $id_gender,
                             $date_of_birth,
