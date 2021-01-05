@@ -1752,8 +1752,8 @@ class KlarnaOfficial extends PaymentModule
         if ((bool) Configuration::get('KLARNA_ONSITE_MESSAGE')) {
             return $this->displayOnsiteMessagingPlacements('product', $params);
         }
-        
     }
+    
     public function hookFooter($params)
     {
         if (Configuration::get('PS_CATALOG_MODE') || 0 == (int) Configuration::get('KCOV3_FOOTERBANNER')) {
