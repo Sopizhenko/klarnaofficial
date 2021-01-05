@@ -2090,6 +2090,7 @@ class KlarnaOfficial extends PaymentModule
         $newOption->setCallToActionText($this->l('Klarna Checkout'))
         ->setAction($this->context->link->getModuleLink($this->name, 'checkoutklarnakco', array(), true));
 
+        $newOptions = array();
         $newOptions[] = $newOption;
 
         return $newOptions;
@@ -3064,6 +3065,5 @@ class KlarnaOfficial extends PaymentModule
             'purchase_currency' => $currency_iso_code,
             'purchase_country' => $shop_country->iso_code
         );
-
     }
 }

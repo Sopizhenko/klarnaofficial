@@ -33,7 +33,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
     {
         parent::setMedia();
         $this->registerStylesheet('module-klarnaofficial-klarnacheckout', 'modules/klarnaofficial/views/css/klarnacheckout.css', array('media' => 'all', 'priority' => 40));
-        $this->registerJavascript('module-klarnaofficial-klarnacheckout','modules/klarnaofficial/views/js/klarna_checkout.js', array('position' => 'bottom', 'priority' => 80));
+        $this->registerJavascript('module-klarnaofficial-klarnacheckout', 'modules/klarnaofficial/views/js/klarna_checkout.js', array('position' => 'bottom', 'priority' => 80));
         $original_cart_url = $this->context->link->getPageLink('order');
         Media::addJsDef(array('kcocarturl' => $original_cart_url));
     }
