@@ -19,7 +19,6 @@ class AdminKlarnaOsmConfigurationController extends ModuleAdminController
     const OSM_THEME_DEFAULT = 'default';
     const OSM_THEME_DARK = 'dark';
     const OSM_THEME_CUSTOM = '';
-    
     const OSM_PLACEMENTS = [
         'top-strip-promotion-standard',
         'credit-promotion-small',
