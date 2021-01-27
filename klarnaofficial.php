@@ -1618,23 +1618,25 @@ class KlarnaOfficial extends PaymentModule
         $this->context->controller->addJS(($this->_path).'views/js/kco_common.js');
         $kco_checkout_url = $this->context->link->getModuleLink('klarnaofficial', 'checkoutklarnakco', array(), true);
         Media::addJsDef(array('kco_checkout_url' => $kco_checkout_url));
-        if (Tools::getValue('controller') === 'cart' ||
-            Tools::getValue('controller') === 'product' ||
-            Tools::getValue('controller') === 'checkoutklarnakco'
+        
+        if (!(bool) Configuration::get('KLARNA_ONSITE_MESSAGE')) {
+            return;
+        }
+        $controllerName = Tools::getValue('controller');
+        if ($controllerName === 'cart' ||
+            $controllerName === 'product' ||
+            $controllerName === 'checkoutklarnakco'
         ) {
-            if (!(bool) Configuration::get('KLARNA_ONSITE_MESSAGE')) {
-                return;
-            }
             if (!self::isValidCountryCurrencyOSM()) {
                 return;
             }
 
             $this->context->controller->addJS($this->_path.'/views/js/onsite_messaging.js');
-            
             $osmConfig = KlarnaOsmConfiguration::getByCountry((int) $this->context->country->id);
             
             if ((empty($osmConfig)) ||
                 ($controllerName === 'cart' && empty($osmConfig['cart_page'])) ||
+                ($controllerName === 'checkoutklarnakco' && empty($osmConfig['cart_page'])) ||
                 ($controllerName === 'product' && empty($osmConfig['product_page']))
             ) {
                 return;
