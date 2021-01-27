@@ -2967,5 +2967,4 @@ class KlarnaOfficial extends PaymentModule
         );
         return $headers;
     }
-
 }
