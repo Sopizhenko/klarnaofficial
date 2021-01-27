@@ -173,10 +173,9 @@ class KlarnaCheckoutCommonFeatures
         return $checkoutcart;
     }
 
-    public function getFromKlarna($mid, $sharedSecret, $version, $endpoint)
+    public function getFromKlarna($mid, $sharedSecret, $headers, $endpoint)
     {
         $url = $this->getKlarnaUrl(Configuration::get('KCO_TESTMODE')).$endpoint;
-        $headers = $this->getKlarnaHeaders($version);
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
@@ -190,10 +189,9 @@ class KlarnaCheckoutCommonFeatures
         return $contents;
     }
     
-    public function postToKlarna($data, $mid, $sharedSecret, $version, $endpoint, $patch = false)
+    public function postToKlarna($data, $mid, $sharedSecret, $headers, $endpoint, $patch = false)
     {
         $url = $this->getKlarnaUrl(Configuration::get('KCO_TESTMODE')).$endpoint;
-        $headers = $this->getKlarnaHeaders($version);
         $ch = curl_init($url);
         if (true === $patch) {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
@@ -223,12 +221,4 @@ class KlarnaCheckoutCommonFeatures
         return $url;
     }
     
-    public function getKlarnaHeaders($version)
-    {
-        $headers = array(
-            'Content-Type:application/json',
-            'UserAgent:Prestaworks.Klarna.kco_rest_php:prestashop:version:'._PS_VERSION_.':klarnaofficial:version:'.$version
-        );
-        return $headers;
-    }
 }

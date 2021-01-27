@@ -206,6 +206,7 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-12">
+                    <a href="{$linkToOsmConfig}">{l s='Handle OSM options' mod='klarnaofficial'}</a>
 						{$osmform nofilter}
 					</div>
 				</div>
