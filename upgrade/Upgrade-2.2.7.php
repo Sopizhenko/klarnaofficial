@@ -39,4 +39,3 @@ function upgrade_module_2_2_7($module)
     $module->installTabs();
     return true;
 }
-
