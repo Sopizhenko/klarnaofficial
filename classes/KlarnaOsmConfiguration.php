@@ -65,21 +65,18 @@ class KlarnaOsmConfiguration extends ObjectModel
     public function add($auto_date = true, $null_values = false)
     {
         $this->id_shop = Context::getContext()->shop->id;
-
         return parent::add($auto_date, $null_values);
     }
 
     public function save($null_values = false, $auto_date = true)
     {
         $this->id_shop = Context::getContext()->shop->id;
-        
         return parent::add($null_values, $auto_date);
     }
 
     public static function getByCountry($countryId)
     {
         $sql = 'SELECT * FROM '._DB_PREFIX_.self::$definition['table'].' WHERE id_country = '.(int) $countryId.' AND active = 1 AND id_shop = '.(int) Context::getContext()->shop->id;
-
         return Db::getInstance()->getRow($sql);
     }
 }
