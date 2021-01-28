@@ -34,9 +34,8 @@ class KlarnaOfficialNotificationModuleFrontController extends ModuleFrontControl
         $klarna_order_id = pSQL($klarna_result["order_id"]);
         
         $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
-        $version = $this->module->version;
         
-        $klarnaorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/ordermanagement/v1/orders/'.$klarna_order_id);
+        $klarnaorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $this->module->getKlarnaHeaders(), '/ordermanagement/v1/orders/'.$klarna_order_id);
         $klarnaorder = json_decode($klarnaorder, true);
 
         $new_pending_status = 0;

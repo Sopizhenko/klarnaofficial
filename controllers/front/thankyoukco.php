@@ -50,10 +50,9 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
             $sharedSecret = Configuration::get('KCOV3_SECRET');
             require_once dirname(__FILE__).'/../../libraries/commonFeatures.php';
             $KlarnaCheckoutCommonFeatures = new KlarnaCheckoutCommonFeatures();
-            $version = $this->module->version;
             $klarna_order_id = pSQL(Tools::getValue('klarna_order_id'));
-            
-            $checkout = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/checkout/v3/orders/'.$klarna_order_id);
+            $headers = $this->module->getKlarnaHeaders();
+            $checkout = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $headers, '/checkout/v3/orders/'.$klarna_order_id);
             $checkout = json_decode($checkout, true);
             
             $snippet = $checkout['html_snippet'];
@@ -203,10 +202,10 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     );
 
                     $endpoint = '/ordermanagement/v1/orders/'.$reference.'/merchant-references';
-                    $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $version, $endpoint, true);
+                    $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $headers, $endpoint, true);
                     
                     $endpoint = '/ordermanagement/v1/orders/'.$reference.'/acknowledge';
-                    $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $version, $endpoint);
+                    $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $headers, $endpoint);
                     
                     $sql = 'UPDATE `'._DB_PREFIX_.
                         "klarna_orders` SET id_order=".
@@ -218,7 +217,7 @@ class KlarnaOfficialThankYouKcoModuleFrontController extends ModuleFrontControll
                     
                     $result['id_order'] = $this->module->currentOrder;
                     
-                    $klarnaorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $version, '/ordermanagement/v1/orders/'.$reference);
+                    $klarnaorder = $KlarnaCheckoutCommonFeatures->getFromKlarna($merchantId, $sharedSecret, $headers, '/ordermanagement/v1/orders/'.$reference);
                     $klarnaorder = json_decode($klarnaorder, true);
                     if (isset($klarnaorder['fraud_status']) && $klarnaorder['fraud_status'] == "PENDING") {
                         $new_pending_status = Configuration::get('KCO_PENDING_PAYMENT');

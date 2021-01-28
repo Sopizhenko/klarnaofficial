@@ -503,7 +503,7 @@ class KlarnaOfficialCheckoutKlarnaKcoModuleFrontController extends ModuleFrontCo
                         } else {
                             $order_id = $_SESSION['klarna_checkout_uk'];
                         }
-                        $checkout = $KlarnaCheckoutCommonFeatures->postToKlarna($create, $mid, $sharedSecret, $this->module->version, '/checkout/v3/orders/'.$order_id);
+                        $checkout = $KlarnaCheckoutCommonFeatures->postToKlarna($create, $mid, $sharedSecret, $this->module->getKlarnaHeaders(), '/checkout/v3/orders/'.$order_id);
                         $checkout = json_decode($checkout);
                         if (isset($checkout->error_code)) {
                             $error_message_string = "";
