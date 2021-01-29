@@ -141,7 +141,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.7';
+        $this->version = '2.2.8';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -1581,9 +1581,18 @@ class KlarnaOfficial extends PaymentModule
                 'id' => $placement,
                 'locale' => $languageIsoCode.'-'.$this->context->country->iso_code
             ];
-        } else if ("product" == $displayLocation && isset($extraParams['product']['price_amount'])) {
-            $purchase_amount = Tools::ps_round($extraParams['product']['price_amount'], 2);
-
+        } elseif ("product" == $displayLocation && isset($extraParams['product']['price_amount'])) {
+            $productId = $extraParams['product']['id_product'];
+            $groupPriceDisplayMethod = (int) Group::getPriceDisplayMethod((int) $this->context->customer->id_default_group);
+            $purchase_amount = Product::getPriceStatic(
+                (int) $productId, 
+                $groupPriceDisplayMethod === 1 ? false : true,
+                null,
+                (int) Configuration::get('PS_PRICE_DISPLAY_PRECISION'),
+                null,
+                false,
+                true
+            );
             $klarna_placement = [
                 'purchase_amount' => ($purchase_amount * 100),
                 'theme' => $theme,
