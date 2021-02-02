@@ -18,6 +18,8 @@
  *  International Registered Trademark & Property of Prestaworks AB
  */
 
+require_once dirname(__FILE__) . '/classes/KlarnaOsmConfiguration.php';
+
 class KlarnaOfficial extends PaymentModule
 {
     public $Pending_risk = 'Pending';
@@ -25,6 +27,10 @@ class KlarnaOfficial extends PaymentModule
     const OSM_THEME_DEFAULT = 'default';
     const OSM_THEME_DARK = 'dark';
     const OSM_THEME_CUSTOM = '';
+    
+    const OSM_EU_LIBRARY = 1;
+    const OSM_USA_LIBRARY = 2;
+    const OSM_OC_LIBRARY = 3;
     
     public static $OSM_PLACEMENTS = array(
         'top-strip-promotion-standard',
@@ -125,19 +131,11 @@ class KlarnaOfficial extends PaymentModule
         'KCO_CANCEL_PAGE'
     );
     
-    public $osm_fields = array(
-        'KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_',
-        'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_THEME_COUNTRY_',
-        // 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_',
-        'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_COUNTRY_',
-        // 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_',
-    );
-    
     public function __construct()
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.5';
+        $this->version = '1.10.6';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -178,6 +176,7 @@ class KlarnaOfficial extends PaymentModule
             || Configuration::updateValue('KCO_ROUNDOFF', 0) == false
             || Configuration::updateValue('KCOV3', 1) == false
             || Configuration::updateValue('KCO_TESTMODE', 1) == false
+            || $this->installTabs() == false
             || $this->setKCOCountrySettings() == false
             ) {
             return false;
@@ -345,19 +344,6 @@ class KlarnaOfficial extends PaymentModule
                     }
                 }
                 
-                if ("KLARNA_ONSITEMESSAGING_CONFIGURATION" == $param &&
-                    Tools::isSubmit('btnOSMSubmit')
-                ) {
-                    foreach ($countries as $country) {
-                        foreach ($this->osm_fields as $osmfield) {
-                            $Key = $osmfield.$country['iso_code'];
-                            $OSMconfig[$country['iso_code']][$Key] = Tools::getValue($Key);
-                        }
-                    }
-                    $OSMconfigJson = Tools::jsonEncode($OSMconfig);
-                    Configuration::updateValue($param, $OSMconfigJson);
-                }
-                
                 if (Tools::getIsset($param)) {
                      Configuration::updateValue($param, Tools::getValue($param));
                      $isSaved = true;
@@ -417,16 +403,10 @@ class KlarnaOfficial extends PaymentModule
             $kcov3_is_active = true;
         }
         
-        $toggle_js_inputs = array();
-
-        $numInputs = 2;
-        foreach (Country::getCountries(Configuration::get('PS_LANG_DEFAULT'), true) as $country) {
-            $toggle_js_inputs['KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code']] = $numInputs;
-        }
-        
         // $cron_domain = $this->context->link->getBaseLink(null, true, false);
         $cron_domain = $this->context->shop->getBaseURL();
         $this->context->smarty->assign(array(
+            'linkToOsmConfig' => $this->context->link->getAdminLink('AdminKlarnaOsmConfiguration'),
             'klarnaisocodedef' => $country_iso_code,
             'country' => $country_iso_code,
             'kcov3_is_active' => $kcov3_is_active,
@@ -443,7 +423,6 @@ class KlarnaOfficial extends PaymentModule
             'errorMSG' => $errorMSG,
             'address_check_done' => $address_check_done,
             'isSaved' => $isSaved,
-            'toggle_js_inputs' => Tools::jsonEncode($toggle_js_inputs),
             'osmform' => $this->createOSMForm(),
             'commonform' => $this->createCommonForm(),
             'kcocommonform' => $this->createKCOCommonForm(),
@@ -492,25 +471,31 @@ class KlarnaOfficial extends PaymentModule
                         )
                     ),
                 ),
+
                 array(
-                    'type' => 'switch',
-                    'label' => $this->l('Use USA library'),
-                    'name' => 'KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY',
-                    'is_bool' => true,
-                    'desc' => $this->l('Default is EU library'),
-                    'values' => array(
-                        array(
-                            'id' => 'active_on',
-                            'value' => true,
-                            'label' => $this->l('Yes')
+                        'tab' => 'onsite_messaging',
+                        'type' => 'select',
+                        'label' => $this->l('Select library'),
+                        'name' => 'KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY',
+                        'options' => array(
+                            'query' => array(
+                                array(
+                                    'value' => self::OSM_EU_LIBRARY,
+                                    'label' => $this->l('EU'),
+                                ),
+                                array(
+                                    'value' => self::OSM_USA_LIBRARY,
+                                    'label' => $this->l('USA'),
+                                ),
+                                array(
+                                    'value' => self::OSM_OC_LIBRARY,
+                                    'label' => $this->l('OC'),
+                                ),
+                            ),
+                            'id' => 'value',
+                            'name' => 'label',
                         ),
-                        array(
-                            'id' => 'active_off',
-                            'value' => false,
-                            'label' => $this->l('No')
-                        )
                     ),
-                ),
                 array(
                     'type' => 'text',
                     'label' => $this->l('Data Client ID'),
@@ -525,105 +510,6 @@ class KlarnaOfficial extends PaymentModule
                 'class' => 'btn btn-default pull-right'
             ),
         );
-        
-        foreach (Country::getCountries(Configuration::get('PS_LANG_DEFAULT'), true) as $country) {
-            $fields_form[0]['form']['input'][] = array(
-                'label' => '',
-                'type' => 'html',
-                'name' => '',
-                'html_content' => '
-                    <div style="border-bottom:1px solid #eee;font-size:18px;font-weight:600;padding-bottom:10px;">'
-                        .$country['name'] . ' ('.$country['iso_code'].')
-                    </div>',
-            );
-
-            $fields_form[0]['form']['input'][] =  array(
-                'tab' => 'onsite_messaging',
-                'type' => 'switch',
-                'desc' => $this->l('Activate On-Site Messaging for ').$country['name'],
-                'name' => 'KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$country['iso_code'],
-                'is_bool' => true,
-                'values' => array(
-                    array(
-                        'id' => 'active_on',
-                        'value' => true,
-                        'label' => $this->l('Yes')
-                    ),
-                    array(
-                        'id' => 'active_off',
-                        'value' => false,
-                        'label' => $this->l('No')
-                    )
-                ),
-            );
-
-            /*Product placement*/
-            $fields_form[0]['form']['input'][] =  array(
-                'tab' => 'onsite_messaging',
-                'type' => 'select',
-                'label' => $this->l('Product page placement'),
-                'name' => 'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_COUNTRY_'.$country['iso_code'],
-                'options' => array(
-                    'query' => $placements,
-                    'id' => 'value',
-                    'name' => 'label',
-                ),
-            );
-            $fields_form[0]['form']['input'][] =  array(
-                'tab' => 'onsite_messaging',
-                'type' => 'select',
-                'label' => $this->l('Product page placement theme'),
-                'name' => 'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_THEME_COUNTRY_'.$country['iso_code'],
-                'options' => array(
-                    'query' => array(
-                        array(
-                            'value' => self::OSM_THEME_DEFAULT,
-                            'label' => $this->l('Default'), ),
-                        array(
-                            'value' => self::OSM_THEME_DARK,
-                            'label' => $this->l('Dark'), ),
-                        array(
-                            'value' => self::OSM_THEME_CUSTOM,
-                            'label' => $this->l('Custom'), ),
-                    ),
-                    'id' => 'value',
-                    'name' => 'label',
-                ),
-            );
-            /*Cart placement*/
-            // $fields_form[0]['form']['input'][] =  array(
-                // 'tab' => 'onsite_messaging',
-                // 'type' => 'select',
-                // 'label' => $this->l('Cart placement'),
-                // 'name' => 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_'.$country['iso_code'],
-                // 'options' => array(
-                    // 'query' => $placements,
-                    // 'id' => 'value',
-                    // 'name' => 'label',
-                // ),
-            // );
-            // $fields_form[0]['form']['input'][] =  array(
-                // 'tab' => 'onsite_messaging',
-                // 'type' => 'select',
-                // 'label' => $this->l('Cart placement theme'),
-                // 'name' => 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_'.$country['iso_code'],
-                // 'options' => array(
-                    // 'query' => array(
-                        // array(
-                            // 'value' => self::OSM_THEME_DEFAULT,
-                            // 'label' => $this->l('Default'), ),
-                        // array(
-                            // 'value' => self::OSM_THEME_DARK,
-                            // 'label' => $this->l('Dark'), ),
-                        // array(
-                            // 'value' => self::OSM_THEME_CUSTOM,
-                            // 'label' => $this->l('Custom'), ),
-                    // ),
-                    // 'id' => 'value',
-                    // 'name' => 'label',
-                // ),
-            // );
-        }
         
         $helper = new HelperForm();
         $helper->show_toolbar = false;
@@ -1599,21 +1485,6 @@ class KlarnaOfficial extends PaymentModule
                 $jsonstring = Configuration::get($param);
                 $dataarray = Tools::jsonDecode($jsonstring, true);
                 $returnarray[$param."[]"] = $dataarray;
-            } elseif ("KLARNA_ONSITEMESSAGING_CONFIGURATION" == $param) {
-                $jsonstring = Configuration::get($param);
-                $dataarray = Tools::jsonDecode($jsonstring, true);
-                $countries = Country::getCountries($this->context->language->id, true);
-               
-                foreach ($countries as $country) {
-                    foreach ($this->osm_fields as $osmfield) {
-                        $Key = $osmfield.$country['iso_code'];
-                        if (isset($dataarray[$country['iso_code']]) && isset($dataarray[$country['iso_code']][$Key])) {
-                            $returnarray[$Key] = $dataarray[$country['iso_code']][$Key];
-                        } else {
-                            $returnarray[$Key] = "";
-                        }
-                    }
-                }
             } else {
                 $returnarray[$param] = Tools::getValue($param, Configuration::get($param));
             }
@@ -1627,61 +1498,57 @@ class KlarnaOfficial extends PaymentModule
         if (!self::isValidCountryCurrencyOSM()) {
             return;
         }
+        $osmConfig = KlarnaOsmConfiguration::getByCountry((int) $this->context->country->id);
 
-        $OSMconfig = Tools::jsonDecode(Configuration::get('KLARNA_ONSITEMESSAGING_CONFIGURATION'), true);
-        $use_osm_key = 'KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$this->context->country->iso_code;
-
-        if (!isset($OSMconfig[$this->context->country->iso_code]) ||
-            !isset($OSMconfig[$this->context->country->iso_code][$use_osm_key])
+        if ((empty($osmConfig)) ||
+            ($displayLocation === 'cart' && empty($osmConfig['cart_page'])) ||
+            ($displayLocation === 'product' && empty($osmConfig['product_page']))
         ) {
             return;
         }
+
         $klarna_placement = array();
-        // Check if country is active
-        if ((bool) $OSMconfig[$this->context->country->iso_code][$use_osm_key]) {
-            $languageIsoCode = $this->context->language->iso_code;
-            $languageIsoCode = str_replace('gb', 'en', $languageIsoCode);
-            
-            if ("cart" == $displayLocation) {
-                $theme_key = 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_THEME_COUNTRY_'.$this->context->country->iso_code;
-                $placement_key = 'KLARNA_ONSITEMESSAGING_CART_PLACEMENT_COUNTRY_'.$this->context->country->iso_code;
-                
-                if (!isset($OSMconfig[$this->context->country->iso_code]) ||
-                    !isset($OSMconfig[$this->context->country->iso_code][$theme_key]) ||
-                    !isset($OSMconfig[$this->context->country->iso_code][$placement_key]) ||
-                    '0' === $OSMconfig[$this->context->country->iso_code][$placement_key]
-                ) {
-                    return;
-                }
+        
+        $languageIsoCode = $this->context->language->iso_code;
+        $languageIsoCode = str_replace('gb', 'en', $languageIsoCode);
+        $languageIsoCode = str_replace('au', 'en', $languageIsoCode);
 
-                $klarna_placement['purchase_amount'] = Tools::ps_round($extraParams, 2) * 100;
-                $klarna_placement['theme'] = $OSMconfig[$this->context->country->iso_code][$theme_key];
-                $klarna_placement['id'] = $OSMconfig[$this->context->country->iso_code][$placement_key];
-                $klarna_placement['locale'] = $languageIsoCode.'-'.$this->context->country->iso_code;
-            }
-            if ("product" == $displayLocation) {
-                $theme_key = 'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_THEME_COUNTRY_'.$this->context->country->iso_code;
-                $placement_key = 'KLARNA_ONSITEMESSAGING_PRODUCT_PAGE_COUNTRY_'.$this->context->country->iso_code;
-
-                if (!isset($OSMconfig[$this->context->country->iso_code]) ||
-                    !isset($OSMconfig[$this->context->country->iso_code][$theme_key]) ||
-                    !isset($OSMconfig[$this->context->country->iso_code][$placement_key]) ||
-                    '0' === $OSMconfig[$this->context->country->iso_code][$placement_key]
-                ) {
-                    return;
-                }
-                if (isset($extraParams['product']->price)) {
-                    $purchase_amount = Tools::ps_round($extraParams['product']->price, 2);
-                    $klarna_placement['purchase_amount'] = $purchase_amount * 100;
-                    $klarna_placement['theme'] = $OSMconfig[$this->context->country->iso_code][$theme_key];
-                    $klarna_placement['id'] = $OSMconfig[$this->context->country->iso_code][$placement_key];
-                    $klarna_placement['locale'] = $languageIsoCode.'-'.$this->context->country->iso_code;
-                }
-            }
-            $this->smarty->assign('klarna_placement', $klarna_placement);
-            return $this->display(__FILE__, 'onsite_messaging.tpl');
+        $placement = $osmConfig[$displayLocation.'_page'];
+        $theme = $osmConfig[$displayLocation.'_page_theme'];
+        
+        if ("cart" == $displayLocation) {
+            $klarna_placement = [
+                'purchase_amount' => (Tools::ps_round($extraParams, 2) * 100),
+                'theme' => $theme,
+                'id' => $placement,
+                'locale' => $languageIsoCode.'-'.$this->context->country->iso_code
+            ];
+        } elseif ("product" == $displayLocation && isset($extraParams['product'])) {
+            $productId = $extraParams['product']->id;
+            $groupPriceDisplayMethod = (int) Group::getPriceDisplayMethod((int) $this->context->customer->id_default_group);
+            $purchase_amount = Product::getPriceStatic(
+                (int) $productId, 
+                $groupPriceDisplayMethod === 1 ? false : true,
+                null,
+                (int) Configuration::get('PS_PRICE_DISPLAY_PRECISION'),
+                null,
+                false,
+                true
+            );
+            $klarna_placement = array(
+                'purchase_amount' => ($purchase_amount * 100),
+                'theme' => $theme,
+                'id' => $placement,
+                'locale' => $languageIsoCode.'-'.$this->context->country->iso_code
+            );
+        } else {
+            return;
         }
+
+        $this->smarty->assign('klarna_placement', $klarna_placement);
+        return $this->display(__FILE__, 'onsite_messaging.tpl');
     }
+    
     public static function isValidCountryCurrencyOSM()
     {
         $countryIsoCode = Context::getContext()->country->iso_code;
@@ -1694,7 +1561,6 @@ class KlarnaOfficial extends PaymentModule
             'US' => 'USD',
             'CH' => 'CHF'
         );
-
         // Check if country+currency matches any of the non-EUR cases defined in the constant, else should be EUR
         if (isset($OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode])) {
             $defaultCurrency = $OSM_VALID_COUNTRY_CURRENCY_COMBINATION[$countryIsoCode];
@@ -1715,28 +1581,43 @@ class KlarnaOfficial extends PaymentModule
     
     public static function getOnSiteMessagingUrl()
     {
-        $eu_test_path = 'https://eu-library.playground.klarnaservices.com/lib.js';
-        $eu_path = 'https://eu-library.klarnaservices.com/lib.js';
+        $live_mode = (int) Configuration::get('KCO_TESTMODE');
+        $endpoints = array(
+            self::OSM_EU_LIBRARY => array(
+                0 => 'https://eu-library.playground.klarnaservices.com/lib.js',
+                1 => 'https://eu-library.klarnaservices.com/lib.js'
+            ),
+            self::OSM_USA_LIBRARY => array(
+                0 => 'https://us-library.playground.klarnaservices.com/lib.js',
+                1 => 'https://us-library.klarnaservices.com/lib.js'
+            ),
+            self::OSM_OC_LIBRARY => array(
+                0 => 'https://oc-library.playground.klarnaservices.com/lib.js',
+                1 => 'https://oc-library.klarnaservices.com/lib.js'
+            )
+        );
         
-        $us_test_path = 'https://us-library.playground.klarnaservices.com/lib.js';
-        $us_path = 'https://us-library.klarnaservices.com/lib.js';
+        $osmLibrary = (int) Configuration::get('KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY');
         
-        $url = $eu_path;
-        if ((int) (Configuration::get('KCO_TESTMODE')) == 1) {
-            if ((int) (Configuration::get('KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY')) == 1) {
-                $url = $us_test_path;
-            } else {
-                $url = $eu_test_path;
-            }
-        } else {
-            if ((int) (Configuration::get('KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY')) == 1) {
-                $url = $us_path;
-            } else {
-                $url = $eu_path;
-            }
+        // Always default to EU
+        $url = $endpoints[self::OSM_EU_LIBRARY][$live_mode];
+        switch ($osmLibrary) {
+            case self::OSM_EU_LIBRARY:
+                $url = $endpoints[self::OSM_EU_LIBRARY][$live_mode];
+                break;
+            case self::OSM_USA_LIBRARY:
+                $url = $endpoints[self::OSM_USA_LIBRARY][$live_mode];
+                break;
+            case self::OSM_OC_LIBRARY:
+                $url = $endpoints[self::OSM_OC_LIBRARY][$live_mode];
+                break;
+            default:
+                $url = $endpoints[self::OSM_EU_LIBRARY][$live_mode];
+                break;
         }
         
         return $url;
+
     }
     // Onsite messaging
     public function hookDisplayShoppingCart()
@@ -1778,38 +1659,7 @@ class KlarnaOfficial extends PaymentModule
         return $this->display(__FILE__, 'klarnafooter.tpl');
     }
 
-    private function getOSMHeaderHtml()
-    {
-        if (Tools::getValue('controller') === 'order' ||
-            Tools::getValue('controller') === 'order-opc' ||
-            Tools::getValue('controller') === 'product' ||
-            Tools::getValue('controller') === 'checkoutklarnakco'
-        ) {
-            if (!self::isValidCountryCurrencyOSM()) {
-                return;
-            }
-
-            $this->context->controller->addJS($this->_path.'/views/js/onsite_messaging.js');
-
-            $OSMconfig = Tools::jsonDecode(Configuration::get('KLARNA_ONSITEMESSAGING_CONFIGURATION'), true);
-            $key = 'KLARNA_ONSITEMESSAGING_SWITCH_COUNTRY_'.$this->context->country->iso_code;
-            if (!isset($OSMconfig[$this->context->country->iso_code]) ||
-                !isset($OSMconfig[$this->context->country->iso_code][$key])
-            ) {
-                return;
-            }
- 
-            $this->context->smarty->assign(
-                'klarna_onsite_messaging_url',
-                self::getOnSiteMessagingUrl()
-            );
-            $this->context->smarty->assign(
-                'klarna_onsite_messaging_dci',
-                Configuration::get('KLARNA_ONSITE_MESSAGE_DCI')
-            );
-            return $this->display(__FILE__, 'views/templates/hook/onsite_messaging_script.tpl');
-        }
-    }
+    
     public function hookHeader()
     {
         if (Tools::getIsset("recover_cart")) {
@@ -1818,7 +1668,7 @@ class KlarnaOfficial extends PaymentModule
         if (Configuration::get('PS_CATALOG_MODE')) {
             return;
         }
-        $returnData = null;
+        $returnData = "";
         if (Configuration::get('KCOV3')) {
             $this->context->controller->addJS(($this->_path).'views/js/kco_common.js');
             $this->smarty->assign(
@@ -1827,11 +1677,38 @@ class KlarnaOfficial extends PaymentModule
             );
 
             $returnData = $this->display(__FILE__, 'header.tpl');
+            
+            if ((bool) Configuration::get('KLARNA_ONSITE_MESSAGE') && self::isValidCountryCurrencyOSM()) {
+                $controllerName = Tools::getValue('controller');
+                if ($controllerName === 'order' ||
+                    $controllerName === 'orderopc' ||
+                    $controllerName === 'product' ||
+                    $controllerName === 'checkoutklarnakco'
+                ) {
+                    $osmConfig = KlarnaOsmConfiguration::getByCountry((int) $this->context->country->id);
+                    
+                    if ((empty($osmConfig)) ||
+                        ($controllerName === 'order' && empty($osmConfig['cart_page'])) ||
+                        ($controllerName === 'orderopc' && empty($osmConfig['cart_page'])) ||
+                        ($controllerName === 'checkoutklarnakco' && empty($osmConfig['cart_page'])) ||
+                        ($controllerName === 'product' && empty($osmConfig['product_page']))
+                    ) {
+                        return;
+                    }
+                    $this->context->smarty->assign([
+                        'klarna_onsite_messaging_dci' => Configuration::get('KLARNA_ONSITE_MESSAGE_DCI'),
+                        'klarna_onsite_messaging_url' => self::getOnSiteMessagingUrl()
+                    ]);
+                    return $this->display(__FILE__, 'views/templates/hook/onsite_messaging_script.tpl');
+                }
+            }
         }
-        if ((bool) Configuration::get('KLARNA_ONSITE_MESSAGE')) {
-            $returnData = $this->getOSMHeaderHtml();
-        }
+        
         return $returnData;
+        
+        
+        
+        
     }
 
     /*public function hookTop($params)
@@ -2728,6 +2605,37 @@ class KlarnaOfficial extends PaymentModule
         }
         
         return false;
+    }
+    
+    public function installTabs()
+    {
+        $controllerAlreadyExists = Tab::getIdFromClassName('AdminKlarnaOsmConfiguration');
+
+        if ((int) $controllerAlreadyExists === 0) {
+            return (bool) $this->createTab(-1, $this->l('Klarna OSM Configuration'), 'AdminKlarnaOsmConfiguration');
+        }
+
+        return true;
+    }
+    
+    public function createTab($id_parent, $name, $class_name, $class = '')
+    {
+        $tab = new Tab();
+        $names = array();
+
+        foreach (Language::getLanguages(false) as $lang) {
+            $names[$lang['id_lang']] = $name;
+        }
+
+        $tab->name = $names;
+        $tab->class_name = $class_name;
+        $tab->icon = $class;
+        
+        $tab->id_parent = $id_parent;
+        $tab->module = $this->name;
+        $tab->add();
+
+        return $tab->id;
     }
     
     public function getAttachment()

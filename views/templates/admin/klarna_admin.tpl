@@ -204,6 +204,9 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-12">
+                     <a href="{$linkToOsmConfig}" class="btn btn-success">{l s='Handle OSM options' mod='klarnaofficial'}</a>
+                     <br />
+                     <br />
 						{$osmform}
 					</div>
 				</div>
@@ -212,6 +215,3 @@
 	</div>
 	</div>
 </div>
-<script>
-var toggle_js_inputs = {$toggle_js_inputs};
-</script>
