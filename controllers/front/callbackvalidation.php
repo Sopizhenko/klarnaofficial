@@ -26,6 +26,7 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
 
     public function init()
     {
+        parent::init();
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnaorder = Tools::jsonDecode($klarnadata, true);
         

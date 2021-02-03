@@ -30,6 +30,7 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
 
     public function init()
     {
+        parent::init();
         $has_changed = false;
         $klarnadata = Tools::file_get_contents('php://input');
         

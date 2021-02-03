@@ -26,6 +26,7 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
 
     public function init()
     {
+        parent::init();
         $klarnadata = Tools::file_get_contents('php://input');
         $klarnadata = json_decode($klarnadata);
         if ($klarnadata == false) {
