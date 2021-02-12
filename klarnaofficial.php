@@ -1527,7 +1527,7 @@ class KlarnaOfficial extends PaymentModule
             $productId = $extraParams['product']->id;
             $groupPriceDisplayMethod = (int) Group::getPriceDisplayMethod((int) $this->context->customer->id_default_group);
             $purchase_amount = Product::getPriceStatic(
-                (int) $productId, 
+                (int) $productId,
                 $groupPriceDisplayMethod === 1 ? false : true,
                 null,
                 (int) Configuration::get('PS_PRICE_DISPLAY_PRECISION'),
@@ -1703,10 +1703,6 @@ class KlarnaOfficial extends PaymentModule
         }
         
         return $returnData;
-        
-        
-        
-        
     }
 
     /*public function hookTop($params)
