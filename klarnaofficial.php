@@ -1584,21 +1584,20 @@ class KlarnaOfficial extends PaymentModule
         $live_mode = (int) Configuration::get('KCO_TESTMODE');
         $endpoints = array(
             self::OSM_EU_LIBRARY => array(
-                0 => 'https://eu-library.playground.klarnaservices.com/lib.js',
-                1 => 'https://eu-library.klarnaservices.com/lib.js'
+                0 => 'https://eu-library.klarnaservices.com/lib.js',
+                1 => 'https://eu-library.playground.klarnaservices.com/lib.js'
             ),
             self::OSM_USA_LIBRARY => array(
-                0 => 'https://us-library.playground.klarnaservices.com/lib.js',
-                1 => 'https://us-library.klarnaservices.com/lib.js'
+                0 => 'https://us-library.klarnaservices.com/lib.js',
+                1 => 'https://us-library.playground.klarnaservices.com/lib.js'
             ),
             self::OSM_OC_LIBRARY => array(
-                0 => 'https://oc-library.playground.klarnaservices.com/lib.js',
-                1 => 'https://oc-library.klarnaservices.com/lib.js'
+                0 => 'https://oc-library.klarnaservices.com/lib.js',
+                1 => 'https://oc-library.playground.klarnaservices.com/lib.js'
             )
         );
         
         $osmLibrary = (int) Configuration::get('KLARNA_ONSITEMESSAGING_LIBRARY_PATH_COUNTRY');
-        
         // Always default to EU
         $url = $endpoints[self::OSM_EU_LIBRARY][$live_mode];
         switch ($osmLibrary) {
@@ -1615,10 +1614,9 @@ class KlarnaOfficial extends PaymentModule
                 $url = $endpoints[self::OSM_EU_LIBRARY][$live_mode];
                 break;
         }
-        
         return $url;
-
     }
+    
     // Onsite messaging
     public function hookDisplayShoppingCart()
     {

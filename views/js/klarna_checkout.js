@@ -592,6 +592,8 @@ function updateKCO()
 		{
 			$("#checkoutdiv").html(jsonData);
             enableAllCartButtons();
+            window.KlarnaOnsiteService = window.KlarnaOnsiteService || [];
+            window.KlarnaOnsiteService.push({ eventName: 'refresh-placements' });
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			alert(jsonData);
