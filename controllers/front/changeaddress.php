@@ -227,4 +227,9 @@ class KlarnaOfficialChangeAddressModuleFrontController extends ModuleFrontContro
         Tools::redirect($url);
         exit;
     }
+    
+    protected function displayMaintenancePage()
+    {
+        
+    }
 }

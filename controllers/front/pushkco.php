@@ -265,4 +265,9 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
         }
         exit;
     }
+    
+    protected function displayMaintenancePage()
+    {
+        
+    }
 }

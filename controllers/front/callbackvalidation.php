@@ -138,4 +138,9 @@ class KlarnaOfficialCallbackValidationModuleFrontController extends ModuleFrontC
         Tools::redirect($url);
         exit;
     }
+    
+    protected function displayMaintenancePage()
+    {
+
+    }
 }

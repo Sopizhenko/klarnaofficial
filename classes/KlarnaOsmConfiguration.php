@@ -28,6 +28,18 @@ class KlarnaOsmConfiguration extends ObjectModel
 
     public $cart_page_theme;
 
+    public $footer_placement;
+    public $footer_theme;
+
+    public $topofpage_placement;
+    public $topofpage_theme;
+
+    public $leftcolumn_placement;
+    public $leftcolumn_theme;
+
+    public $rightcolumn_placement;
+    public $rightcolumn_theme;
+
     public $id_shop;
 
     public $active;
@@ -51,6 +63,30 @@ class KlarnaOsmConfiguration extends ObjectModel
                 'type' => self::TYPE_STRING
             ),
             'cart_page_theme' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'footer_placement' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'footer_theme' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'topofpage_placement' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'topofpage_theme' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'leftcolumn_placement' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'leftcolumn_theme' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'rightcolumn_placement' => array(
+                'type' => self::TYPE_STRING
+            ),
+            'rightcolumn_theme' => array(
                 'type' => self::TYPE_STRING
             ),
             'id_shop' => array(

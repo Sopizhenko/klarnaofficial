@@ -75,20 +75,32 @@ class AdminKlarnaOsmConfigurationController extends ModuleAdminController
                 'orderBy' => true,
                 'search' => true,
             ),
-            'product_page_theme' => array(
-                'title' => $this->l('Product page theme'),
-                'type' => 'text',
-                'orderBy' => true,
-                'search' => true,
-            ),
             'cart_page' => array(
                 'title' => $this->l('Cart'),
                 'type' => 'text',
                 'orderBy' => true,
                 'search' => true,
             ),
-            'cart_page_theme' => array(
-                'title' => $this->l('Cart theme'),
+            'footer_placement' => array(
+                'title' => $this->l('Footer'),
+                'type' => 'text',
+                'orderBy' => true,
+                'search' => true,
+            ),
+            'topofpage_placement' => array(
+                'title' => $this->l('Top of page'),
+                'type' => 'text',
+                'orderBy' => true,
+                'search' => true,
+            ),
+            'leftcolumn_placement' => array(
+                'title' => $this->l('Left column'),
+                'type' => 'text',
+                'orderBy' => true,
+                'search' => true,
+            ),
+            'rightcolumn_placement' => array(
+                'title' => $this->l('Right column'),
                 'type' => 'text',
                 'orderBy' => true,
                 'search' => true,
@@ -138,6 +150,18 @@ class AdminKlarnaOsmConfigurationController extends ModuleAdminController
                 'name' => $country['name']
             ];
         }
+        
+        $placement_themes = array(
+            array(
+                'value' => self::OSM_THEME_DEFAULT,
+                'label' => $this->l('Default'), ),
+            array(
+                'value' => self::OSM_THEME_DARK,
+                'label' => $this->l('Dark'), ),
+            array(
+                'value' => self::OSM_THEME_CUSTOM,
+                'label' => $this->l('Custom'), ),
+        );
 
         $this->fields_form = array(
             'legend' => array(
@@ -156,12 +180,93 @@ class AdminKlarnaOsmConfigurationController extends ModuleAdminController
                         'name' => 'name',
                     ),
                 ),
-
-                // product
                 array(
                     'type' => 'html',
-                    'desc' => $this->l('Product placements'),
+                    'desc' => $this->l('Placements'),
                     'name' => ''
+                ),
+                // Footer
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Footer placement theme'),
+                    'name' => 'footer_theme',
+                    'options' => array(
+                        'query' => $placement_themes,
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Footer placement'),
+                    'desc' => $this->l('Enter data-key for Footer placement'),
+                    'name' => 'footer_placement',
+                ),
+                
+                //Top of page
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Top of page theme'),
+                    'name' => 'topofpage_theme',
+                    'options' => array(
+                        'query' => $placement_themes,
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Top of page placement'),
+                    'desc' => $this->l('Enter data-key for Top of page placement'),
+                    'name' => 'topofpage_placement',
+                ),
+                
+                //Left column
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Left column theme'),
+                    'name' => 'leftcolumn_theme',
+                    'options' => array(
+                        'query' => $placement_themes,
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Left column placement'),
+                    'desc' => $this->l('Enter data-key for Left column placement'),
+                    'name' => 'leftcolumn_placement',
+                ),
+                
+                //Right column
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Right column theme'),
+                    'name' => 'rightcolumn_theme',
+                    'options' => array(
+                        'query' => $placement_themes,
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Right column placement'),
+                    'desc' => $this->l('Enter data-key for Right column placement'),
+                    'name' => 'rightcolumn_placement',
+                ),
+                
+                // product
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Product page placement theme'),
+                    'name' => 'product_page_theme',
+                    'options' => array(
+                        'query' => $placement_themes,
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
                 ),
                 array(
                     'type' => 'text',
@@ -169,32 +274,17 @@ class AdminKlarnaOsmConfigurationController extends ModuleAdminController
                     'desc' => $this->l('Enter data-key for product page placement'),
                     'name' => 'product_page',
                 ),
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Product page placement theme'),
-                    'name' => 'product_page_theme',
-                    'options' => array(
-                        'query' => array(
-                            array(
-                                'value' => self::OSM_THEME_DEFAULT,
-                                'label' => $this->l('Default'), ),
-                            array(
-                                'value' => self::OSM_THEME_DARK,
-                                'label' => $this->l('Dark'), ),
-                            array(
-                                'value' => self::OSM_THEME_CUSTOM,
-                                'label' => $this->l('Custom'), ),
-                        ),
-                        'id' => 'value',
-                        'name' => 'label',
-                    ),
-                ),
 
                 // Cart
                 array(
-                    'type' => 'html',
-                    'desc' => $this->l('Cart placements'),
-                    'name' => ''
+                    'type' => 'select',
+                    'label' => $this->l('Cart page placement theme'),
+                    'name' => 'cart_page_theme',
+                    'options' => array(
+                        'query' => $placement_themes,
+                        'id' => 'value',
+                        'name' => 'label',
+                    ),
                 ),
                 array(
                     'type' => 'text',
@@ -202,26 +292,7 @@ class AdminKlarnaOsmConfigurationController extends ModuleAdminController
                     'desc' => $this->l('Enter data-key for cart page placement'),
                     'name' => 'cart_page',
                 ),
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Cart page placement theme'),
-                    'name' => 'cart_page_theme',
-                    'options' => array(
-                        'query' => array(
-                            array(
-                                'value' => self::OSM_THEME_DEFAULT,
-                                'label' => $this->l('Default'), ),
-                            array(
-                                'value' => self::OSM_THEME_DARK,
-                                'label' => $this->l('Dark'), ),
-                            array(
-                                'value' => self::OSM_THEME_CUSTOM,
-                                'label' => $this->l('Custom'), ),
-                        ),
-                        'id' => 'value',
-                        'name' => 'label',
-                    ),
-                ),
+                
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Active'),

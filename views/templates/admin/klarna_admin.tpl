@@ -71,11 +71,6 @@
 		 {l s='You use PHP 7, KPM library requires PHP 5' mod='klarnaofficial'}
 	</div>
 {/if}
-{if $isMAINTENANCE_warning}
-    <div class="alert alert-danger">
-		 {l s='Your shop is in maintenance mode, no callbacks from Klarna will work.' mod='klarnaofficial'}
-	</div>
-{/if}
 {if $isNoSll_warning}
     <div class="alert alert-danger">
 		 {l s='Klarna Checkout V3 requires SSL' mod='klarnaofficial'}
@@ -206,7 +201,7 @@
 						</ul>
 					</div>
 					<div id="klarnacheckout-admin" class="col-lg-12">
-                    <a href="{$linkToOsmConfig}">{l s='Handle OSM options' mod='klarnaofficial'}</a>
+                    <a class="btn btn-success" href="{$linkToOsmConfig}">{l s='Handle OSM options' mod='klarnaofficial'}</a><br /><br />
 						{$osmform nofilter}
 					</div>
 				</div>

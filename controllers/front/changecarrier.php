@@ -128,4 +128,9 @@ class KlarnaOfficialChangeCarrierModuleFrontController extends ModuleFrontContro
         Tools::redirect($url);
         exit;
     }
+    
+    protected function displayMaintenancePage()
+    {
+        
+    }
 }
