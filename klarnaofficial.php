@@ -143,7 +143,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.10';
+        $this->version = '2.2.11';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
@@ -216,7 +216,13 @@ class KlarnaOfficial extends PaymentModule
         $controllerAlreadyExists = Tab::getIdFromClassName('AdminKlarnaOsmConfiguration');
 
         if ((int) $controllerAlreadyExists === 0) {
-            return (bool) $this->createTab(0, $this->l('Klarna OSM Configuration'), 'AdminKlarnaOsmConfiguration');
+            $ret = $this->createTab(0, $this->l('Klarna OSM Configuration'), 'AdminKlarnaOsmConfiguration');
+        }
+        
+        $controllerAlreadyExists = Tab::getIdFromClassName('AdminKlarnaOrderInfo');
+
+        if ((int) $controllerAlreadyExists === 0) {
+            $ret2 = $this->createTab(0, $this->l('Klarna Order Info'), 'AdminKlarnaOrderInfo');
         }
 
         return true;
@@ -418,6 +424,7 @@ class KlarnaOfficial extends PaymentModule
         }
         $this->context->smarty->assign(array(
             'linkToOsmConfig' => $this->context->link->getAdminLink('AdminKlarnaOsmConfiguration'),
+            'linkToOrderInfo' => $this->context->link->getAdminLink('AdminKlarnaOrderInfo'),
             'klarnaisocodedef' => $country_iso_code,
             'showbanner1' => $showbanner1,
             'errorMSG' => $errorMSG,
@@ -1752,6 +1759,8 @@ class KlarnaOfficial extends PaymentModule
         $sql = 'SELECT error_message FROM `'._DB_PREFIX_.
         'klarna_errors` WHERE id_order='.(int) Tools::getValue('id_order');
         $klarna_errors = Db::getInstance()->executeS($sql);
+        
+        $klarnainfolink = $this->context->link->getAdminLink('AdminKlarnaOrderInfo', true, [], ['klarna_order_reference' => $klarna_orderinfo['reservation']]);
         $this->context->smarty->assign('klarna_checkbox_info', $klarna_checkbox_info);
         $this->context->smarty->assign('klarnacheckout_ssn', $klarna_orderinfo['ssn']);
         $this->context->smarty->assign('klarnacheckout_invoicenumber', $klarna_orderinfo['invoicenumber']);
@@ -1759,6 +1768,7 @@ class KlarnaOfficial extends PaymentModule
         $this->context->smarty->assign('klarnacheckout_risk_status', $klarna_orderinfo['risk_status']);
         $this->context->smarty->assign('klarnacheckout_eid', $klarna_orderinfo['eid']);
         $this->context->smarty->assign('klarna_errors', $klarna_errors);
+        $this->context->smarty->assign('klarnainfolink', $klarnainfolink);
         
         return $this->display(__FILE__, 'klarnaofficial_adminorder.tpl');
     }

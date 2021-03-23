@@ -190,6 +190,7 @@
 				<button id="module_form_submit_btn" class="btn btn-default pull-right" name="btnRunaddressCheckSubmit" value="1" type="submit">
 					<i class="process-icon-save"></i>{l s='Run address check' mod='klarnaofficial'}</button>
 				</form>
+                <a class="btn btn-default pull-right" href="{$linkToOrderInfo}"><i class="process-icon-help"></i>{l s='Order info' mod='klarnaofficial'}</a>
 			</div>
 		</div>
 		<div id="pane9" class="tab-pane">

@@ -27,7 +27,7 @@
                     {$klarna_checkbox_info.text_at_time_of_purchase|escape:'html':'UTF-8'}<br />
                 {/if}
 				{l s='Invoice number' mod='klarnaofficial'}: {$klarnacheckout_invoicenumber|escape:'html':'UTF-8'}<br />
-				{l s='Reservation' mod='klarnaofficial'}: {$klarnacheckout_reservation|escape:'html':'UTF-8'}<br />
+				{l s='Reservation' mod='klarnaofficial'}: <a href="{$klarnainfolink}">{$klarnacheckout_reservation|escape:'html':'UTF-8'}</a><br />
 				<span{if $klarnacheckout_risk_status == 'Pending'} style="color:orange; font-weight:bold;"{/if}{if $klarnacheckout_risk_status == 'cancel' || $klarnacheckout_risk_status == 'credit'} style="color:red; font-weight:bold;"{/if}{if $klarnacheckout_risk_status == 'ok' || $klarnacheckout_risk_status == 'ACCEPTED'}  style="color:green; font-weight:bold;"{/if}>
 				{l s='Risk status' mod='klarnaofficial'}: {$klarnacheckout_risk_status|escape:'html':'UTF-8'}<br />
 				</span>
