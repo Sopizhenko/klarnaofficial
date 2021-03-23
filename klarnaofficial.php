@@ -18,7 +18,9 @@
  *  International Registered Trademark & Property of Prestaworks AB
  */
 
-require_once dirname(__FILE__) . '/classes/KlarnaOsmConfiguration.php';
+if (!class_exists('KlarnaOsmConfiguration')) {
+    require_once dirname(__FILE__) . '/classes/KlarnaOsmConfiguration.php';
+}
 
 class KlarnaOfficial extends PaymentModule
 {
@@ -135,7 +137,7 @@ class KlarnaOfficial extends PaymentModule
     {
         $this->name = 'klarnaofficial';
         $this->tab = 'payments_gateways';
-        $this->version = '1.10.6';
+        $this->version = '1.10.7';
         $this->author = 'Prestaworks AB';
         $this->module_key = 'b803c9b20c1ec71722eab517259b8ddf';
         $this->need_instance = 1;
