@@ -487,7 +487,7 @@ class KlarnaOfficial extends PaymentModule
                                 ),
                                 array(
                                     'value' => self::OSM_USA_LIBRARY,
-                                    'label' => $this->l('USA'),
+                                    'label' => $this->l('NA'),
                                 ),
                                 array(
                                     'value' => self::OSM_OC_LIBRARY,
