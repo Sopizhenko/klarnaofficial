@@ -71,11 +71,10 @@ class KlarnaOfficialPushKcoModuleFrontController extends ModuleFrontController
                             );
 
                             $endpoint = '/ordermanagement/v1/orders/'.$klarna_order_id.'/merchant-references';
-                            $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $headers, $endpoint);
+                            $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $headers, $endpoint, true);
                             
                             $endpoint = '/ordermanagement/v1/orders/'.$klarna_order_id.'/acknowledge';
-                            $update = $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $headers, $endpoint, true);
-                            $update = json_decode($update, true);
+                            $KlarnaCheckoutCommonFeatures->postToKlarna($data, $merchantId, $sharedSecret, $headers, $endpoint);
 
                             Logger::addLog(
                                 'KCO: created sent: '.$id_cart.' res:'.$klarna_order_id,
